@@ -1,10 +1,10 @@
-
 #include "G4d2oEventAction.hh"
 #include "G4d2oDetectorHit.hh"
 #include "G4d2oNeutrinoAlley.hh"
 #include "G4d2oSensitiveDetector.hh"
 #include "G4d2oDetector.hh"
 #include "G4d2oRunAction.hh"
+#include "G4d2oMaterialsDefinition.hh"
 #include "G4Navigator.hh"
 #include "G4TransportationManager.hh"
 
@@ -195,7 +195,7 @@ G4d2oEventAction::~G4d2oEventAction()
     G4cout << "\t**********************************************************************************" << G4endl;
     G4cout << G4endl << G4endl;
 
-} // END of constructor
+} // END of destructor
 
 void G4d2oEventAction::BeginOfEventAction(const G4Event *thisEvent)
 {
@@ -241,6 +241,9 @@ void G4d2oEventAction::ProcessEvent(void)
     numEvents++;
 
     eventNumber = numEvents;
+    
+    // Set current event number for reflection tracking
+    G4d2oMaterialsDefinition::SetCurrentEventNumber(eventNumber);
 
     G4d2oDetectorHit *thisHit;
 

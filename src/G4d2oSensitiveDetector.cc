@@ -410,3 +410,4 @@ G4String G4d2oSensitiveDetector::GetHitsCollectionName(void)
     return hitsCollectionName;
 
 } // END of GetHitsCollectionName()
+

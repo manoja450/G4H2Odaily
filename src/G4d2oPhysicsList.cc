@@ -1,5 +1,6 @@
-
 #include "G4d2oPhysicsList.hh"
+#include "G4d2oCustomOpBoundary.hh"
+#include "G4d2oDataDrivenReflector.hh"
 
 #include <fstream>
 
@@ -108,21 +109,19 @@ void G4d2oPhysicsList::ConstructProcess()
     
     if(!bNull){
         //Electric and Magnetic Processes
-        G4cerr << "G4d2oPhysicsList::ConstructProcess() -> Registering EM processes" << G4endl;;
+        G4cerr << "G4d2oPhysicsList::ConstructProcess() -> Registering EM processes" << G4endl;
         ConstructEM();
         
-        //Radioactive Decay
-        G4bool bTurnOnRAD = true;
+        //Radioactive Decay - DISABLED to avoid missing G4RADIOACTIVEDATA error
+        // Set to true only if you have the radioactive decay data installed
+        G4bool bTurnOnRAD = false;
         
         if(bTurnOnRAD){
             G4cerr << "G4d2oPhysicsList::ConstructProcess() -> Registering radioactive decay processes" << G4endl;
             ConstructRadioactiveDecay();
         }
         else{
-            G4cerr << G4endl << "************************* WARNING ******************************" << G4endl;
-            G4cerr << "G4d2oPhysicsList::ConstructProcess() -> NOT registering radioactive decay processes" << G4endl;;
-            G4cerr << "************************* WARNING ******************************" << G4endl << G4endl;
-            system("sleep 5.0");
+            G4cerr << "G4d2oPhysicsList::ConstructProcess() -> Radioactive decay processes DISABLED" << G4endl;
         }
         
         //Construct hadronic physics
@@ -193,7 +192,7 @@ void G4d2oPhysicsList::ConstructHadronic()
     G4VPhysicsConstructor *hadPhysics = 0;
     G4VPhysicsConstructor *ionPhysics = 0;
     
-    // Hadron Elastic G4d2oing
+    // Hadron Elastic 
     if(bNeutronHP) hadElastic = new G4HadronElasticPhysicsHP(verbosityLevel);
     else hadElastic = new G4HadronElasticPhysics(verbosityLevel);
         
@@ -228,9 +227,9 @@ void G4d2oPhysicsList::ConstructHadronic()
 void G4d2oPhysicsList::ConstructOptical()
 {
     
-  G4Scintillation* theScintillationProcess = new G4Scintillation("Scintillation");
-  //  theScintillationProcess->SetScintillationYieldFactor(1.);
-  theScintillationProcess->SetTrackSecondariesFirst(true);
+    G4Scintillation* theScintillationProcess = new G4Scintillation("Scintillation");
+    //  theScintillationProcess->SetScintillationYieldFactor(1.);
+    theScintillationProcess->SetTrackSecondariesFirst(true);
 
     //G4Cerenkov treatment taken from G4 Application Developers guide
     G4int MaxNumPhotons = 300;
@@ -241,7 +240,11 @@ void G4d2oPhysicsList::ConstructOptical()
 
     G4OpAbsorption* theAbsorptionProcess = new G4OpAbsorption();
     G4OpRayleigh* theRayleighScatteringProcess = new G4OpRayleigh();
-    G4OpBoundaryProcess* theBoundaryProcess = new G4OpBoundaryProcess();
+    
+    // ============================================================
+    // USE OUR CUSTOM BOUNDARY PROCESS (Data-driven from thesis)
+    // ============================================================
+    G4d2oCustomOpBoundary* theBoundaryProcess = new G4d2oCustomOpBoundary();
     
     GetParticleIterator()->reset();
     
@@ -293,4 +296,4 @@ void G4d2oPhysicsList::SetCuts()
 }
 
 
-//end of file G4d2oPhysicsList.cc 
+//end of file G4d2oPhysicsList.cc

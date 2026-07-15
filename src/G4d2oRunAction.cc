@@ -69,6 +69,10 @@ void G4d2oRunAction::BeginOfRunAction(const G4Run *aRun)
     setupTree->Branch( "totPMTs", &totPMTs, "totPMTs/I");
     setupTree->Branch( "numPMTRows", &pmtRows, "numPMTRows/I");
     setupTree->Branch( "tankSize", "TVector3", &tankSize);
+    
+    // Attach reflection tree to output file
+    TFile* outFile = evAct->OutFilePtr();
+    G4d2oMaterialsDefinition::AttachReflectionTree(outFile);
 
     G4cerr << "\t*********************" << G4endl;
     G4cerr << "\t***** BEGIN Run *****" << G4endl;
@@ -102,6 +106,9 @@ void G4d2oRunAction::EndOfRunAction(const G4Run*)
     evAct->OutFilePtr()->cd();
     setupTree->Fill();
     setupTree->AutoSave();
+    
+    // Close reflection tree
+    G4d2oMaterialsDefinition::CloseReflectionTree();
 
 }//END of EndOfRunAction()
 
@@ -114,4 +121,3 @@ G4d2oMaterialsDefinition* G4d2oRunAction::GetMaterialsPointer( void )
     return materialsPtr;
 	
 }//END of GetMaterialsPointer()
-

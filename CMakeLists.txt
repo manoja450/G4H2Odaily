@@ -1,10 +1,12 @@
-
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 project(G4d2o)
 
+# Find Geant4 and ROOT
 find_package(Geant4 REQUIRED ui_all vis_all)
-include(${Geant4_USE_FILE})
 find_package(ROOT REQUIRED)
+
+# Include Geant4 and ROOT directories
+include(${Geant4_USE_FILE})
 include(${ROOT_USE_FILE})
 
 set(CMAKE_BUILD_TYPE Release)
@@ -20,12 +22,12 @@ message( STATUS "ROOT_USE_FILE:         " ${ROOT_USE_FILE})
 message( STATUS "PROJECT_SOURCE_DIR:    " ${PROJECT_SOURCE_DIR})
 message( STATUS "ROOT_INCLUDE_DIR:      " ${ROOT_INCLUDE_DIR})
 
-include(${Geant4_USE_FILE})
-
+# IMPORTANT: Use Geant4_INCLUDE_DIRS (plural) not Geant4_INCLUDE_DIR
+# This is the correct variable name after find_package(Geant4)
 set(INCLUDE_DIRECTORIES
         ${ROOT_INCLUDE_DIR}
-        ${Geant4_INCLUDE_DIR}
-        ${CMAKE_SOURCE_DIR} 
+        ${Geant4_INCLUDE_DIRS}
+        ${CMAKE_SOURCE_DIR}
         ${CMAKE_SOURCE_DIR}/simEvent
         ${PROJECT_SOURCE_DIR}/include
         $ENV{CRYHOME}/src
@@ -46,7 +48,6 @@ if(DEFINED ENV{CRYHOME})
   target_link_libraries(G4d2o ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} simEvent ${crylibs})
 else(DEFINED ENV{CRYHOME})
   message( STATUS "CRYHOME environment variable not defined")
-  file(GLOB crylibs $ENV{CRYHOME}/lib/libCRY.a)
   add_executable(G4d2o G4d2o.cc ${sources} ${headers})
   target_link_libraries(G4d2o ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} simEvent)
 endif(DEFINED ENV{CRYHOME})

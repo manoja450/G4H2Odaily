@@ -249,9 +249,9 @@ G4LogicalVolume * G4d2oCylindricalDetector::GetDetector(){
     //              -> H2O tank
     //                 -(1)-> PMTs
     //                 -(2)-> acrylic tank
-    //                        -> D2O
+    //                        -> H2O (changed from D2O)
     
-    ///// Place the D2O in acrylic tank /////
+    ///// Place the central H2O (formerly D2O) in acrylic tank /////
     G4VPhysicalVolume *d2oPhysV = new G4PVPlacement(0,G4ThreeVector(0,0,0),d2oLogV,"d2oPhysV",acrylicLogV,false,0,true);
     
     ///// Place the acrylic tank in H2O /////
@@ -271,10 +271,14 @@ G4LogicalVolume * G4d2oCylindricalDetector::GetDetector(){
     //    G4VPhysicalVolume *tyvekPhysV = new G4PVPlacement(0,G4ThreeVector(0,0,-(pmtLegLength-0.5*pmtMinorAxis-h2oTCthickness+2.0*tyvekThickness)/2.0),tyvekLining,"tyvekPhysV",h2oLogV,false,0,true); was this
     G4VPhysicalVolume *tyvekPhysV = new G4PVPlacement(0,G4ThreeVector(0,0,contOuterHeight/2.0-(h2oHeight-0.5*pmtLegLength-0.5*pmtMinorAxis)/2.0-outerContainerThickness/2.0),tyvekLining,"tyvekPhysV",h2oLogV,false,0,true); 
     auto g4pvs = G4PhysicalVolumeStore::GetInstance();
-    //set reflectivity of tyvek
-    matPtr->SetReflector(tyvekPhysV, h2oPhysV, tyvekReflectivity, tyvekSigmaAlpha);
-    matPtr->SetReflector(h2oPhysV, tyvekPhysV, tyvekReflectivity, tyvekSigmaAlpha);
-    // setting other reflectivities
+    
+    // ============================================================
+    // MODIFIED: Set reflectivity of tyvek using DATA-DRIVEN reflector
+    // ============================================================
+    matPtr->SetDataDrivenReflector(tyvekPhysV, h2oPhysV, tyvekReflectivity, "angular_data");
+    matPtr->SetDataDrivenReflector(h2oPhysV, tyvekPhysV, tyvekReflectivity, "angular_data");
+    
+    // setting other reflectivities (remain unchanged)
     acrylicReflectivity = 0.0263;
     acrylicSigmaAlpha = 0.0;
     //    airh2oReflectivity = 0.5;
@@ -288,8 +292,12 @@ G4LogicalVolume * G4d2oCylindricalDetector::GetDetector(){
     G4VPhysicalVolume *tyvekCapTopPhysV = 0;
     G4VPhysicalVolume *tyvekCapBotPhysV = 0;
     tyvekCapBotPhysV = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -(h2oHeight-tyvekThickness-0.5*pmtLegLength-0.5*pmtMinorAxis)/2.0), tyvekCapBot, "tyvekCapBotPhysV", h2oLogV, false, 0, true); // [For H2O up to PMT hemisphere]
-    matPtr->SetReflector(h2oPhysV, tyvekCapBotPhysV, tyvekReflectivity, tyvekSigmaAlpha);
-    matPtr->SetReflector(tyvekCapBotPhysV, h2oPhysV, tyvekReflectivity, tyvekSigmaAlpha);
+    
+    // ============================================================
+    // MODIFIED: Tyvek cap reflector using DATA-DRIVEN reflector
+    // ============================================================
+    matPtr->SetDataDrivenReflector(h2oPhysV, tyvekCapBotPhysV, tyvekReflectivity, "angular_data");
+    matPtr->SetDataDrivenReflector(tyvekCapBotPhysV, h2oPhysV, tyvekReflectivity, "angular_data");
     
     
    /* if (tyvekCapTop) { // Tyvek Top Cap
@@ -806,18 +814,19 @@ G4double acrylicHeight = d2oHeight + 2.0*acrylicEndCapThickness; //z
     
 }
 
+// ============================================================
+// 🔥 MODIFIED GetD2OLogV FUNCTION
+// Changed: Material from D2O to H2O (Option 1 - keep all geometry)
+// ============================================================
+
 G4LogicalVolume *G4d2oCylindricalDetector::GetD2OLogV(){
     
     G4Tubs* d2oSolid = new G4Tubs("d2oSolid",0.0,d2oLength/2.0,d2oHeight/2.0,0.0,360.0*deg);
     G4LogicalVolume *d2oLogV = new G4LogicalVolume(d2oSolid,
-                                                   matPtr->GetMaterial( D2O ),
+                                                   matPtr->GetMaterial( H2O ),  // ← CHANGED: H2O instead of D2O
                                                    "d2oLogV");
     G4VisAttributes *visAttD2O = new G4VisAttributes();
-
-    //    visAttD2O->SetColour(G4Color::Blue());
     visAttD2O->SetColour(G4Colour(0.0, 0.6, 1.0)); // this is lightish blue, not cyan
-
-    //    visAttD2O->SetForceSolid(true);
     d2oLogV->SetVisAttributes( visAttD2O );
 
     return d2oLogV;
@@ -1282,7 +1291,3 @@ void G4d2oCylindricalDetector::PlacePMTs(G4LogicalVolume *thePMTLogV, G4LogicalV
     
     
 }
-
-
-
-

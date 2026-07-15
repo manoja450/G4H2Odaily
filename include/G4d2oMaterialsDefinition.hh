@@ -13,6 +13,8 @@
 
 #include "inputVariables.hh"
 
+class TFile;
+
 enum materialName
 {
     AIR, VINYLTOLUENE, ALUMINUM, LEAD,  
@@ -28,7 +30,7 @@ enum materialName
     DELRIN,
     EPOXY,
     CONCRETE
-};//END of enum materialName 
+};
 
 class G4d2oMaterialsDefinition
 {
@@ -41,6 +43,12 @@ public:
     static void SetReflector(G4VPhysicalVolume *theExitingVolume, G4VPhysicalVolume *theEnteringVolume,
 		      G4double theReflectivity, G4double theSigmaAlpha=0.0, G4SurfaceType=dielectric_dielectric);
     
+    static void SetDataDrivenReflector(G4VPhysicalVolume*, G4VPhysicalVolume*, G4double, const G4String&);
+    
+    static void AttachReflectionTree(TFile* file);
+    static void CloseReflectionTree();
+    static void SetCurrentEventNumber(G4int eventNum);
+    
 protected:
     inputVariables *input;
     G4double h2oRefl;
@@ -51,8 +59,8 @@ private:
     
     G4Material *matAir, *matVinylToluene, *matAl, *matSteel;
     G4Material *matPb, *matPoly;
-	G4Material *matPMMA;
-	G4Material *matMuMetal;
+    G4Material *matPMMA;
+    G4Material *matMuMetal;
     G4Material *matCopper;
     G4Material *matPlastic;
     G4Material *matVacuum;
@@ -64,16 +72,11 @@ private:
     G4Material *matTyvek;
     G4Material *matDelrin;
     G4Material *matEpoxy;
-  
-  
     G4Material *matConcrete;
-
-//    G4double temperature;
-//    G4double pressure;
     
     void SetUniformOpticalProperties(G4Material *theMat, G4double theIndex, G4double theAbsLength);
     void SetOpticalProperties(G4Material *theMat, G4double theIndex, G4double h2oReflF, G4String absLengthFile);
     
-};//END of class G4d2oMaterialsDefinition
+};
 
 #endif

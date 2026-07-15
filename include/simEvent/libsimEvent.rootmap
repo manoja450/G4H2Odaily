@@ -1,0 +1,8 @@
+[ libsimEvent.so ]
+# List of selected classes
+class G4d2oGeom
+class simAreaHit
+class simEvent
+class simHit
+header G4d2oGeom.h
+header simEvent.h

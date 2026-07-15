@@ -1,0 +1,1178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+  <define>
+    <matrix coldim="2" name="RINDEX0x255d8e0" values="1.5e-06 1.58 4.25e-06 1.58 7e-06 1.58"/>
+    <matrix coldim="2" name="GROUPVEL0x255d9c0" values="1.5e-06 189.742 2.875e-06 189.742 7e-06 189.742"/>
+    <matrix coldim="2" name="ABSLENGTH0x255db60" values="1.5e-06 40.5 4.25e-06 40.5 7e-06 40.5"/>
+    <matrix coldim="2" name="RINDEX0x21e47f0" values="1.5e-06 1 4.25e-06 1 7e-06 1"/>
+    <matrix coldim="2" name="GROUPVEL0x2556de0" values="1.5e-06 299.792 2.875e-06 299.792 7e-06 299.792"/>
+    <matrix coldim="2" name="ABSLENGTH0x2556f20" values="1.5e-06 1e+10 4.25e-06 1e+10 7e-06 1e+10"/>
+    <matrix coldim="2" name="RINDEX0x2578830" values="1.5498e-06 1.33 1.55369e-06 1.33 1.55759e-06 1.33 1.56151e-06 1.33 1.56546e-06 1.33 1.56942e-06 1.33 1.5734e-06 1.33 1.57741e-06 1.33 1.58143e-06 1.33 1.58548e-06 1.33 1.58954e-06 1.33 1.59363e-06 1.33 1.59773e-06 1.33 1.60186e-06 1.33 1.60601e-06 1.33 1.61018e-06 1.33 1.61438e-06 1.33 1.61859e-06 1.33 1.62283e-06 1.33 1.62709e-06 1.33 1.63137e-06 1.33 1.63568e-06 1.33 1.64e-06 1.33 1.64435e-06 1.33 1.64873e-06 1.33 1.65312e-06 1.33 1.65754e-06 1.33 1.66199e-06 1.33 1.66645e-06 1.33 1.67095e-06 1.33 1.67546e-06 1.33 1.68e-06 1.33 1.68457e-06 1.33 1.68916e-06 1.33 1.69377e-06 1.33 1.69841e-06 1.33 1.70308e-06 1.33 1.70777e-06 1.33 1.71249e-06 1.33 1.71723e-06 1.33 1.722e-06 1.33 1.7268e-06 1.33 1.73162e-06 1.33 1.73647e-06 1.33 1.74135e-06 1.33 1.74626e-06 1.33 1.75119e-06 1.33 1.75615e-06 1.33 1.76114e-06 1.33 1.76616e-06 1.33 1.7712e-06 1.33 1.77628e-06 1.33 1.78138e-06 1.33 1.78652e-06 1.33 1.79168e-06 1.33 1.79687e-06 1.33 1.8021e-06 1.33 1.80735e-06 1.33 1.81263e-06 1.33 1.81795e-06 1.33 1.8233e-06 1.33 1.82868e-06 1.33 1.83409e-06 1.33 1.83953e-06 1.33 1.845e-06 1.33 1.85051e-06 1.33 1.85605e-06 1.33 1.86162e-06 1.33 1.86723e-06 1.33 1.87287e-06 1.33 1.87855e-06 1.33 1.88426e-06 1.33 1.89e-06 1.33 1.89578e-06 1.33 1.9016e-06 1.33 1.90745e-06 1.33 1.91334e-06 1.33 1.91926e-06 1.33 1.92522e-06 1.33 1.93122e-06 1.33 1.93725e-06 1.33 1.94333e-06 1.33 1.94944e-06 1.33 1.95559e-06 1.33 1.96178e-06 1.33 1.968e-06 1.33 1.97427e-06 1.33 1.98058e-06 1.33 1.98693e-06 1.33 1.99332e-06 1.33 1.99975e-06 1.33 2.00622e-06 1.33 2.01273e-06 1.33 2.01929e-06 1.33 2.02589e-06 1.33 2.03253e-06 1.33 2.03921e-06 1.33 2.04594e-06 1.33 2.05272e-06 1.33 2.05954e-06 1.33 2.0664e-06 1.33 2.07331e-06 1.33 2.08027e-06 1.33 2.08728e-06 1.33 2.09433e-06 1.33 2.10143e-06 1.33 2.10857e-06 1.33 2.11577e-06 1.33 2.12302e-06 1.33 2.13031e-06 1.33 2.13766e-06 1.33 2.14506e-06 1.33 2.1525e-06 1.33 2.16e-06 1.33 2.16756e-06 1.33 2.17516e-06 1.33 2.18282e-06 1.33 2.19053e-06 1.33 2.1983e-06 1.33 2.20612e-06 1.33 2.214e-06 1.33 2.22194e-06 1.33 2.22993e-06 1.33 2.23798e-06 1.33 2.24609e-06 1.33 2.25426e-06 1.33 2.26249e-06 1.33 2.27077e-06 1.33 2.27912e-06 1.33 2.28753e-06 1.33 2.296e-06 1.33 2.30454e-06 1.33 2.31314e-06 1.33 2.3218e-06 1.33 2.33053e-06 1.33 2.33932e-06 1.33 2.34819e-06 1.33 2.35711e-06 1.33 2.36611e-06 1.33 2.37518e-06 1.33 2.38431e-06 1.33 2.39352e-06 1.33 2.40279e-06 1.33 2.41214e-06 1.33 2.42157e-06 1.33 2.43106e-06 1.33 2.44063e-06 1.33 2.45028e-06 1.33 2.46e-06 1.33 2.4698e-06 1.33 2.47968e-06 1.33 2.48964e-06 1.33 2.49968e-06 1.33 2.5098e-06 1.33 2.52e-06 1.33 2.53029e-06 1.33 2.54066e-06 1.33 2.55112e-06 1.33 2.56166e-06 1.33 2.57229e-06 1.33 2.583e-06 1.33 2.59381e-06 1.33 2.60471e-06 1.33 2.6157e-06 1.33 2.62678e-06 1.33 2.63796e-06 1.33 2.64924e-06 1.33 2.66061e-06 1.33 2.67207e-06 1.33 2.68364e-06 1.33 2.69531e-06 1.33 2.70708e-06 1.33 2.71895e-06 1.33 2.73093e-06 1.33 2.74301e-06 1.33 2.7552e-06 1.33 2.7675e-06 1.33 2.77991e-06 1.33 2.79244e-06 1.33 2.80507e-06 1.33 2.81782e-06 1.33 2.83069e-06 1.33 2.84367e-06 1.33 2.85678e-06 1.33 2.87e-06 1.33 2.88335e-06 1.33 2.89683e-06 1.33 2.91043e-06 1.33 2.92416e-06 1.33 2.93801e-06 1.33 2.952e-06 1.33 2.96613e-06 1.33 2.98039e-06 1.33 2.99479e-06 1.33 3.00933e-06 1.33 3.024e-06 1.33 3.03883e-06 1.33 3.0538e-06 1.33 3.06892e-06 1.33 3.08418e-06 1.33 3.0996e-06 1.33 3.11518e-06 1.33 3.13091e-06 1.33 3.14681e-06 1.33 3.16286e-06 1.33 3.17908e-06 1.33 3.19547e-06 1.33 3.21203e-06 1.33 3.22876e-06 1.33 3.24566e-06 1.33 3.26274e-06 1.33 3.28001e-06 1.33 3.29745e-06 1.33 3.31509e-06 1.33 3.33291e-06 1.33 3.35092e-06 1.33 3.36914e-06 1.33 3.38755e-06 1.33 3.40616e-06 1.33 3.42498e-06 1.33 3.44401e-06 1.33 3.46325e-06 1.33 3.4827e-06 1.33 3.50238e-06 1.33 3.52228e-06 1.33 3.54241e-06 1.33 3.56276e-06 1.33 3.58336e-06 1.33 3.60419e-06 1.33 3.62527e-06 1.33 3.64659e-06 1.33 3.66817e-06 1.33 3.69001e-06 1.33 3.7121e-06 1.33 3.73446e-06 1.33 3.7571e-06 1.33 3.78001e-06 1.33 3.8032e-06 1.33 3.82667e-06 1.33 3.85044e-06 1.33 3.87451e-06 1.33 3.89887e-06 1.33 3.92355e-06 1.33 3.94854e-06 1.33 3.97385e-06 1.33 3.99949e-06 1.33 4.02546e-06 1.33 4.05177e-06 1.33 4.07843e-06 1.33 4.10544e-06 1.33 4.13281e-06 1.33 6.19921e-06 1.33"/>
+    <matrix coldim="2" name="GROUPVEL0x25798f0" values="1.5498e-06 225.408 1.55174e-06 225.408 1.55564e-06 225.408 1.55955e-06 225.408 1.56349e-06 225.408 1.56744e-06 225.408 1.57141e-06 225.408 1.57541e-06 225.408 1.57942e-06 225.408 1.58345e-06 225.408 1.58751e-06 225.408 1.59158e-06 225.408 1.59568e-06 225.408 1.5998e-06 225.408 1.60394e-06 225.408 1.6081e-06 225.408 1.61228e-06 225.408 1.61649e-06 225.408 1.62071e-06 225.408 1.62496e-06 225.408 1.62923e-06 225.408 1.63352e-06 225.408 1.63784e-06 225.408 1.64218e-06 225.408 1.64654e-06 225.408 1.65092e-06 225.408 1.65533e-06 225.408 1.65976e-06 225.408 1.66422e-06 225.408 1.6687e-06 225.408 1.6732e-06 225.408 1.67773e-06 225.408 1.68229e-06 225.408 1.68686e-06 225.408 1.69147e-06 225.408 1.69609e-06 225.408 1.70075e-06 225.408 1.70543e-06 225.408 1.71013e-06 225.408 1.71486e-06 225.408 1.71962e-06 225.408 1.7244e-06 225.408 1.72921e-06 225.408 1.73405e-06 225.408 1.73891e-06 225.408 1.7438e-06 225.408 1.74872e-06 225.408 1.75367e-06 225.408 1.75864e-06 225.408 1.76365e-06 225.408 1.76868e-06 225.408 1.77374e-06 225.408 1.77883e-06 225.408 1.78395e-06 225.408 1.7891e-06 225.408 1.79428e-06 225.408 1.79948e-06 225.408 1.80472e-06 225.408 1.80999e-06 225.408 1.81529e-06 225.408 1.82062e-06 225.408 1.82599e-06 225.408 1.83138e-06 225.408 1.83681e-06 225.408 1.84227e-06 225.408 1.84776e-06 225.408 1.85328e-06 225.408 1.85884e-06 225.408 1.86443e-06 225.408 1.87005e-06 225.408 1.87571e-06 225.408 1.8814e-06 225.408 1.88713e-06 225.408 1.89289e-06 225.408 1.89869e-06 225.408 1.90452e-06 225.408 1.91039e-06 225.408 1.9163e-06 225.408 1.92224e-06 225.408 1.92822e-06 225.408 1.93424e-06 225.408 1.94029e-06 225.408 1.94638e-06 225.408 1.95251e-06 225.408 1.95868e-06 225.408 1.96489e-06 225.408 1.97114e-06 225.408 1.97742e-06 225.408 1.98375e-06 225.408 1.99012e-06 225.408 1.99653e-06 225.408 2.00298e-06 225.408 2.00947e-06 225.408 2.01601e-06 225.408 2.02259e-06 225.408 2.02921e-06 225.408 2.03587e-06 225.408 2.04258e-06 225.408 2.04933e-06 225.408 2.05613e-06 225.408 2.06297e-06 225.408 2.06986e-06 225.408 2.07679e-06 225.408 2.08377e-06 225.408 2.0908e-06 225.408 2.09788e-06 225.408 2.105e-06 225.408 2.11217e-06 225.408 2.11939e-06 225.408 2.12666e-06 225.408 2.13399e-06 225.408 2.14136e-06 225.408 2.14878e-06 225.408 2.15625e-06 225.408 2.16378e-06 225.408 2.17136e-06 225.408 2.17899e-06 225.408 2.18668e-06 225.408 2.19442e-06 225.408 2.20221e-06 225.408 2.21006e-06 225.408 2.21797e-06 225.408 2.22594e-06 225.408 2.23396e-06 225.408 2.24204e-06 225.408 2.25017e-06 225.408 2.25837e-06 225.408 2.26663e-06 225.408 2.27495e-06 225.408 2.28333e-06 225.408 2.29177e-06 225.408 2.30027e-06 225.408 2.30884e-06 225.408 2.31747e-06 225.408 2.32617e-06 225.408 2.33493e-06 225.408 2.34376e-06 225.408 2.35265e-06 225.408 2.36161e-06 225.408 2.37064e-06 225.408 2.37974e-06 225.408 2.38891e-06 225.408 2.39816e-06 225.408 2.40747e-06 225.408 2.41686e-06 225.408 2.42631e-06 225.408 2.43585e-06 225.408 2.44546e-06 225.408 2.45514e-06 225.408 2.4649e-06 225.408 2.47474e-06 225.408 2.48466e-06 225.408 2.49466e-06 225.408 2.50474e-06 225.408 2.5149e-06 225.408 2.52515e-06 225.408 2.53547e-06 225.408 2.54589e-06 225.408 2.55639e-06 225.408 2.56697e-06 225.408 2.57765e-06 225.408 2.58841e-06 225.408 2.59926e-06 225.408 2.61021e-06 225.408 2.62124e-06 225.408 2.63237e-06 225.408 2.6436e-06 225.408 2.65492e-06 225.408 2.66634e-06 225.408 2.67786e-06 225.408 2.68947e-06 225.408 2.70119e-06 225.408 2.71302e-06 225.408 2.72494e-06 225.408 2.73697e-06 225.408 2.74911e-06 225.408 2.76135e-06 225.408 2.77371e-06 225.408 2.78618e-06 225.408 2.79875e-06 225.408 2.81145e-06 225.408 2.82426e-06 225.408 2.83718e-06 225.408 2.85023e-06 225.408 2.86339e-06 225.408 2.87668e-06 225.408 2.89009e-06 225.408 2.90363e-06 225.408 2.91729e-06 225.408 2.93108e-06 225.408 2.94501e-06 225.408 2.95907e-06 225.408 2.97326e-06 225.408 2.98759e-06 225.408 3.00206e-06 225.408 3.01667e-06 225.408 3.03142e-06 225.408 3.04631e-06 225.408 3.06136e-06 225.408 3.07655e-06 225.408 3.09189e-06 225.408 3.10739e-06 225.408 3.12305e-06 225.408 3.13886e-06 225.408 3.15483e-06 225.408 3.17097e-06 225.408 3.18728e-06 225.408 3.20375e-06 225.408 3.22039e-06 225.408 3.23721e-06 225.408 3.2542e-06 225.408 3.27137e-06 225.408 3.28873e-06 225.408 3.30627e-06 225.408 3.324e-06 225.408 3.34192e-06 225.408 3.36003e-06 225.408 3.37834e-06 225.408 3.39685e-06 225.408 3.41557e-06 225.408 3.43449e-06 225.408 3.45363e-06 225.408 3.47297e-06 225.408 3.49254e-06 225.408 3.51233e-06 225.408 3.53234e-06 225.408 3.55258e-06 225.408 3.57306e-06 225.408 3.59378e-06 225.408 3.61473e-06 225.408 3.63593e-06 225.408 3.65738e-06 225.408 3.67909e-06 225.408 3.70105e-06 225.408 3.72328e-06 225.408 3.74578e-06 225.408 3.76855e-06 225.408 3.7916e-06 225.408 3.81493e-06 225.408 3.83856e-06 225.408 3.86247e-06 225.408 3.88669e-06 225.408 3.91121e-06 225.408 3.93605e-06 225.408 3.9612e-06 225.408 3.98667e-06 225.408 4.01248e-06 225.408 4.03862e-06 225.408 4.0651e-06 225.408 4.09193e-06 225.408 4.11912e-06 225.408 6.19921e-06 225.408"/>
+    <matrix coldim="2" name="ABSLENGTH0x257aca0" values="1.5498e-06 146.084 1.55369e-06 143.58 1.55759e-06 141.1 1.56151e-06 139.102 1.56546e-06 136.841 1.56942e-06 134.409 1.5734e-06 132.228 1.57741e-06 130.34 1.58143e-06 128.54 1.58548e-06 127.222 1.58954e-06 125.987 1.59363e-06 124.554 1.59773e-06 123.63 1.60186e-06 122.688 1.60601e-06 121.898 1.61018e-06 121.632 1.61438e-06 121.333 1.61859e-06 120.934 1.62283e-06 120.756 1.62709e-06 120.795 1.63137e-06 120.895 1.63568e-06 121.254 1.64e-06 121.632 1.64435e-06 121.916 1.64873e-06 122.205 1.65312e-06 122.558 1.65754e-06 123.089 1.66199e-06 123.978 1.66645e-06 125.36 1.67095e-06 127.711 1.67546e-06 132.312 1.68e-06 139.921 1.68457e-06 151.762 1.68916e-06 168.198 1.69377e-06 187.444 1.69841e-06 206.65 1.70308e-06 225.286 1.70777e-06 244.187 1.71249e-06 264.112 1.71723e-06 286.84 1.722e-06 312.383 1.7268e-06 339.378 1.73162e-06 367.768 1.73647e-06 396.685 1.74135e-06 424.427 1.74626e-06 451.787 1.75119e-06 479.05 1.75615e-06 505.432 1.76114e-06 531.493 1.76616e-06 558.799 1.7712e-06 585.46 1.77628e-06 612.432 1.78138e-06 638.825 1.78652e-06 660.619 1.79168e-06 683.255 1.79687e-06 703.781 1.8021e-06 721.05 1.80735e-06 737.074 1.81263e-06 751.458 1.81795e-06 764.666 1.8233e-06 775.822 1.82868e-06 784.543 1.83409e-06 793.275 1.83953e-06 802.78 1.845e-06 807.229 1.85051e-06 812.712 1.85605e-06 817.472 1.86162e-06 822.692 1.86723e-06 833.541 1.87287e-06 852.2 1.87855e-06 883.672 1.88426e-06 921.342 1.89e-06 954.96 1.89578e-06 978.674 1.9016e-06 996.431 1.90745e-06 1010.56 1.91334e-06 1026.66 1.91926e-06 1039.4 1.92522e-06 1053.13 1.93122e-06 1065.52 1.93725e-06 1076.82 1.94333e-06 1089.08 1.94944e-06 1102.7 1.95559e-06 1112.59 1.96178e-06 1121.15 1.968e-06 1133.67 1.97427e-06 1146.47 1.98058e-06 1157.97 1.98693e-06 1168.06 1.99332e-06 1179.99 1.99975e-06 1192.17 2.00622e-06 1202.87 2.01273e-06 1212.01 2.01929e-06 1222.63 2.02589e-06 1233.89 2.03253e-06 1244.89 2.03921e-06 1262.72 2.04594e-06 1294.94 2.05272e-06 1368.46 2.05954e-06 1415.89 2.0664e-06 1506.3 2.07331e-06 1801.08 2.08027e-06 1970.59 2.08728e-06 2137.84 2.09433e-06 2296.09 2.10143e-06 2470.5 2.10857e-06 2673.58 2.11577e-06 2890.42 2.12302e-06 3104.73 2.13031e-06 3350 2.13766e-06 3518.91 2.14506e-06 3738.84 2.1525e-06 3904.43 2.16e-06 4090.35 2.16756e-06 4256.67 2.17516e-06 4413.7 2.18282e-06 4564.03 2.19053e-06 4665.74 2.1983e-06 4792.56 2.20612e-06 4883.38 2.214e-06 4985.12 2.22194e-06 5091.19 2.22993e-06 5185.76 2.23798e-06 5309.03 2.24609e-06 5482.81 2.25426e-06 5697.28 2.26249e-06 5939.72 2.27077e-06 6158.09 2.27912e-06 6356.74 2.28753e-06 6660.04 2.296e-06 6767.68 2.30454e-06 6979.17 2.31314e-06 7127.66 2.3218e-06 7346.49 2.33053e-06 7528.09 2.33932e-06 7808.86 2.34819e-06 7919.62 2.35711e-06 7845.43 2.36611e-06 8190.71 2.37518e-06 8052.88 2.38431e-06 8190.71 2.39352e-06 8292.08 2.40279e-06 8678.76 2.41214e-06 9103.26 2.42157e-06 9598.86 2.43106e-06 10182.4 2.44063e-06 10806.5 2.45028e-06 11512 2.46e-06 12271.1 2.4698e-06 13137.3 2.47968e-06 14075.6 2.48964e-06 15022.4 2.49968e-06 16028.7 2.5098e-06 16919.2 2.52e-06 17724.9 2.53029e-06 18508.3 2.54066e-06 19252.9 2.55112e-06 20059.9 2.56166e-06 20679 2.57229e-06 21337.6 2.583e-06 22039.5 2.59381e-06 22635.1 2.60471e-06 23263.9 2.6157e-06 23758.9 2.62678e-06 24275.4 2.63796e-06 24814.8 2.64924e-06 25188 2.66061e-06 25769.2 2.67207e-06 26171.9 2.68364e-06 26587.3 2.69531e-06 27016.1 2.70708e-06 27459 2.71895e-06 27916.7 2.73093e-06 28389.8 2.74301e-06 28879.3 2.7552e-06 29386 2.7675e-06 29910.7 2.77991e-06 30454.5 2.79244e-06 31018.5 2.80507e-06 31603.8 2.81782e-06 32211.5 2.83069e-06 32843.1 2.84367e-06 33838.4 2.85678e-06 34536.1 2.87e-06 35638.3 2.88335e-06 36413.1 2.89683e-06 37640.5 2.91043e-06 38505.7 2.92416e-06 39880.9 2.93801e-06 40853.7 2.952e-06 42405.1 2.96613e-06 44078.9 2.98039e-06 45270.3 2.99479e-06 46527.8 3.00933e-06 48550.7 3.024e-06 50000 3.03883e-06 51538.5 3.0538e-06 53174.6 3.06892e-06 54918 3.08418e-06 56779.7 3.0996e-06 57758.6 3.11518e-06 59821.4 3.13091e-06 60909.1 3.14681e-06 62037 3.16286e-06 62037 3.17908e-06 62037 3.19547e-06 63207.5 3.21203e-06 63207.5 3.22876e-06 63207.5 3.24566e-06 62037 3.26274e-06 62037 3.28001e-06 60909.1 3.29745e-06 59821.4 3.31509e-06 58771.9 3.33291e-06 57758.6 3.35092e-06 55833.3 3.36914e-06 54032.3 3.38755e-06 52343.8 3.40616e-06 50757.6 3.42498e-06 48550.7 3.44401e-06 47183.1 3.46325e-06 44666.7 3.4827e-06 42948.7 3.50238e-06 40853.7 3.52228e-06 38953.5 3.54241e-06 36813.2 3.56276e-06 34895.8 3.58336e-06 33168.3 3.60419e-06 31308.4 3.62527e-06 29646 3.64659e-06 28151.3 3.66817e-06 26378 3.69001e-06 25000 3.7121e-06 23591.6 3.73446e-06 22185.4 3.7571e-06 20937.5 3.78001e-06 19705.9 3.8032e-06 18611.1 3.82667e-06 17539.3 3.85044e-06 16502.5 3.87451e-06 15581.4 3.89887e-06 14693 3.92355e-06 13843 3.94854e-06 13035 3.97385e-06 12316.2 3.99949e-06 11631.9 4.02546e-06 10983.6 4.05177e-06 10371.5 4.07843e-06 9824.05 4.10544e-06 9279.78 4.13281e-06 8769.63 6.19921e-06 2339.39"/>
+    <matrix coldim="2" name="RINDEX0x257d750" values="1.5e-06 1.4986 4.25e-06 1.4986 7e-06 1.4986"/>
+    <matrix coldim="2" name="GROUPVEL0x257d850" values="1.5e-06 200.048 2.875e-06 200.048 7e-06 200.048"/>
+    <matrix coldim="2" name="ABSLENGTH0x257d9f0" values="1.5e-06 10000 4.25e-06 10000 7e-06 10000"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25b6b50" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25b6c70" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="RINDEX0x25846c0" values="1.5e-06 1 4.25e-06 1 7e-06 1"/>
+    <matrix coldim="2" name="GROUPVEL0x25847c0" values="1.5e-06 299.792 2.875e-06 299.792 7e-06 299.792"/>
+    <matrix coldim="2" name="ABSLENGTH0x2584960" values="1.5e-06 1.79769e+308 4.25e-06 1.79769e+308 7e-06 1.79769e+308"/>
+    <matrix coldim="2" name="REFLECTIVITY0x258cd80" values="1.5e-06 1 4.25e-06 1 7e-06 1"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x258cea0" values="1.5e-06 0 4.25e-06 0 7e-06 0"/>
+    <matrix coldim="2" name="RINDEX0x2589590" values="1.5e-06 1.5 4.25e-06 1.5 7e-06 1.5"/>
+    <matrix coldim="2" name="GROUPVEL0x2589690" values="1.5e-06 199.862 2.875e-06 199.862 7e-06 199.862"/>
+    <matrix coldim="2" name="ABSLENGTH0x2589830" values="1.5e-06 0.1 4.25e-06 0.1 7e-06 0.1"/>
+    <matrix coldim="2" name="RINDEX0x258f8d0" values="1.5e-06 1.517 4.25e-06 1.517 7e-06 1.517"/>
+    <matrix coldim="2" name="GROUPVEL0x258ffe0" values="1.5e-06 197.622 2.875e-06 197.622 7e-06 197.622"/>
+    <matrix coldim="2" name="ABSLENGTH0x2590180" values="1.5e-06 1e-07 4.25e-06 1e-07 7e-06 1e-07"/>
+    <matrix coldim="2" name="RINDEX0x25818c0" values="1.5e-06 1.517 4.25e-06 1.517 7e-06 1.517"/>
+    <matrix coldim="2" name="GROUPVEL0x25819c0" values="1.5e-06 197.622 2.875e-06 197.622 7e-06 197.622"/>
+    <matrix coldim="2" name="ABSLENGTH0x2581b60" values="1.5e-06 10000 4.25e-06 10000 7e-06 10000"/>
+    <matrix coldim="2" name="RINDEX0x2572810" values="1.5e-06 1.5 4.25e-06 1.5 7e-06 1.5"/>
+    <matrix coldim="2" name="GROUPVEL0x2572910" values="1.5e-06 199.862 2.875e-06 199.862 7e-06 199.862"/>
+    <matrix coldim="2" name="ABSLENGTH0x2572ab0" values="1.5e-06 0.1 4.25e-06 0.1 7e-06 0.1"/>
+    <matrix coldim="2" name="REFLECTIVITY0x259b6b0" values="1.5e-06 0.931 4.25e-06 0.931 7e-06 0.931"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x259b790" values="1.5e-06 0.069 4.25e-06 0.069 7e-06 0.069"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25bb2c0" values="1.5e-06 0.931 4.25e-06 0.931 7e-06 0.931"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25bb3e0" values="1.5e-06 0.069 4.25e-06 0.069 7e-06 0.069"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25b48d0" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25b49f0" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25b2600" values="1.5e-06 0.931 4.25e-06 0.931 7e-06 0.931"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25b26e0" values="1.5e-06 0.069 4.25e-06 0.069 7e-06 0.069"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25b8fb0" values="1.5e-06 0.931 4.25e-06 0.931 7e-06 0.931"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25b90d0" values="1.5e-06 0.069 4.25e-06 0.069 7e-06 0.069"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25bde80" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25bdfa0" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25c02a0" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25c03c0" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25c26c0" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25c27e0" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25c4b80" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25c4ca0" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25c6fa0" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25c70c0" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25c9410" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25c9530" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25cb8d0" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25cb9f0" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25cdcf0" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25cde10" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25d0160" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25d0280" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25d2620" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25d2740" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25d4a40" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25d4b60" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25d6eb0" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25d6fd0" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25d9370" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25d9490" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25db790" values="1.5e-06 0.0263 4.25e-06 0.0263 7e-06 0.0263"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25db8b0" values="1.5e-06 0.9737 4.25e-06 0.9737 7e-06 0.9737"/>
+    <matrix coldim="2" name="REFLECTIVITY0x25dee70" values="1.5e-06 0.02 4.25e-06 0.02 7e-06 0.02"/>
+    <matrix coldim="2" name="TRANSMITTANCE0x25def90" values="1.5e-06 0.98 4.25e-06 0.98 7e-06 0.98"/>
+  </define>
+
+  <materials>
+    <isotope N="12" Z="6" name="C120x2542460">
+      <atom unit="g/mole" value="12"/>
+    </isotope>
+    <isotope N="13" Z="6" name="C130x2542730">
+      <atom unit="g/mole" value="13.0034"/>
+    </isotope>
+    <element name="C0x21b17e0">
+      <fraction n="0.9893" ref="C120x2542460"/>
+      <fraction n="0.0107" ref="C130x2542730"/>
+    </element>
+    <isotope N="1" Z="1" name="H10x2543050">
+      <atom unit="g/mole" value="1.00782503081372"/>
+    </isotope>
+    <isotope N="2" Z="1" name="H20x2557090">
+      <atom unit="g/mole" value="2.01410199966617"/>
+    </isotope>
+    <element name="H0x25570e0">
+      <fraction n="0.999885" ref="H10x2543050"/>
+      <fraction n="0.000115" ref="H20x2557090"/>
+    </element>
+    <material name="G4_PLASTIC_SC_VINYLTOLUENE0x21e8bd0" state="solid">
+      <property name="RINDEX" ref="RINDEX0x255d8e0"/>
+      <property name="GROUPVEL" ref="GROUPVEL0x255d9c0"/>
+      <property name="ABSLENGTH" ref="ABSLENGTH0x255db60"/>
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="64.7"/>
+      <D unit="g/cm3" value="1.032"/>
+      <fraction n="0.914708531800025" ref="C0x21b17e0"/>
+      <fraction n="0.0852914681999746" ref="H0x25570e0"/>
+    </material>
+    <isotope N="14" Z="7" name="N140x25428c0">
+      <atom unit="g/mole" value="14.0031"/>
+    </isotope>
+    <isotope N="15" Z="7" name="N150x2542910">
+      <atom unit="g/mole" value="15.0001"/>
+    </isotope>
+    <element name="N0x21aeae0">
+      <fraction n="0.99632" ref="N140x25428c0"/>
+      <fraction n="0.00368" ref="N150x2542910"/>
+    </element>
+    <isotope N="16" Z="8" name="O160x2542a80">
+      <atom unit="g/mole" value="15.9949"/>
+    </isotope>
+    <isotope N="17" Z="8" name="O170x2542b20">
+      <atom unit="g/mole" value="16.9991"/>
+    </isotope>
+    <isotope N="18" Z="8" name="O180x2542b90">
+      <atom unit="g/mole" value="17.9992"/>
+    </isotope>
+    <element name="O0x2542be0">
+      <fraction n="0.99757" ref="O160x2542a80"/>
+      <fraction n="0.00038" ref="O170x2542b20"/>
+      <fraction n="0.00205" ref="O180x2542b90"/>
+    </element>
+    <isotope N="36" Z="18" name="Ar360x2542d60">
+      <atom unit="g/mole" value="35.9675"/>
+    </isotope>
+    <isotope N="38" Z="18" name="Ar380x2542db0">
+      <atom unit="g/mole" value="37.9627"/>
+    </isotope>
+    <isotope N="40" Z="18" name="Ar400x2542ad0">
+      <atom unit="g/mole" value="39.9624"/>
+    </isotope>
+    <element name="Ar0x2542e30">
+      <fraction n="0.003365" ref="Ar360x2542d60"/>
+      <fraction n="0.000632" ref="Ar380x2542db0"/>
+      <fraction n="0.996003" ref="Ar400x2542ad0"/>
+    </element>
+    <material name="G4_AIR0x21e1be0" state="gas">
+      <property name="RINDEX" ref="RINDEX0x21e47f0"/>
+      <property name="GROUPVEL" ref="GROUPVEL0x2556de0"/>
+      <property name="ABSLENGTH" ref="ABSLENGTH0x2556f20"/>
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="85.7"/>
+      <D unit="g/cm3" value="0.00120479"/>
+      <fraction n="0.000124000124000124" ref="C0x21b17e0"/>
+      <fraction n="0.755267755267755" ref="N0x21aeae0"/>
+      <fraction n="0.231781231781232" ref="O0x2542be0"/>
+      <fraction n="0.0128270128270128" ref="Ar0x2542e30"/>
+    </material>
+    <material Z="13" name="Aluminum0x25851c0" state="solid">
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="166"/>
+      <D unit="g/cm3" value="2.7"/>
+      <atom unit="g/mole" value="26.9815"/>
+    </material>
+    <material name="Water0x2572e90" state="liquid">
+      <property name="RINDEX" ref="RINDEX0x2578830"/>
+      <property name="GROUPVEL" ref="GROUPVEL0x25798f0"/>
+      <property name="ABSLENGTH" ref="ABSLENGTH0x257aca0"/>
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="68.9984174679527"/>
+      <D unit="g/cm3" value="1"/>
+      <fraction n="0.111898477841067" ref="H0x25570e0"/>
+      <fraction n="0.888101522158933" ref="O0x2542be0"/>
+    </material>
+    <material name="PMMA0x2577950" state="solid">
+      <property name="RINDEX" ref="RINDEX0x257d750"/>
+      <property name="GROUPVEL" ref="GROUPVEL0x257d850"/>
+      <property name="ABSLENGTH" ref="ABSLENGTH0x257d9f0"/>
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="68.6088807971964"/>
+      <D unit="g/cm3" value="1.19"/>
+      <fraction n="0.599841070879962" ref="C0x21b17e0"/>
+      <fraction n="0.319617088375753" ref="O0x2542be0"/>
+      <fraction n="0.0805418407442842" ref="H0x25570e0"/>
+    </material>
+    <material name="vacuum0x2581ee0" state="gas">
+      <property name="RINDEX" ref="RINDEX0x25846c0"/>
+      <property name="GROUPVEL" ref="GROUPVEL0x25847c0"/>
+      <property name="ABSLENGTH" ref="ABSLENGTH0x2584960"/>
+      <T unit="K" value="2.73"/>
+      <P unit="pascal" value="3e-18"/>
+      <MEE unit="eV" value="19.2"/>
+      <D unit="g/cm3" value="1e-25"/>
+      <fraction n="1" ref="H0x25570e0"/>
+    </material>
+    <material name="Epoxy0x2586a70" state="gas">
+      <property name="RINDEX" ref="RINDEX0x2589590"/>
+      <property name="GROUPVEL" ref="GROUPVEL0x2589690"/>
+      <property name="ABSLENGTH" ref="ABSLENGTH0x2589830"/>
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="68.4816431843939"/>
+      <D unit="g/cm3" value="1.949848963578e-19"/>
+      <fraction n="0.789187038838" ref="C0x21b17e0"/>
+      <fraction n="0.0706437975938055" ref="H0x25570e0"/>
+      <fraction n="0.140169163568195" ref="O0x2542be0"/>
+    </material>
+    <material name="G4_POLYOXYMETHYLENE0x21d6630" state="solid">
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="77.4"/>
+      <D unit="g/cm3" value="1.425"/>
+      <fraction n="0.400011092432421" ref="C0x21b17e0"/>
+      <fraction n="0.0671378454783368" ref="H0x25570e0"/>
+      <fraction n="0.532851062089243" ref="O0x2542be0"/>
+    </material>
+    <material Z="13" name="Photo_cathode_(arb.)0x258f9c0" state="solid">
+      <property name="RINDEX" ref="RINDEX0x258f8d0"/>
+      <property name="GROUPVEL" ref="GROUPVEL0x258ffe0"/>
+      <property name="ABSLENGTH" ref="ABSLENGTH0x2590180"/>
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="166"/>
+      <D unit="g/cm3" value="2.23"/>
+      <atom unit="g/mole" value="26.9815"/>
+    </material>
+    <isotope N="10" Z="5" name="B100x256a8d0">
+      <atom unit="g/mole" value="10.0129"/>
+    </isotope>
+    <isotope N="11" Z="5" name="B110x256ea20">
+      <atom unit="g/mole" value="11.0093"/>
+    </isotope>
+    <element name="B0x257e960">
+      <fraction n="0.199" ref="B100x256a8d0"/>
+      <fraction n="0.801" ref="B110x256ea20"/>
+    </element>
+    <isotope N="23" Z="11" name="Na230x255b700">
+      <atom unit="g/mole" value="22.9898"/>
+    </isotope>
+    <element name="Na0x2568d70">
+      <fraction n="1" ref="Na230x255b700"/>
+    </element>
+    <isotope N="27" Z="13" name="Al270x25692f0">
+      <atom unit="g/mole" value="26.9815"/>
+    </isotope>
+    <element name="Al0x2569360">
+      <fraction n="1" ref="Al270x25692f0"/>
+    </element>
+    <isotope N="28" Z="14" name="Si280x2569580">
+      <atom unit="g/mole" value="27.9769"/>
+    </isotope>
+    <isotope N="29" Z="14" name="Si290x25695d0">
+      <atom unit="g/mole" value="28.9765"/>
+    </isotope>
+    <isotope N="30" Z="14" name="Si300x2569640">
+      <atom unit="g/mole" value="29.9738"/>
+    </isotope>
+    <element name="Si0x2569690">
+      <fraction n="0.922296077703922" ref="Si280x2569580"/>
+      <fraction n="0.0468319531680468" ref="Si290x25695d0"/>
+      <fraction n="0.0308719691280309" ref="Si300x2569640"/>
+    </element>
+    <isotope N="39" Z="19" name="K390x25571a0">
+      <atom unit="g/mole" value="38.9637"/>
+    </isotope>
+    <isotope N="40" Z="19" name="K400x2569890">
+      <atom unit="g/mole" value="39.964"/>
+    </isotope>
+    <isotope N="41" Z="19" name="K410x2569900">
+      <atom unit="g/mole" value="40.9618"/>
+    </isotope>
+    <element name="K0x2569950">
+      <fraction n="0.932581" ref="K390x25571a0"/>
+      <fraction n="0.000117" ref="K400x2569890"/>
+      <fraction n="0.067302" ref="K410x2569900"/>
+    </element>
+    <material name="Borosilicate_glass0x257e7e0" state="solid">
+      <property name="RINDEX" ref="RINDEX0x25818c0"/>
+      <property name="GROUPVEL" ref="GROUPVEL0x25819c0"/>
+      <property name="ABSLENGTH" ref="ABSLENGTH0x2581b60"/>
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="120.671790226908"/>
+      <D unit="g/cm3" value="2.23"/>
+      <fraction n="0.0400639198721603" ref="B0x257e960"/>
+      <fraction n="0.539560920878158" ref="O0x2542be0"/>
+      <fraction n="0.0281909436181128" ref="Na0x2568d70"/>
+      <fraction n="0.0116439767120466" ref="Al0x2569360"/>
+      <fraction n="0.377219245561509" ref="Si0x2569690"/>
+      <fraction n="0.00332099335801328" ref="K0x2569950"/>
+    </material>
+    <material name="Tyvek0x256fee0" state="solid">
+      <property name="RINDEX" ref="RINDEX0x2572810"/>
+      <property name="GROUPVEL" ref="GROUPVEL0x2572910"/>
+      <property name="ABSLENGTH" ref="ABSLENGTH0x2572ab0"/>
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="56.5182975271737"/>
+      <D unit="g/cm3" value="0.406367041199"/>
+      <fraction n="0.856281712255198" ref="C0x21b17e0"/>
+      <fraction n="0.143718287744802" ref="H0x25570e0"/>
+    </material>
+    <isotope N="55" Z="25" name="Mn550x256cab0">
+      <atom unit="g/mole" value="54.938"/>
+    </isotope>
+    <element name="Mn0x256d060">
+      <fraction n="1" ref="Mn550x256cab0"/>
+    </element>
+    <isotope N="50" Z="24" name="Cr500x256d2a0">
+      <atom unit="g/mole" value="49.946"/>
+    </isotope>
+    <isotope N="52" Z="24" name="Cr520x256d2f0">
+      <atom unit="g/mole" value="51.9405"/>
+    </isotope>
+    <isotope N="53" Z="24" name="Cr530x256d360">
+      <atom unit="g/mole" value="52.9407"/>
+    </isotope>
+    <isotope N="54" Z="24" name="Cr540x256d3e0">
+      <atom unit="g/mole" value="53.9389"/>
+    </isotope>
+    <element name="Cr0x256d430">
+      <fraction n="0.04345" ref="Cr500x256d2a0"/>
+      <fraction n="0.83789" ref="Cr520x256d2f0"/>
+      <fraction n="0.09501" ref="Cr530x256d360"/>
+      <fraction n="0.02365" ref="Cr540x256d3e0"/>
+    </element>
+    <isotope N="92" Z="42" name="Mo920x256d680">
+      <atom unit="g/mole" value="91.9068"/>
+    </isotope>
+    <isotope N="94" Z="42" name="Mo940x256d6d0">
+      <atom unit="g/mole" value="93.9051"/>
+    </isotope>
+    <isotope N="95" Z="42" name="Mo950x256d720">
+      <atom unit="g/mole" value="94.9058"/>
+    </isotope>
+    <isotope N="96" Z="42" name="Mo960x256d7a0">
+      <atom unit="g/mole" value="95.9047"/>
+    </isotope>
+    <isotope N="97" Z="42" name="Mo970x256d7f0">
+      <atom unit="g/mole" value="96.906"/>
+    </isotope>
+    <isotope N="98" Z="42" name="Mo980x256d890">
+      <atom unit="g/mole" value="97.9054"/>
+    </isotope>
+    <isotope N="100" Z="42" name="Mo1000x256d8e0">
+      <atom unit="g/mole" value="99.9075"/>
+    </isotope>
+    <element name="Mo0x256d930">
+      <fraction n="0.1484" ref="Mo920x256d680"/>
+      <fraction n="0.0925" ref="Mo940x256d6d0"/>
+      <fraction n="0.1592" ref="Mo950x256d720"/>
+      <fraction n="0.1668" ref="Mo960x256d7a0"/>
+      <fraction n="0.0955" ref="Mo970x256d7f0"/>
+      <fraction n="0.2413" ref="Mo980x256d890"/>
+      <fraction n="0.0963" ref="Mo1000x256d8e0"/>
+    </element>
+    <isotope N="58" Z="28" name="Ni580x256d840">
+      <atom unit="g/mole" value="57.9353"/>
+    </isotope>
+    <isotope N="60" Z="28" name="Ni600x256dbd0">
+      <atom unit="g/mole" value="59.9308"/>
+    </isotope>
+    <isotope N="61" Z="28" name="Ni610x256dc40">
+      <atom unit="g/mole" value="60.9311"/>
+    </isotope>
+    <isotope N="62" Z="28" name="Ni620x256dc90">
+      <atom unit="g/mole" value="61.9283"/>
+    </isotope>
+    <isotope N="64" Z="28" name="Ni640x256dce0">
+      <atom unit="g/mole" value="63.928"/>
+    </isotope>
+    <element name="Ni0x256dd80">
+      <fraction n="0.680769" ref="Ni580x256d840"/>
+      <fraction n="0.262231" ref="Ni600x256dbd0"/>
+      <fraction n="0.011399" ref="Ni610x256dc40"/>
+      <fraction n="0.036345" ref="Ni620x256dc90"/>
+      <fraction n="0.009256" ref="Ni640x256dce0"/>
+    </element>
+    <isotope N="31" Z="15" name="P310x256dfd0">
+      <atom unit="g/mole" value="30.9738"/>
+    </isotope>
+    <element name="P0x256e040">
+      <fraction n="1" ref="P310x256dfd0"/>
+    </element>
+    <isotope N="32" Z="16" name="S320x256e260">
+      <atom unit="g/mole" value="31.9721"/>
+    </isotope>
+    <isotope N="33" Z="16" name="S330x256e2b0">
+      <atom unit="g/mole" value="32.9715"/>
+    </isotope>
+    <isotope N="34" Z="16" name="S340x256e320">
+      <atom unit="g/mole" value="33.9679"/>
+    </isotope>
+    <isotope N="36" Z="16" name="S360x256e370">
+      <atom unit="g/mole" value="35.9671"/>
+    </isotope>
+    <element name="S0x256e3c0">
+      <fraction n="0.9493" ref="S320x256e260"/>
+      <fraction n="0.0076" ref="S330x256e2b0"/>
+      <fraction n="0.0429" ref="S340x256e320"/>
+      <fraction n="0.0002" ref="S360x256e370"/>
+    </element>
+    <isotope N="54" Z="26" name="Fe540x25692a0">
+      <atom unit="g/mole" value="53.9396"/>
+    </isotope>
+    <isotope N="56" Z="26" name="Fe560x2569250">
+      <atom unit="g/mole" value="55.9349"/>
+    </isotope>
+    <isotope N="57" Z="26" name="Fe570x2569cf0">
+      <atom unit="g/mole" value="56.9354"/>
+    </isotope>
+    <isotope N="58" Z="26" name="Fe580x256a100">
+      <atom unit="g/mole" value="57.9333"/>
+    </isotope>
+    <element name="Fe0x256a150">
+      <fraction n="0.05845" ref="Fe540x25692a0"/>
+      <fraction n="0.91754" ref="Fe560x2569250"/>
+      <fraction n="0.02119" ref="Fe570x2569cf0"/>
+      <fraction n="0.00282" ref="Fe580x256a100"/>
+    </element>
+    <material name="Steel0x256cea0" state="solid">
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="281.851732130528"/>
+      <D unit="g/cm3" value="8"/>
+      <fraction n="0.0008" ref="C0x21b17e0"/>
+      <fraction n="0.02" ref="Mn0x256d060"/>
+      <fraction n="0.18" ref="Cr0x256d430"/>
+      <fraction n="0.01" ref="Mo0x256d930"/>
+      <fraction n="0.1" ref="Ni0x256dd80"/>
+      <fraction n="0.01" ref="Si0x2569690"/>
+      <fraction n="0.00045" ref="P0x256e040"/>
+      <fraction n="0.0003" ref="S0x256e3c0"/>
+      <fraction n="0.67845" ref="Fe0x256a150"/>
+    </material>
+    <isotope N="204" Z="82" name="Pb2040x256c100">
+      <atom unit="g/mole" value="203.973"/>
+    </isotope>
+    <isotope N="206" Z="82" name="Pb2060x256c150">
+      <atom unit="g/mole" value="205.974"/>
+    </isotope>
+    <isotope N="207" Z="82" name="Pb2070x256c1c0">
+      <atom unit="g/mole" value="206.976"/>
+    </isotope>
+    <isotope N="208" Z="82" name="Pb2080x256c210">
+      <atom unit="g/mole" value="207.977"/>
+    </isotope>
+    <element name="Pb0x256c260">
+      <fraction n="0.014" ref="Pb2040x256c100"/>
+      <fraction n="0.241" ref="Pb2060x256c150"/>
+      <fraction n="0.221" ref="Pb2070x256c1c0"/>
+      <fraction n="0.524" ref="Pb2080x256c210"/>
+    </element>
+    <material name="Lead0x21b88e0" state="solid">
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="823"/>
+      <D unit="g/cm3" value="11.35"/>
+      <fraction n="1" ref="Pb0x256c260"/>
+    </material>
+    <isotope N="24" Z="12" name="Mg240x2568f40">
+      <atom unit="g/mole" value="23.985"/>
+    </isotope>
+    <isotope N="25" Z="12" name="Mg250x2568f90">
+      <atom unit="g/mole" value="24.9858"/>
+    </isotope>
+    <isotope N="26" Z="12" name="Mg260x2569000">
+      <atom unit="g/mole" value="25.9826"/>
+    </isotope>
+    <element name="Mg0x2569080">
+      <fraction n="0.7899" ref="Mg240x2568f40"/>
+      <fraction n="0.1" ref="Mg250x2568f90"/>
+      <fraction n="0.1101" ref="Mg260x2569000"/>
+    </element>
+    <isotope N="40" Z="20" name="Ca400x2569b20">
+      <atom unit="g/mole" value="39.9626"/>
+    </isotope>
+    <isotope N="42" Z="20" name="Ca420x2569b90">
+      <atom unit="g/mole" value="41.9586"/>
+    </isotope>
+    <isotope N="43" Z="20" name="Ca430x2569c00">
+      <atom unit="g/mole" value="42.9588"/>
+    </isotope>
+    <isotope N="44" Z="20" name="Ca440x2569c50">
+      <atom unit="g/mole" value="43.9555"/>
+    </isotope>
+    <isotope N="46" Z="20" name="Ca460x2569ca0">
+      <atom unit="g/mole" value="45.9537"/>
+    </isotope>
+    <isotope N="48" Z="20" name="Ca480x2569d40">
+      <atom unit="g/mole" value="47.9525"/>
+    </isotope>
+    <element name="Ca0x2569d90">
+      <fraction n="0.96941" ref="Ca400x2569b20"/>
+      <fraction n="0.00647" ref="Ca420x2569b90"/>
+      <fraction n="0.00135" ref="Ca430x2569c00"/>
+      <fraction n="0.02086" ref="Ca440x2569c50"/>
+      <fraction n="4e-05" ref="Ca460x2569ca0"/>
+      <fraction n="0.00187" ref="Ca480x2569d40"/>
+    </element>
+    <material name="Concrete0x220b470" state="solid">
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="112.556573948809"/>
+      <D unit="g/cm3" value="2.3"/>
+      <fraction n="0.0221000221000221" ref="H0x25570e0"/>
+      <fraction n="0.00248400248400248" ref="C0x21b17e0"/>
+      <fraction n="0.574930574930575" ref="O0x2542be0"/>
+      <fraction n="0.0152080152080152" ref="Na0x2568d70"/>
+      <fraction n="0.00126600126600127" ref="Mg0x2569080"/>
+      <fraction n="0.01995301995302" ref="Al0x2569360"/>
+      <fraction n="0.304627304627305" ref="Si0x2569690"/>
+      <fraction n="0.01004501004501" ref="K0x2569950"/>
+      <fraction n="0.042951042951043" ref="Ca0x2569d90"/>
+      <fraction n="0.00643500643500643" ref="Fe0x256a150"/>
+    </material>
+  </materials>
+
+  <solids>
+    <box lunit="mm" name="v0x2593c50" x="1135.0752" y="1135.0752" z="50.8"/>
+    <box lunit="mm" name="v0x2591a60" x="1135.0752" y="1135.0752" z="9.652"/>
+    <box lunit="mm" name="v0x25917f0" x="1138.1232" y="1138.1232" z="63.5"/>
+    <box lunit="mm" name="v0x2594500" x="296.8752" y="50.8" z="2195.322"/>
+    <box lunit="mm" name="v0x25934a0" x="296.8752" y="9.652" z="2195.322"/>
+    <box lunit="mm" name="v0x25931a0" x="299.9232" y="63.5" z="2198.37"/>
+    <box lunit="mm" name="v0x2594dd0" x="639.7752" y="50.8" z="2195.322"/>
+    <box lunit="mm" name="v0x25939e0" x="639.7752" y="9.652" z="2195.322"/>
+    <box lunit="mm" name="v0x2593710" x="642.8232" y="63.5" z="2198.37"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="d2oSolid0x2579a60" rmax="336.55" rmin="0" startphi="0" z="1349.248"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="acrylicSolid0x2579b70" rmax="349.25" rmin="0" startphi="0" z="1400.048"/>
+    <opticalsurface finish="0" model="1" name="Reflector0x25b4bb0" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25b6b50"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25b6c70"/>
+    </opticalsurface>
+    <ellipsoid ax="96.5" by="96.5" cz="72.22" lunit="mm" name="IPMTbottomVacuumEVol0x2585b10" zcut1="-72.22" zcut2="0"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="IPMTVacuumLegVol0x2585d00" rmax="36.25" rmin="0" startphi="0" z="141"/>
+    <union name="InnerPMTVacuumVol0x2585ef0">
+      <first ref="IPMTbottomVacuumEVol0x2585b10"/>
+      <second ref="IPMTVacuumLegVol0x2585d00"/>
+      <position name="InnerPMTVacuumVol0x2585ef0_pos" unit="mm" x="0" y="0" z="-131.34"/>
+    </union>
+    <opticalsurface finish="0" model="1" name="Reflector0x258ad60" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x258cd80"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x258cea0"/>
+    </opticalsurface>
+    <ellipsoid ax="98" by="98" cz="73.72" lunit="mm" name="IPMTbottomSilverEVol0x2584b30" zcut1="-73.72" zcut2="0"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="IPMTSilverLegVol0x2584ca0" rmax="39.25" rmin="0" startphi="0" z="144"/>
+    <union name="InnerPMTSilverVol0x2584e90">
+      <first ref="IPMTbottomSilverEVol0x2584b30"/>
+      <second ref="IPMTSilverLegVol0x2584ca0"/>
+      <position name="InnerPMTSilverVol0x2584e90_pos" unit="mm" x="0" y="0" z="-132.84"/>
+    </union>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="ThickRingSolid0x25868e0" rmax="58" rmin="42.5" startphi="0" z="85"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="ThinRingSolid0x2589bf0" rmax="47.5" rmin="42.5" startphi="0" z="62"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="HolderRingSolid0x258a220" rmax="58" rmin="48" startphi="0" z="20"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="HolderRodSolid0x258a6b0" rmax="10" rmin="0" startphi="0" z="85"/>
+    <sphere aunit="deg" deltaphi="360" deltatheta="43.515274240312" lunit="mm" name="PhotocathodeVol0x21b32a0" rmax="128" rmin="127.999974" startphi="0" starttheta="0"/>
+    <ellipsoid ax="98" by="98" cz="73.72" lunit="mm" name="IPMTtopEVol0x2581d90" zcut1="0" zcut2="73.72"/>
+    <ellipsoid ax="101" by="101" cz="76.72" lunit="mm" name="PMTTopEVol0x255ddc0" zcut1="0" zcut2="76.72"/>
+    <ellipsoid ax="101" by="101" cz="76.72" lunit="mm" name="OPMTBottomEVol0x255deb0" zcut1="-76.72" zcut2="0"/>
+    <union name="OuterPMTSphericalVol0x257e030">
+      <first ref="PMTTopEVol0x255ddc0"/>
+      <second ref="OPMTBottomEVol0x255deb0"/>
+    </union>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="OPMTLegVol0x257e3b0" rmax="42.25" rmin="0" startphi="0" z="147"/>
+    <union name="pmtLogV0x257e540">
+      <first ref="OuterPMTSphericalVol0x257e030"/>
+      <second ref="OPMTLegVol0x257e3b0"/>
+      <position name="pmtLogV0x257e540_pos" unit="mm" x="0" y="0" z="-135.5"/>
+    </union>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="tyvekSolid0x256fd30" rmax="444.5" rmin="441.325" startphi="0" z="1906.27"/>
+    <opticalsurface finish="4" model="1" name="Tyvek_Reflector0x259c140" type="1" value="0.733038285837618">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x259b6b0"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x259b790"/>
+    </opticalsurface>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="botCapSolid0x2598920" rmax="441.325" rmin="0" startphi="0" z="6.35"/>
+    <opticalsurface finish="4" model="1" name="Tyvek_Reflector0x25b9360" type="1" value="0.733038285837618">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25bb2c0"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25bb3e0"/>
+    </opticalsurface>
+    <box lunit="mm" name="ribs0x25920a0" x="25.4" y="85.725" z="50.8"/>
+    <box lunit="mm" name="feet0x2592e90" x="35.052" y="35.052" z="104.902"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="airStraw0x2592750" rmax="6.35" rmin="0" startphi="0" z="391.16"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="straw0x25923b0" rmax="12.7" rmin="0" startphi="0" z="391.16"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="h2oSolid0x2572d00" rmax="444.5" rmin="0" startphi="0" z="1798.55"/>
+    <opticalsurface finish="0" model="1" name="Reflector0x25b2900" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25b48d0"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25b49f0"/>
+    </opticalsurface>
+    <opticalsurface finish="4" model="1" name="Tyvek_Reflector0x259b970" type="1" value="0.733038285837618">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25b2600"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25b26e0"/>
+    </opticalsurface>
+    <opticalsurface finish="4" model="1" name="Tyvek_Reflector0x25b6fb0" type="1" value="0.733038285837618">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25b8fb0"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25b90d0"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25bbed0" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25bde80"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25bdfa0"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25be280" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25c02a0"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25c03c0"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25c06a0" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25c26c0"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25c27e0"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25c2b10" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25c4b80"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25c4ca0"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25c4f80" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25c6fa0"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25c70c0"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25c73f0" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25c9410"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25c9530"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25c9860" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25cb8d0"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25cb9f0"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25cbcd0" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25cdcf0"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25cde10"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25ce140" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25d0160"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25d0280"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25d05b0" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25d2620"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25d2740"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25d2a20" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25d4a40"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25d4b60"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25d4e90" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25d6eb0"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25d6fd0"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25d7300" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25d9370"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25d9490"/>
+    </opticalsurface>
+    <opticalsurface finish="0" model="1" name="Reflector0x25d9770" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25db790"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25db8b0"/>
+    </opticalsurface>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="outerAirsel0x256eec0" rmax="444.5" rmin="0" startphi="0" z="1906.27"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="outerVessel0x2538d90" rmax="450.85" rmin="0" startphi="0" z="1918.97"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="basePlate0x2591d00" rmax="450.85" rmin="0" startphi="0" z="90.3223999999998"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="shieldVessel0x2538650" rmax="501.65" rmin="0" startphi="0" z="2053.7424"/>
+    <box lunit="mm" name="outerSolid0x256bd70" x="1138.1232" y="1138.1232" z="2261.87"/>
+    <opticalsurface finish="0" model="1" name="Reflector0x25dce30" type="1" value="0">
+      <property name="REFLECTIVITY" ref="REFLECTIVITY0x25dee70"/>
+      <property name="TRANSMITTANCE" ref="TRANSMITTANCE0x25def90"/>
+    </opticalsurface>
+    <box lunit="mm" name="hallOpening_solid0x256b860" x="8000" y="3352.8" z="3657.6"/>
+    <box lunit="mm" name="hallConcreteVol_solid0x2568b70" x="8000" y="8229.6" z="8534.4"/>
+    <box lunit="mm" name="worldVol_solid0x255e5b0" x="11000" y="11000" z="11000"/>
+  </solids>
+
+  <structure>
+    <volume name="topVetoLogV0x2593cd0">
+      <materialref ref="G4_PLASTIC_SC_VINYLTOLUENE0x21e8bd0"/>
+      <solidref ref="v0x2593c50"/>
+      <auxiliary auxtype="SensDet" auxvalue="topVetoSD"/>
+    </volume>
+    <volume name="topAirLogV0x2591b10">
+      <materialref ref="G4_AIR0x21e1be0"/>
+      <solidref ref="v0x2591a60"/>
+    </volume>
+    <volume name="topAluminumLogV0x2591870">
+      <materialref ref="Aluminum0x25851c0"/>
+      <solidref ref="v0x25917f0"/>
+      <physvol name="topVetoPhysV0x25bba70">
+        <volumeref ref="topVetoLogV0x2593cd0"/>
+        <position name="topVetoPhysV0x25bba70_pos" unit="mm" x="0" y="0" z="-4.826"/>
+      </physvol>
+      <physvol name="topAirPhysV0x25bbb80">
+        <volumeref ref="topAirLogV0x2591b10"/>
+        <position name="topAirPhysV0x25bbb80_pos" unit="mm" x="0" y="0" z="25.4"/>
+      </physvol>
+    </volume>
+    <volume name="narrowVetoLogV0x2594610">
+      <materialref ref="G4_PLASTIC_SC_VINYLTOLUENE0x21e8bd0"/>
+      <solidref ref="v0x2594500"/>
+      <auxiliary auxtype="SensDet" auxvalue="VetoNu1SD"/>
+    </volume>
+    <volume name="narrowAirLogV0x2593520">
+      <materialref ref="G4_AIR0x21e1be0"/>
+      <solidref ref="v0x25934a0"/>
+    </volume>
+    <volume name="narrowAluminiumLogV0x2593240">
+      <materialref ref="Aluminum0x25851c0"/>
+      <solidref ref="v0x25931a0"/>
+      <physvol name="narrowVetoPhysV0x25dc2e0">
+        <volumeref ref="narrowVetoLogV0x2594610"/>
+        <position name="narrowVetoPhysV0x25dc2e0_pos" unit="mm" x="0" y="-4.826" z="0"/>
+      </physvol>
+      <physvol name="narrowAirPhysV0x25dc3f0">
+        <volumeref ref="narrowAirLogV0x2593520"/>
+        <position name="narrowAirPhysV0x25dc3f0_pos" unit="mm" x="0" y="25.4" z="0"/>
+      </physvol>
+    </volume>
+    <volume name="wideVetoLogV0x2594e50">
+      <materialref ref="G4_PLASTIC_SC_VINYLTOLUENE0x21e8bd0"/>
+      <solidref ref="v0x2594dd0"/>
+      <auxiliary auxtype="SensDet" auxvalue="VetoNu2SD"/>
+    </volume>
+    <volume name="wideAirLogV0x2593a60">
+      <materialref ref="G4_AIR0x21e1be0"/>
+      <solidref ref="v0x25939e0"/>
+    </volume>
+    <volume name="wideAluminiumLogV0x25937b0">
+      <materialref ref="Aluminum0x25851c0"/>
+      <solidref ref="v0x2593710"/>
+      <physvol name="wideVetoPhysV0x25dc980">
+        <volumeref ref="wideVetoLogV0x2594e50"/>
+        <position name="wideVetoPhysV0x25dc980_pos" unit="mm" x="0" y="-4.826" z="0"/>
+      </physvol>
+      <physvol name="wideAirPhysV0x25dca90">
+        <volumeref ref="wideAirLogV0x2593a60"/>
+        <position name="wideAirPhysV0x25dca90_pos" unit="mm" x="0" y="25.4" z="0"/>
+      </physvol>
+    </volume>
+    <volume name="d2oLogV0x257dd20">
+      <materialref ref="Water0x2572e90"/>
+      <solidref ref="d2oSolid0x2579a60"/>
+    </volume>
+    <volume name="acrylicLogV0x257dad0">
+      <materialref ref="PMMA0x2577950"/>
+      <solidref ref="acrylicSolid0x2579b70"/>
+      <physvol name="d2oPhysV0x2595580">
+        <volumeref ref="d2oLogV0x257dd20"/>
+      </physvol>
+    </volume>
+    <volume name="InnerVacuumPMTVol0x25861f0">
+      <materialref ref="vacuum0x2581ee0"/>
+      <solidref ref="InnerPMTVacuumVol0x2585ef0"/>
+    </volume>
+    <volume name="InnerSilverPMTVol0x25858f0">
+      <materialref ref="Aluminum0x25851c0"/>
+      <solidref ref="InnerPMTSilverVol0x2584e90"/>
+      <physvol name="BottomPart0x2586430">
+        <volumeref ref="InnerVacuumPMTVol0x25861f0"/>
+      </physvol>
+    </volume>
+    <volume name="ThickRingLogV0x2589910">
+      <materialref ref="Epoxy0x2586a70"/>
+      <solidref ref="ThickRingSolid0x25868e0"/>
+    </volume>
+    <volume name="ThinRingLogV0x2589d80">
+      <materialref ref="Epoxy0x2586a70"/>
+      <solidref ref="ThinRingSolid0x2589bf0"/>
+    </volume>
+    <volume name="HolderRingLogV0x258a390">
+      <materialref ref="G4_POLYOXYMETHYLENE0x21d6630"/>
+      <solidref ref="HolderRingSolid0x258a220"/>
+    </volume>
+    <volume name="HolderRodLogV0x258a840">
+      <materialref ref="G4_POLYOXYMETHYLENE0x21d6630"/>
+      <solidref ref="HolderRodSolid0x258a6b0"/>
+    </volume>
+    <volume name="PhotocathodeVol0x2590260">
+      <materialref ref="Photo_cathode_(arb.)0x258f9c0"/>
+      <solidref ref="PhotocathodeVol0x21b32a0"/>
+      <auxiliary auxtype="SensDet" auxvalue="pmt"/>
+    </volume>
+    <volume name="ITopPMTLog0x2584a40">
+      <materialref ref="vacuum0x2581ee0"/>
+      <solidref ref="IPMTtopEVol0x2581d90"/>
+      <physvol name="PhotocathodeVol0x25903b0">
+        <volumeref ref="PhotocathodeVol0x2590260"/>
+        <position name="PhotocathodeVol0x25903b0_pos" unit="mm" x="0" y="0" z="-57.28"/>
+      </physvol>
+    </volume>
+    <volume name="pmtLogV0x2581c40">
+      <materialref ref="Borosilicate_glass0x257e7e0"/>
+      <solidref ref="pmtLogV0x257e540"/>
+      <physvol name="BottomTotal0x25866d0">
+        <volumeref ref="InnerSilverPMTVol0x25858f0"/>
+      </physvol>
+      <physvol name="ThickRing0x2589ae0">
+        <volumeref ref="ThickRingLogV0x2589910"/>
+        <position name="ThickRing0x2589ae0_pos" unit="mm" x="0" y="0" z="-183.5"/>
+      </physvol>
+      <physvol name="ThinRing0x2589f70">
+        <volumeref ref="ThinRingLogV0x2589d80"/>
+        <position name="ThinRing0x2589f70_pos" unit="mm" x="0" y="0" z="-110"/>
+      </physvol>
+      <physvol name="HolderRing0x258a580">
+        <volumeref ref="HolderRingLogV0x258a390"/>
+        <position name="HolderRing0x258a580_pos" unit="mm" x="0" y="0" z="-89"/>
+      </physvol>
+      <physvol name="HolderRod0x258aa30">
+        <volumeref ref="HolderRodLogV0x258a840"/>
+        <position name="HolderRod0x258aa30_pos" unit="mm" x="48.0832611206852" y="48.0832611206852" z="-183.5"/>
+      </physvol>
+      <physvol name="HolderRod0x258abb0">
+        <volumeref ref="HolderRodLogV0x258a840"/>
+        <position name="HolderRod0x258abb0_pos" unit="mm" x="35.7218952396055" y="-57.8614396683201" z="-183.5"/>
+      </physvol>
+      <physvol name="HolderRod0x258ac10">
+        <volumeref ref="HolderRodLogV0x258a840"/>
+        <position name="HolderRod0x258ac10_pos" unit="mm" x="-57.8614396683202" y="-35.7218952396054" z="-183.5"/>
+      </physvol>
+      <physvol name="HolderRod0x258acd0">
+        <volumeref ref="HolderRodLogV0x258a840"/>
+        <position name="HolderRod0x258acd0_pos" unit="mm" x="-35.7218952396057" y="57.86143966832" z="-183.5"/>
+      </physvol>
+      <physvol name="TopTotal0x258d100">
+        <volumeref ref="ITopPMTLog0x2584a40"/>
+      </physvol>
+    </volume>
+    <volume name="theSideLiningLogV0x2570310">
+      <materialref ref="Tyvek0x256fee0"/>
+      <solidref ref="tyvekSolid0x256fd30"/>
+    </volume>
+    <volume name="botCapLogV0x2598ad0">
+      <materialref ref="Tyvek0x256fee0"/>
+      <solidref ref="botCapSolid0x2598920"/>
+    </volume>
+    <volume name="ribsLogV0x25921c0">
+      <materialref ref="PMMA0x2577950"/>
+      <solidref ref="ribs0x25920a0"/>
+    </volume>
+    <volume name="feetLogV0x2592fb0">
+      <materialref ref="PMMA0x2577950"/>
+      <solidref ref="feet0x2592e90"/>
+    </volume>
+    <volume name="airStrawLogV0x2592900">
+      <materialref ref="G4_AIR0x21e1be0"/>
+      <solidref ref="airStraw0x2592750"/>
+    </volume>
+    <volume name="strawLogV0x2592560">
+      <materialref ref="PMMA0x2577950"/>
+      <solidref ref="straw0x25923b0"/>
+      <physvol name="airStrawPhysV0x25dbcd0">
+        <volumeref ref="airStrawLogV0x2592900"/>
+      </physvol>
+    </volume>
+    <volume name="h2oLogV0x2570260">
+      <materialref ref="Water0x2572e90"/>
+      <solidref ref="h2oSolid0x2572d00"/>
+      <physvol name="acrylicPhysV0x2595680">
+        <volumeref ref="acrylicLogV0x257dad0"/>
+        <position name="acrylicPhysV0x2595680_pos" unit="mm" x="0" y="0" z="-87.999"/>
+      </physvol>
+      <physvol name="pmtPhysV_00x2595780">
+        <volumeref ref="pmtLogV0x2581c40"/>
+        <position name="pmtPhysV_00x2595780_pos" unit="mm" x="-106.6" y="-309.459744285639" z="773.24"/>
+        <rotation name="pmtPhysV_00x2595780_rot" unit="deg" x="180" y="0" z="180"/>
+      </physvol>
+      <physvol copynumber="1" name="pmtPhysV_10x2595a00">
+        <volumeref ref="pmtLogV0x2581c40"/>
+        <position name="pmtPhysV_10x2595a00_pos" unit="mm" x="103.6" y="-309.459744285639" z="773.24"/>
+        <rotation name="pmtPhysV_10x2595a00_rot" unit="deg" x="180" y="0" z="180"/>
+      </physvol>
+      <physvol copynumber="2" name="pmtPhysV_20x2595b40">
+        <volumeref ref="pmtLogV0x2581c40"/>
+        <position name="pmtPhysV_20x2595b40_pos" unit="mm" x="-210.2" y="-124.823128198797" z="773.24"/>
+        <rotation name="pmtPhysV_20x2595b40_rot" unit="deg" x="180" y="0" z="180"/>
+      </physvol>
+      <physvol copynumber="3" name="pmtPhysV_30x2595c30">
+        <volumeref ref="pmtLogV0x2581c40"/>
+        <position name="pmtPhysV_30x2595c30_pos" unit="mm" x="0" y="-124.823128198797" z="773.24"/>
+        <rotation name="pmtPhysV_30x2595c30_rot" unit="deg" x="180" y="0" z="180"/>
+      </physvol>
+      <physvol copynumber="4" name="pmtPhysV_40x2595d40">
+        <volumeref ref="pmtLogV0x2581c40"/>
+        <position name="pmtPhysV_40x2595d40_pos" unit="mm" x="210.2" y="-124.823128198797" z="773.24"/>
+        <rotation name="pmtPhysV_40x2595d40_rot" unit="deg" x="180" y="0" z="180"/>
+      </physvol>
+      <physvol copynumber="5" name="pmtPhysV_50x2595e20">
+        <volumeref ref="pmtLogV0x2581c40"/>
+        <position name="pmtPhysV_50x2595e20_pos" unit="mm" x="-316.8" y="59.8134878880452" z="773.24"/>
+        <rotation name="pmtPhysV_50x2595e20_rot" unit="deg" x="180" y="0" z="180"/>
+      </physvol>
+      <physvol copynumber="6" name="pmtPhysV_60x2595f30">
+        <volumeref ref="pmtLogV0x2581c40"/>
+        <position name="pmtPhysV_60x2595f30_pos" unit="mm" x="-106.6" y="59.8134878880452" z="773.24"/>
+        <rotation name="pmtPhysV_60x2595f30_rot" unit="deg" x="180" y="0" z="180"/>
+      </physvol>
+      <physvol copynumber="7" name="pmtPhysV_70x2596040">
+        <volumeref ref="pmtLogV0x2581c40"/>
+        <position name="pmtPhysV_70x2596040_pos" unit="mm" x="103.6" y="59.8134878880452" z="773.24"/>
+        <rotation name="pmtPhysV_70x2596040_rot" unit="deg" x="180" y="0" z="180"/>
+      </physvol>
+      <physvol copynumber="8" name="pmtPhysV_80x25961e0">
+        <volumeref ref="pmtLogV0x2581c40"/>
+        <position name="pmtPhysV_80x25961e0_pos" unit="mm" x="313.8" y="59.8134878880452" z="773.24"/>
+        <rotation name="pmtPhysV_80x25961e0_rot" unit="deg" x="180" y="0" z="180"/>
+      </physvol>
+      <physvol copynumber="9" name="pmtPhysV_90x25962f0">
+        <volumeref ref="pmtLogV0x2581c40"/>
+        <position name="pmtPhysV_90x25962f0_pos" unit="mm" x="-210.2" y="244.450103974888" z="773.24"/>
+        <rotation name="pmtPhysV_90x25962f0_rot" unit="deg" x="180" y="0" z="180"/>
+      </physvol>
+      <physvol copynumber="10" name="pmtPhysV_100x2596400">
+        <volumeref ref="pmtLogV0x2581c40"/>
+        <position name="pmtPhysV_100x2596400_pos" unit="mm" x="0" y="244.450103974888" z="773.24"/>
+        <rotation name="pmtPhysV_100x2596400_rot" unit="deg" x="180" y="0" z="180"/>
+      </physvol>
+      <physvol copynumber="11" name="pmtPhysV_110x2596510">
+        <volumeref ref="pmtLogV0x2581c40"/>
+        <position name="pmtPhysV_110x2596510_pos" unit="mm" x="210.2" y="244.450103974888" z="773.24"/>
+        <rotation name="pmtPhysV_110x2596510_rot" unit="deg" x="180" y="0" z="180"/>
+      </physvol>
+      <physvol name="tyvekPhysV0x2598dc0">
+        <volumeref ref="theSideLiningLogV0x2570310"/>
+        <position name="tyvekPhysV0x2598dc0_pos" unit="mm" x="0" y="0" z="57.035"/>
+      </physvol>
+      <physvol name="tyvekCapBotPhysV0x25b6e90">
+        <volumeref ref="botCapLogV0x2598ad0"/>
+        <position name="tyvekCapBotPhysV0x25b6e90_pos" unit="mm" x="0" y="0" z="-896.1"/>
+      </physvol>
+      <physvol name="ribsPhysV_00x25bbdc0">
+        <volumeref ref="ribsLogV0x25921c0"/>
+        <position name="ribsPhysV_00x25bbdc0_pos" unit="mm" x="0" y="392.1125" z="423.926"/>
+      </physvol>
+      <physvol name="ribsPhysV_10x25be1c0">
+        <volumeref ref="ribsLogV0x25921c0"/>
+        <position name="ribsPhysV_10x25be1c0_pos" unit="mm" x="392.1125" y="2.40099659015333e-14" z="423.926"/>
+        <rotation name="ribsPhysV_10x25be1c0_rot" unit="deg" x="0" y="0" z="90"/>
+      </physvol>
+      <physvol name="ribsPhysV_20x25c05e0">
+        <volumeref ref="ribsLogV0x25921c0"/>
+        <position name="ribsPhysV_20x25c05e0_pos" unit="mm" x="4.80199318030667e-14" y="-392.1125" z="423.926"/>
+        <rotation name="ribsPhysV_20x25c05e0_rot" unit="deg" x="0" y="0" z="180"/>
+      </physvol>
+      <physvol name="ribsPhysV_30x25c2a00">
+        <volumeref ref="ribsLogV0x25921c0"/>
+        <position name="ribsPhysV_30x25c2a00_pos" unit="mm" x="-392.1125" y="-7.20298977046e-14" z="423.926"/>
+        <rotation name="ribsPhysV_30x25c2a00_rot" unit="deg" x="0" y="0" z="-90"/>
+      </physvol>
+      <physvol name="feetPhysV_00x25c4ec0">
+        <volumeref ref="feetLogV0x2592fb0"/>
+        <position name="feetPhysV_00x25c4ec0_pos" unit="mm" x="0" y="315.2775" z="-840.474"/>
+      </physvol>
+      <physvol name="feetPhysV_10x25c72e0">
+        <volumeref ref="feetLogV0x2592fb0"/>
+        <position name="feetPhysV_10x25c72e0_pos" unit="mm" x="185.31546487964" y="255.064855444047" z="-840.474"/>
+      </physvol>
+      <physvol name="feetPhysV_20x25c9750">
+        <volumeref ref="feetLogV0x2592fb0"/>
+        <position name="feetPhysV_20x25c9750_pos" unit="mm" x="299.846720816245" y="97.4261054440475" z="-840.474"/>
+      </physvol>
+      <physvol name="feetPhysV_30x25cbc10">
+        <volumeref ref="feetLogV0x2592fb0"/>
+        <position name="feetPhysV_30x25cbc10_pos" unit="mm" x="299.846720816245" y="-97.4261054440475" z="-840.474"/>
+      </physvol>
+      <physvol name="feetPhysV_40x25ce030">
+        <volumeref ref="feetLogV0x2592fb0"/>
+        <position name="feetPhysV_40x25ce030_pos" unit="mm" x="185.31546487964" y="-255.064855444047" z="-840.474"/>
+      </physvol>
+      <physvol name="feetPhysV_50x25d04a0">
+        <volumeref ref="feetLogV0x2592fb0"/>
+        <position name="feetPhysV_50x25d04a0_pos" unit="mm" x="3.8610358121818e-14" y="-315.2775" z="-840.474"/>
+      </physvol>
+      <physvol name="feetPhysV_60x25d2960">
+        <volumeref ref="feetLogV0x2592fb0"/>
+        <position name="feetPhysV_60x25d2960_pos" unit="mm" x="-185.31546487964" y="-255.064855444048" z="-840.474"/>
+      </physvol>
+      <physvol name="feetPhysV_70x25d4d80">
+        <volumeref ref="feetLogV0x2592fb0"/>
+        <position name="feetPhysV_70x25d4d80_pos" unit="mm" x="-299.846720816245" y="-97.4261054440475" z="-840.474"/>
+      </physvol>
+      <physvol name="feetPhysV_80x25d71f0">
+        <volumeref ref="feetLogV0x2592fb0"/>
+        <position name="feetPhysV_80x25d71f0_pos" unit="mm" x="-299.846720816245" y="97.4261054440474" z="-840.474"/>
+      </physvol>
+      <physvol name="feetPhysV_90x25d96b0">
+        <volumeref ref="feetLogV0x2592fb0"/>
+        <position name="feetPhysV_90x25d96b0_pos" unit="mm" x="-185.31546487964" y="255.064855444047" z="-840.474"/>
+      </physvol>
+      <physvol name="strawPhysV0x25dbad0">
+        <volumeref ref="strawLogV0x2592560"/>
+        <position name="strawPhysV0x25dbad0_pos" unit="mm" x="0" y="0" z="807.605"/>
+      </physvol>
+    </volume>
+    <volume name="outerAirselLogV0x256fb40">
+      <materialref ref="G4_AIR0x21e1be0"/>
+      <solidref ref="outerAirsel0x256eec0"/>
+      <physvol name="h2oPhysV0x2598cc0">
+        <volumeref ref="h2oLogV0x2570260"/>
+        <position name="h2oPhysV0x2598cc0_pos" unit="mm" x="0" y="0" z="-53.86"/>
+      </physvol>
+    </volume>
+    <volume name="outerVesselLogV0x256f8d0">
+      <materialref ref="Steel0x256cea0"/>
+      <solidref ref="outerVessel0x2538d90"/>
+      <physvol name="outerAirselPhysV0x25bb790">
+        <volumeref ref="outerAirselLogV0x256fb40"/>
+      </physvol>
+    </volume>
+    <volume name="basePlateLogV0x2591eb0">
+      <materialref ref="Aluminum0x25851c0"/>
+      <solidref ref="basePlate0x2591d00"/>
+    </volume>
+    <volume name="shieldingLogV0x256cd10">
+      <materialref ref="Lead0x21b88e0"/>
+      <solidref ref="shieldVessel0x2538650"/>
+      <physvol name="outerVesselPhysV0x25bb670">
+        <volumeref ref="outerVesselLogV0x256f8d0"/>
+        <position name="outerVesselPhysV0x25bb670_pos" unit="mm" x="0" y="0" z="22.9361999999999"/>
+      </physvol>
+      <physvol name="basePlatePhysV0x25bbcb0">
+        <volumeref ref="basePlateLogV0x2591eb0"/>
+        <position name="basePlatePhysV0x25bbcb0_pos" unit="mm" x="0" y="0" z="-981.71"/>
+      </physvol>
+    </volume>
+    <volume name="totalDetLogV0x256be70">
+      <materialref ref="G4_AIR0x21e1be0"/>
+      <solidref ref="outerSolid0x256bd70"/>
+      <physvol name="topAluminumPhysV0x25bb900">
+        <volumeref ref="topAluminumLogV0x2591870"/>
+        <position name="topAluminumPhysV0x25bb900_pos" unit="mm" x="0" y="0" z="1097.661"/>
+      </physvol>
+      <physvol name="narrowAluminumPhysV0x25dbe00">
+        <volumeref ref="narrowAluminiumLogV0x2593240"/>
+        <position name="narrowAluminumPhysV0x25dbe00_pos" unit="mm" x="377.170757084904" y="377.170757084904" z="-33.274"/>
+        <rotation name="narrowAluminumPhysV0x25dbe00_rot" unit="deg" x="0" y="0" z="45"/>
+      </physvol>
+      <physvol copynumber="1" name="narrowAluminumPhysV0x25dbfc0">
+        <volumeref ref="narrowAluminiumLogV0x2593240"/>
+        <position name="narrowAluminumPhysV0x25dbfc0_pos" unit="mm" x="377.170757084904" y="-377.170757084904" z="-33.274"/>
+        <rotation name="narrowAluminumPhysV0x25dbfc0_rot" unit="deg" x="0" y="0" z="135"/>
+      </physvol>
+      <physvol copynumber="2" name="narrowAluminumPhysV0x25dc0f0">
+        <volumeref ref="narrowAluminiumLogV0x2593240"/>
+        <position name="narrowAluminumPhysV0x25dc0f0_pos" unit="mm" x="-377.170757084904" y="-377.170757084904" z="-33.274"/>
+        <rotation name="narrowAluminumPhysV0x25dc0f0_rot" unit="deg" x="0" y="0" z="-135"/>
+      </physvol>
+      <physvol copynumber="3" name="narrowAluminumPhysV0x25dc200">
+        <volumeref ref="narrowAluminiumLogV0x2593240"/>
+        <position name="narrowAluminumPhysV0x25dc200_pos" unit="mm" x="-377.170757084904" y="377.170757084904" z="-33.274"/>
+        <rotation name="narrowAluminumPhysV0x25dc200_rot" unit="deg" x="0" y="0" z="-45"/>
+      </physvol>
+      <physvol name="wideAluminumPhysV0x25dc520">
+        <volumeref ref="wideAluminiumLogV0x25937b0"/>
+        <position name="wideAluminumPhysV0x25dc520_pos" unit="mm" x="0" y="537.21" z="-33.274"/>
+      </physvol>
+      <physvol copynumber="1" name="wideAluminumPhysV0x25dc6e0">
+        <volumeref ref="wideAluminiumLogV0x25937b0"/>
+        <position name="wideAluminumPhysV0x25dc6e0_pos" unit="mm" x="537.21" y="3.28946253484975e-14" z="-33.274"/>
+        <rotation name="wideAluminumPhysV0x25dc6e0_rot" unit="deg" x="0" y="0" z="90"/>
+      </physvol>
+      <physvol copynumber="2" name="wideAluminumPhysV0x25dc7e0">
+        <volumeref ref="wideAluminiumLogV0x25937b0"/>
+        <position name="wideAluminumPhysV0x25dc7e0_pos" unit="mm" x="6.57892506969949e-14" y="-537.21" z="-33.274"/>
+        <rotation name="wideAluminumPhysV0x25dc7e0_rot" unit="deg" x="0" y="0" z="180"/>
+      </physvol>
+      <physvol copynumber="3" name="wideAluminumPhysV0x25dc8f0">
+        <volumeref ref="wideAluminiumLogV0x25937b0"/>
+        <position name="wideAluminumPhysV0x25dc8f0_pos" unit="mm" x="-537.21" y="-9.86838760454924e-14" z="-33.274"/>
+        <rotation name="wideAluminumPhysV0x25dc8f0_rot" unit="deg" x="0" y="0" z="90"/>
+      </physvol>
+      <physvol name="shieldingPhysV0x25dcbc0">
+        <volumeref ref="shieldingLogV0x256cd10"/>
+        <position name="shieldingPhysV0x25dcbc0_pos" unit="mm" x="0" y="0" z="-104.0638"/>
+      </physvol>
+    </volume>
+    <volume name="hallOpening_logV0x256b9e0">
+      <materialref ref="G4_AIR0x21e1be0"/>
+      <solidref ref="hallOpening_solid0x256b860"/>
+      <physvol name="detPhysV0x25dccd0">
+        <volumeref ref="totalDetLogV0x256be70"/>
+        <position name="detPhysV0x25dccd0_pos" unit="mm" x="0" y="1107.3384" z="-697.865"/>
+        <rotation name="detPhysV0x25dccd0_rot" unit="deg" x="0" y="0" z="-90"/>
+      </physvol>
+    </volume>
+    <volume name="hallConcreteVol_logV0x2557310">
+      <materialref ref="Concrete0x220b470"/>
+      <solidref ref="hallConcreteVol_solid0x2568b70"/>
+      <physvol name="hallOpening_physV0x256bc00">
+        <volumeref ref="hallOpening_logV0x256b9e0"/>
+      </physvol>
+    </volume>
+    <volume name="worldVol_logV0x25573c0">
+      <materialref ref="G4_AIR0x21e1be0"/>
+      <solidref ref="worldVol_solid0x255e5b0"/>
+      <physvol name="hallConcreteVol_physV0x256b5d0">
+        <volumeref ref="hallConcreteVol_logV0x2557310"/>
+      </physvol>
+    </volume>
+    <bordersurface name="optSurf_acrylicPhysV_d2oPhysV0x25b6dc0" surfaceproperty="Reflector0x25b4bb0">
+      <physvolref ref="acrylicPhysV0x2595680"/>
+      <physvolref ref="d2oPhysV0x2595580"/>
+    </bordersurface>
+    <bordersurface name="optSurf_BottomPart_BottomTotal0x258cff0" surfaceproperty="Reflector0x258ad60">
+      <physvolref ref="BottomPart0x2586430"/>
+      <physvolref ref="BottomTotal0x25866d0"/>
+    </bordersurface>
+    <bordersurface name="DataDriven_tyvekPhysV_h2oPhysV0x259bb10" surfaceproperty="Tyvek_Reflector0x259c140">
+      <physvolref ref="tyvekPhysV0x2598dc0"/>
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+    </bordersurface>
+    <bordersurface name="DataDriven_tyvekCapBotPhysV_h2oPhysV0x25bb530" surfaceproperty="Tyvek_Reflector0x25b9360">
+      <physvolref ref="tyvekCapBotPhysV0x25b6e90"/>
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_acrylicPhysV0x25b28a0" surfaceproperty="Reflector0x25b2900">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="acrylicPhysV0x2595680"/>
+    </bordersurface>
+    <bordersurface name="DataDriven_h2oPhysV_tyvekPhysV0x259b910" surfaceproperty="Tyvek_Reflector0x259b970">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="tyvekPhysV0x2598dc0"/>
+    </bordersurface>
+    <bordersurface name="DataDriven_h2oPhysV_tyvekCapBotPhysV0x25b9220" surfaceproperty="Tyvek_Reflector0x25b6fb0">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="tyvekCapBotPhysV0x25b6e90"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_ribsPhysV_00x25be0f0" surfaceproperty="Reflector0x25bbed0">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="ribsPhysV_00x25bbdc0"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_ribsPhysV_10x25c0510" surfaceproperty="Reflector0x25be280">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="ribsPhysV_10x25be1c0"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_ribsPhysV_20x25c2930" surfaceproperty="Reflector0x25c06a0">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="ribsPhysV_20x25c05e0"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_ribsPhysV_30x25c4df0" surfaceproperty="Reflector0x25c2b10">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="ribsPhysV_30x25c2a00"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_feetPhysV_00x25c7210" surfaceproperty="Reflector0x25c4f80">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="feetPhysV_00x25c4ec0"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_feetPhysV_10x25c9680" surfaceproperty="Reflector0x25c73f0">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="feetPhysV_10x25c72e0"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_feetPhysV_20x25cbb40" surfaceproperty="Reflector0x25c9860">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="feetPhysV_20x25c9750"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_feetPhysV_30x25cdf60" surfaceproperty="Reflector0x25cbcd0">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="feetPhysV_30x25cbc10"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_feetPhysV_40x25d03d0" surfaceproperty="Reflector0x25ce140">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="feetPhysV_40x25ce030"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_feetPhysV_50x25d2890" surfaceproperty="Reflector0x25d05b0">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="feetPhysV_50x25d04a0"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_feetPhysV_60x25d4cb0" surfaceproperty="Reflector0x25d2a20">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="feetPhysV_60x25d2960"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_feetPhysV_70x25d7120" surfaceproperty="Reflector0x25d4e90">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="feetPhysV_70x25d4d80"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_feetPhysV_80x25d95e0" surfaceproperty="Reflector0x25d7300">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="feetPhysV_80x25d71f0"/>
+    </bordersurface>
+    <bordersurface name="optSurf_h2oPhysV_feetPhysV_90x25dba00" surfaceproperty="Reflector0x25d9770">
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+      <physvolref ref="feetPhysV_90x25d96b0"/>
+    </bordersurface>
+    <bordersurface name="optSurf_detPhysV_h2oPhysV0x25df0e0" surfaceproperty="Reflector0x25dce30">
+      <physvolref ref="detPhysV0x25dccd0"/>
+      <physvolref ref="h2oPhysV0x2598cc0"/>
+    </bordersurface>
+  </structure>
+
+  <setup name="Default" version="1.0">
+    <world ref="worldVol_logV0x25573c0"/>
+  </setup>
+
+</gdml>

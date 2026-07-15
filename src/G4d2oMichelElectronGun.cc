@@ -118,7 +118,7 @@ void G4d2oMichelElectronGun::GeneratePrimaries(G4Event* anEvent)
   //
   //     F(x,y) = f(x)*g(x,y);   g(x,y) = 1.+g(x)*y
   // ***************************************************
-  
+
   // ***** sampling F(x,y) directly (brute force) *****
   do {
     // Sample the positron energy by sampling from F
@@ -187,7 +187,7 @@ void G4d2oMichelElectronGun::GeneratePrimaries(G4Event* anEvent)
   G4double randvarn1 = 44.45*sqrt(G4UniformRand()); // rho, radius
   G4double randvarn2 = 2.0*TMath::Pi()*G4UniformRand(); // theta, xy angle
   G4double randvarn3 = 89.9275*(-1.0+2.0*G4UniformRand()); // length of the tank
-  
+
   particleGun->SetParticlePosition( {(0.0+randvarn1*cos(randvarn2))*cm, (110.73384+randvarn1*sin(randvarn2))*cm, (-80.74526+randvarn3)*cm}  );
   //particleGun->SetParticlePosition( {(0.0+randvarn1*cos(randvarn2))*cm, (110.73384+randvarn1*sin(randvarn2))*cm, (-80.74526-(3.0/4.0)*(89.9275)+randvarn3/4.00)*cm}  );
 
