@@ -1,0 +1,26 @@
+============================================================
+MICHEL ELECTRON SPECTRUM ANALYSIS RESULTS
+============================================================
+
+Min P.E. threshold: 60 PE (applied to both datasets)
+
+Real data: 104921 events
+  Mean: 249.86 P.E.
+  Std:  121.31 P.E.
+
+Simulation: 165 events
+  Mean: 118.30 P.E.
+  Std:  51.93 P.E.
+
+Standard binning fit results (40 PE bins):
+  Real fit: μ = 215.92 ± 0.67 PE
+            σ = 127.37 ± 4.60 PE
+            FWHM = 299.95 PE
+            R² = 0.9843
+            χ²/dof = 22.87
+
+  Simulation fit: μ = 60.00 ± 35.10 PE
+                  σ = 64.93 ± 16.37 PE
+                  FWHM = 152.92 PE
+                  R² = 0.9959
+                  χ²/dof = 0.92

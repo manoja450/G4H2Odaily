@@ -6,7 +6,7 @@
 #SBATCH --partition=longjobs
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=80G
+#SBATCH --mem=1300G
 
 echo "=========================================="
 echo "Michel Spectrum Comparison (Python)"
@@ -31,9 +31,9 @@ echo "Python location: $(which python)"
 # ============================================================================
 # Define file paths
 # ============================================================================
-DATA_DIR="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/G4d2o/data"
-SIM_FILE="${DATA_DIR}/Sim_D2ODetector11111.root"
-REAL_FILE="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/G4d2o/mac/all_histograms.root"
+DATA_DIR="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/data"
+SIM_FILE="${DATA_DIR}/Sim_D2ODetector002.root"
+REAL_FILE="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/mac/all_histograms.root"
 
 # Check if files exist
 if [ ! -f "$SIM_FILE" ]; then
