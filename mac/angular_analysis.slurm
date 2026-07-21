@@ -1,119 +1,80 @@
 #!/bin/bash
-#SBATCH --job-name=angular
-#SBATCH --output=tyvek_angular_%j.out
-#SBATCH --error=tyvek_angular_%j.err
-#SBATCH --time=4:00:00
-#SBATCH --partition=shortjobs
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=20
-#SBATCH --mem=84G
+#SBATCH -J angular_analysis
+#SBATCH -p longjobs
+#SBATCH -t 100:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem=1300G
+#SBATCH -o /home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/mac/SLURMOUT/angular_analysis-%j.out
+#SBATCH -e /home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/mac/SLURMOUT/angular_analysis-%j.out
 
-# ============================================================
-# Tyvek Angular Analysis - Optimized for Large ROOT File
-# File size: 7.86 billion reflections
-# ============================================================
+# Get timestamp for this run
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-echo "=========================================="
-echo "Tyvek Angular Analysis Job"
-echo "Start time: $(date)"
-echo "Job ID: $SLURM_JOB_ID"
-echo "Node: $SLURM_JOB_NODELIST"
-echo "=========================================="
+# Base directory (mac folder)
+BASE_DIR="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/mac"
+SLURM_DIR="${BASE_DIR}/SLURMOUT"
 
-# ============================================================
-# CHANGE TO THE CORRECT DIRECTORY (ADD THIS LINE)
-# ============================================================
-cd /home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o/mac
+# Create SLURM output directory if it doesn't exist
+mkdir -p ${SLURM_DIR}
 
-# Load required modules (adjust to your cluster)
-# module purge
-# module load root/6.26
-# module load gcc/11.2
+# Change to base directory
+cd ${BASE_DIR}
 
-# Set environment variables
-export ROOT_INCLUDE_PATH=$ROOTSYS/include
-export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+echo "========================================="
+echo "Angular Analysis started at $(date)"
+echo "SLURM Job ID: ${SLURM_JOB_ID}"
+echo "Working directory: $(pwd)"
+echo "========================================="
 
-# Set paths
-EXECUTABLE="./angular_analysis"
-INPUT_FILE="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o/data/Sim_D2ODetector002.root"
-OUTPUT_DIR="./tyvek_analysis_results"
+# Set up Python environment
+# If using conda (uncomment and modify as needed):
+# source /home/manoja450/miniconda3/etc/profile.d/conda.sh
+# conda activate your_env_name
 
-# Create output directory
-mkdir -p $OUTPUT_DIR
+# If using virtualenv (uncomment and modify as needed):
+# source /path/to/your/venv/bin/activate
 
-echo "Input file: $INPUT_FILE"
-echo "Output directory: $OUTPUT_DIR"
-echo "CPUs per task: $SLURM_CPUS_PER_TASK"
-echo "Memory: 84GB"
-echo "=========================================="
+# Print Python version and packages for debugging
+echo "Python version:"
+python3 --version
 
-# Check if input file exists
-if [ ! -f "$INPUT_FILE" ]; then
-    echo "ERROR: Input file not found!"
-    echo "Looking for: $INPUT_FILE"
+echo -e "\nInstalled packages:"
+python3 -c "import numpy, uproot, matplotlib, sys; print(f'Python: {sys.version}'); print(f'Numpy: {numpy.__version__}'); print(f'Uproot: {uproot.__version__}'); print(f'Matplotlib: {matplotlib.__version__}')" 2>/dev/null || echo "Some packages not found"
 
-    # Try to find the file
-    DATA_DIR="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o/data/"
-    if [ -d "$DATA_DIR" ]; then
-        echo "Available ROOT files in $DATA_DIR:"
-        ls -lh "$DATA_DIR"/*.root 2>/dev/null
+echo "========================================="
+echo "Running angular_analysis.py..."
+echo "========================================="
+
+# Run the Python script
+python3 angular_analysis.py
+
+# Check if the script ran successfully
+if [ $? -eq 0 ]; then
+    echo "========================================="
+    echo "✅ Angular analysis completed successfully at $(date)"
+    echo "========================================="
+    
+    # Find the latest output directory
+    LATEST_OUTPUT=$(ls -td ${BASE_DIR}/*_angular_* 2>/dev/null | head -1)
+    
+    if [ -n "${LATEST_OUTPUT}" ]; then
+        echo "Output files saved to: ${LATEST_OUTPUT}"
+        echo -e "\nGenerated files:"
+        ls -la ${LATEST_OUTPUT}/ 2>/dev/null || echo "No files found"
+        echo -e "\nTotal size of output:"
+        du -sh ${LATEST_OUTPUT} 2>/dev/null
+    else
+        echo "Warning: Could not find output directory"
     fi
+else
+    echo "========================================="
+    echo "❌ Angular analysis FAILED at $(date)"
+    echo "========================================="
+    echo "Check the error log for details"
     exit 1
 fi
 
-# Display file size
-FILE_SIZE=$(ls -lh "$INPUT_FILE" | awk '{print $5}')
-echo "Input file size: $FILE_SIZE"
-
-# Check if executable exists, compile if not
-if [ ! -f "$EXECUTABLE" ]; then
-    echo "Compiling angular_analysis..."
-    g++ -O2 -o angular_analysis angular_analysis.cpp `root-config --cflags --libs` -lm
-
-    if [ $? -ne 0 ]; then
-        echo "ERROR: Compilation failed!"
-        exit 1
-    fi
-    echo "Compilation successful!"
-fi
-
-# ============================================================
-# Run the analysis
-# ============================================================
-echo ""
-echo "Starting analysis at $(date)"
-echo "This may take several hours due to 7.86B reflections..."
-echo "=========================================="
-
-# Use time command to measure execution time
-/usr/bin/time -v ./angular_analysis "$INPUT_FILE"
-
-EXIT_STATUS=$?
-
-# ============================================================
-# Check results
-# ============================================================
-echo ""
-echo "=========================================="
-echo "Analysis completed at $(date)"
-echo "Exit status: $EXIT_STATUS"
-
-if [ $EXIT_STATUS -eq 0 ]; then
-    echo "✓ Analysis completed successfully!"
-
-    # List output files
-    echo ""
-    echo "Output files generated:"
-    if [ -d "$OUTPUT_DIR" ]; then
-        ls -lh "$OUTPUT_DIR"/*.pdf "$OUTPUT_DIR"/*.png "$OUTPUT_DIR"/*.log 2>/dev/null
-    fi
-else
-    echo "✗ Analysis failed with exit code $EXIT_STATUS"
-fi
-
-echo "=========================================="
-echo "Job finished at $(date)"
-echo "=========================================="
-
-exit $EXIT_STATUS
+echo "========================================="
+echo "SLURM job completed at $(date)"
+echo "========================================="
