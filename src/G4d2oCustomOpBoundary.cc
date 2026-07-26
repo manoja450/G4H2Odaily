@@ -10,106 +10,260 @@
 #include "G4VSolid.hh"
 #include "G4ParticleChange.hh"
 #include "G4OpticalSurface.hh"
-#include <random>
 #include <cstdio>
 
 static G4int gPrintCount = 0;
 static G4int gMaxPrint = 100;
 static G4bool gPrintLimitReached = false;
+static G4int gReflectionCount = 0;
+
+// ============================================================
+// Constructor / Destructor
+// ============================================================
 
 G4d2oCustomOpBoundary::G4d2oCustomOpBoundary(const G4String& processName)
-    : G4OpBoundaryProcess(processName) {
+    : G4OpBoundaryProcess(processName),
+      fRNG(std::random_device{}()),
+      fRandDist(0.0, 1.0),
+      fGaussDist(0.0, 1.0) {
     G4cout << "\n=========================================================" << G4endl;
-    G4cout << "G4d2oCustomOpBoundary: Created - PURE DATA-DRIVEN REFLECTOR" << G4endl;
-    G4cout << "  Using ONLY thesis data from Chavarria 2007" << G4endl;
-    G4cout << "  NO mixing, NO bias, NO artificial fixes" << G4endl;
+    G4cout << "G4d2oCustomOpBoundary: Created" << G4endl;
+    G4cout << "  Data-driven reflector (Chavarria 2007 thesis)" << G4endl;
+    G4cout << "  In-plane distribution: digitized thesis PDF (1D)" << G4endl;
+    G4cout << "  Out-of-plane (azimuthal) model: " << GetAzimuthalModelName() << G4endl;
     G4cout << "=========================================================\n" << G4endl;
 }
 
 G4d2oCustomOpBoundary::~G4d2oCustomOpBoundary() {}
 
-G4VParticleChange* G4d2oCustomOpBoundary::PostStepDoIt(const G4Track& track, const G4Step& step) {
-    
+// ============================================================
+// Get model name
+// ============================================================
+
+const char* G4d2oCustomOpBoundary::GetAzimuthalModelName() const {
+    switch(fAzimuthalModel) {
+        case kUniform:           return "UNIFORM (0 to 2π) [thesis default]";
+        case kGaussian15:        return "GAUSSIAN σ = 15°";
+        case kGaussian30:        return "GAUSSIAN σ = 30° [thesis Super-K value]";
+        case kGaussian35:        return "GAUSSIAN σ = 35°";
+        case kGaussian45:        return "GAUSSIAN σ = 45°";
+        case kGaussian60:        return "GAUSSIAN σ = 60°";
+        case kLambertianAzimuth: return "LAMBERTIAN (cos-weighted)";
+        default:                 return "UNKNOWN";
+    }
+}
+
+// ============================================================
+// Helper: Soft clamp to avoid stuck tracks
+// ============================================================
+
+G4double G4d2oCustomOpBoundary::SoftClampAngle(G4double angleDeg) const {
+    const G4double min_angle = 0.5;
+    const G4double max_angle = 89.5;
+
+    if (std::abs(angleDeg) < min_angle && angleDeg != 0.0) {
+        G4double offset = min_angle + fRandDist(fRNG) * 0.5;
+        return (angleDeg > 0) ? offset : -offset;
+    }
+    if (angleDeg > max_angle) {
+        G4double offset = fRandDist(fRNG) * 0.5;
+        return max_angle - offset;
+    }
+    if (angleDeg < -max_angle) {
+        G4double offset = fRandDist(fRNG) * 0.5;
+        return -max_angle + offset;
+    }
+    return angleDeg;
+}
+
+// ============================================================
+// Helper: Sample azimuthal angle based on selected model
+// ============================================================
+
+G4double G4d2oCustomOpBoundary::SampleAzimuthalAngle() const {
+    G4double phi = 0.0;
+
+    switch(fAzimuthalModel) {
+        case kUniform:
+            // Uniform azimuth: broadest possible distribution
+            phi = 2.0 * M_PI * fRandDist(fRNG);
+            break;
+
+        case kGaussian15:
+            // Gaussian with σ = 15° (narrow)
+            phi = fGaussDist(fRNG) * 15.0 * deg;
+            break;
+
+        case kGaussian30:
+            // Gaussian with σ = 30° (thesis Super-K comparison value)
+            phi = fGaussDist(fRNG) * 30.0 * deg;
+            break;
+
+        case kGaussian35:
+            // Gaussian with σ = 35° (test slightly wider than 30°)
+            phi = fGaussDist(fRNG) * 35.0 * deg;
+            break;
+
+        case kGaussian45:
+            // Gaussian with σ = 45° (moderate)
+            phi = fGaussDist(fRNG) * 45.0 * deg;
+            break;
+
+        case kGaussian60:
+            // Gaussian with σ = 60° (broad)
+            phi = fGaussDist(fRNG) * 60.0 * deg;
+            break;
+
+        case kLambertianAzimuth:
+            // Lambertian-weighted azimuth: probability ∝ cos(phi)
+            // This gives more weight to small phi (in-plane)
+            {
+                G4double u = fRandDist(fRNG);
+                // Simple acceptance-rejection for cos(phi) distribution
+                // For phi in [-90°, 90°] with p(phi) ∝ cos(phi)
+                G4double phi_abs = 0.0;
+                G4double maxVal = 1.0;
+                int nAttempts = 0;
+                while (nAttempts < 1000) {
+                    G4double trial = fRandDist(fRNG) * 90.0 * deg;
+                    G4double prob = std::cos(trial);
+                    if (fRandDist(fRNG) * maxVal <= prob) {
+                        phi_abs = trial;
+                        break;
+                    }
+                    nAttempts++;
+                }
+                phi = phi_abs;
+                if (fRandDist(fRNG) < 0.5) phi = -phi;
+            }
+            break;
+
+        default:
+            // Fallback to uniform
+            phi = 2.0 * M_PI * fRandDist(fRNG);
+            break;
+    }
+
+    // Clamp to avoid numerical issues
+    if (phi > 90.0 * deg) phi = 90.0 * deg;
+    if (phi < -90.0 * deg) phi = -90.0 * deg;
+
+    return phi;
+}
+
+// ============================================================
+// Main boundary process
+// ============================================================
+
+G4VParticleChange* G4d2oCustomOpBoundary::PostStepDoIt(const G4Track& track,
+                                                         const G4Step& step) {
+
+    // --- 1. Store original direction ---
+    G4ThreeVector originalDir = track.GetMomentumDirection();
+
+    // --- 2. Let Geant4 handle the boundary ---
+    G4VParticleChange* vpChange = G4OpBoundaryProcess::PostStepDoIt(track, step);
+
+    // --- 3. Cast to G4ParticleChange ---
+    G4ParticleChange* particleChange = dynamic_cast<G4ParticleChange*>(vpChange);
+    if (!particleChange) return vpChange;
+
+    // --- 4. Check if reflection occurred ---
+    if (*particleChange->GetMomentumDirection() == originalDir) {
+        return vpChange;
+    }
+
+    // --- 5. Get reflector ---
+    G4d2oDataDrivenReflector* reflector = G4d2oDataDrivenReflector::GetInstance();
+    if (reflector == nullptr) return vpChange;
+
+    // --- 6. Get incident angle ---
     const G4StepPoint* postStepPoint = step.GetPostStepPoint();
-    G4ThreeVector incomingDirection = track.GetMomentumDirection();
+    G4ThreeVector incomingDir = track.GetMomentumDirection();
+
     G4VPhysicalVolume* volume = postStepPoint->GetPhysicalVolume();
-    
     G4ThreeVector normal(0, 0, 1);
-    if (volume != nullptr && volume->GetLogicalVolume() != nullptr && 
+    if (volume != nullptr && volume->GetLogicalVolume() != nullptr &&
         volume->GetLogicalVolume()->GetSolid() != nullptr) {
         normal = volume->GetLogicalVolume()->GetSolid()->SurfaceNormal(postStepPoint->GetPosition());
     }
-    
-    G4ThreeVector incoming = incomingDirection.unit();
-    G4ThreeVector norm = normal.unit();
-    if (incoming.dot(norm) > 0) {
-        norm = -norm;
-    }
-    
-    G4double incidentAngleRad = incoming.angle(-norm);
-    G4double incidentDeg = incidentAngleRad / deg;
+    if (incomingDir.dot(normal) > 0) normal = -normal;
+
+    G4double incidentRad = incomingDir.angle(-normal);
+    G4double incidentDeg = incidentRad / deg;
     if (incidentDeg > 90.0) incidentDeg = 90.0;
     if (incidentDeg < 0) incidentDeg = 0;
-    
-    G4d2oDataDrivenReflector* reflector = G4d2oDataDrivenReflector::GetInstance();
-    
-    G4ParticleChange* particleChange = new G4ParticleChange();
-    particleChange->Initialize(track);
-    
-    if (reflector != nullptr) {
-        // ============================================================
-        // PURE DATA-DRIVEN: Sample directly from thesis PDFs
-        // NO mixing with Lambertian
-        // NO upward bias
-        // NO artificial fixes
-        // ============================================================
-        G4double thetaOutDeg = reflector->SampleOutgoingAngle(incidentDeg);
-        G4double thetaOutRad = thetaOutDeg * deg;
-        
-        // Record for ROOT
-        reflector->RecordReflection(incidentDeg, thetaOutDeg);
-        
-        // Limited console printing
-        if (!gPrintLimitReached) {
-            if (gPrintCount < gMaxPrint) {
-                gPrintCount++;
-                printf("  [PURE DATA %d] incident=%.2f°, reflected=%.2f°\n", 
-                       gPrintCount, incidentDeg, thetaOutDeg);
-                fflush(stdout);
-            } else if (gPrintCount == gMaxPrint) {
-                gPrintCount++;
-                printf("  ... (further reflections not printed)\n");
-                fflush(stdout);
-            }
+
+    // --- 7. Sample outgoing angle (in-plane) ---
+    G4double thetaOutDeg = reflector->SampleOutgoingAngle(incidentDeg);
+    G4double originalTheta = thetaOutDeg;
+    thetaOutDeg = SoftClampAngle(thetaOutDeg);
+    G4double thetaOutRad = thetaOutDeg * deg;
+
+    // --- 8. Print (limited) ---
+    if (!gPrintLimitReached && gPrintCount < gMaxPrint) {
+        gPrintCount++;
+        gReflectionCount++;
+        if (originalTheta != thetaOutDeg) {
+            printf("  [REFLECTION %d] incident=%.2f°, sampled=%.2f° -> clamped=%.2f° [AZIMUTH=%s]\n",
+                   gReflectionCount, incidentDeg, originalTheta, thetaOutDeg,
+                   GetAzimuthalModelName());
+        } else {
+            printf("  [REFLECTION %d] incident=%.2f°, reflected=%.2f° [AZIMUTH=%s]\n",
+                   gReflectionCount, incidentDeg, thetaOutDeg,
+                   GetAzimuthalModelName());
         }
-        
-        // Calculate reflection direction in plane of incidence
-        G4ThreeVector perp = incoming - (incoming.dot(norm)) * norm;
-        if (perp.mag() < 1e-10) {
-            perp = G4ThreeVector(1, 0, 0);
-            if (std::abs(norm.dot(perp)) > 0.9999) perp = G4ThreeVector(0, 1, 0);
+        fflush(stdout);
+        if (gPrintCount >= gMaxPrint) {
+            gPrintLimitReached = true;
+            printf("  ... (further reflections suppressed)\n");
+            fflush(stdout);
         }
-        perp = perp.unit();
-        
-        // Construct reflected direction from thesis-sampled angle
-        G4ThreeVector reflected = -std::cos(thetaOutRad) * norm + std::sin(thetaOutRad) * perp;
-        
-        // Random azimuth (physically correct - isotropic out-of-plane)
-        std::uniform_real_distribution<G4double> dist(0.0, 2.0 * M_PI);
-        static std::mt19937 rng(std::random_device{}());
-        G4double azimuth = dist(rng);
-        
-        G4ThreeVector perp2 = norm.cross(perp).unit();
-        G4ThreeVector finalDir = std::cos(azimuth) * reflected + std::sin(azimuth) * perp2;
-        finalDir = finalDir.unit();
-        
-        particleChange->ProposeMomentumDirection(finalDir);
-        particleChange->ProposeEnergy(track.GetKineticEnergy());
-        particleChange->ProposeLocalEnergyDeposit(0.0);
-        particleChange->SetNumberOfSecondaries(0);
-        
-        return particleChange;
-    } else {
-        return G4OpBoundaryProcess::PostStepDoIt(track, step);
     }
+
+    // --- 9. Build in-plane reflection direction ---
+    G4ThreeVector norm = normal.unit();
+    G4ThreeVector perp = incomingDir - (incomingDir.dot(norm)) * norm;
+    if (perp.mag() < 1e-10) {
+        perp = G4ThreeVector(1, 0, 0);
+        if (std::abs(norm.dot(perp)) > 0.9999) perp = G4ThreeVector(0, 1, 0);
+    }
+    perp = perp.unit();
+
+    G4ThreeVector reflectedInPlane = -std::cos(thetaOutRad) * norm +
+                                      std::sin(thetaOutRad) * perp;
+
+    // ============================================================
+    // --- 10. Sample azimuthal angle (out-of-plane) ---
+    // This is the key: the azimuthal model determines how the 1D
+    // in-plane measurement is extended into 3D.
+    // The thesis does NOT specify this distribution.
+    // ============================================================
+    G4double phi = SampleAzimuthalAngle();
+
+    G4ThreeVector perp2 = norm.cross(perp).unit();
+    G4ThreeVector finalDir = std::cos(phi) * reflectedInPlane +
+                              std::sin(phi) * perp2;
+    finalDir = finalDir.unit();
+
+    // --- 11. Safety: ensure direction points away from surface ---
+    G4double dotNormal = finalDir.dot(norm);
+    if (dotNormal > 0) {
+        finalDir = finalDir - 2.0 * dotNormal * norm;
+        finalDir = finalDir.unit();
+    }
+    if (std::abs(finalDir.dot(norm)) < 1e-6) {
+        finalDir = finalDir - 1e-6 * norm;
+        finalDir = finalDir.unit();
+    }
+
+    // --- 12. Record global direction for diagnostics ---
+    reflector->RecordReflection(incidentDeg, thetaOutDeg,
+                                finalDir.x(), finalDir.y(), finalDir.z(),
+                                norm.x(), norm.y(), norm.z());
+
+    // --- 13. Override momentum ---
+    particleChange->ProposeMomentumDirection(finalDir);
+
+    return particleChange;
 }

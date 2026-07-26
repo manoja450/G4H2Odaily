@@ -30,7 +30,7 @@ public:
     void LoadPDF(G4double incidentAngleDeg, const G4String& filename);
     void LoadAllPDFs(const G4String& directory);
     void PrintLoadedAngles() const;
-    
+
     // Validation method
     void ValidatePDF(G4double incidentAngleDeg, G4int nSamples = 100000) const;
 
@@ -40,7 +40,9 @@ public:
 
     static void SetRootFile(TFile* file);
     static void CloseRootTree();
-    static void RecordReflection(G4double incidentAngleDeg, G4double reflectedAngleDeg);
+    static void RecordReflection(G4double incidentAngleDeg, G4double reflectedAngleDeg,
+                                 G4double px = 0, G4double py = 0, G4double pz = 0,
+                                 G4double nx = 0, G4double ny = 0, G4double nz = 0);
     static void SetCurrentEventNumber(G4int eventNum);
 
 private:
@@ -63,10 +65,8 @@ private:
     G4double InterpolateThetaOut(G4double incidentAngleDeg, G4double rand) const;
     void FindBoundingPDFs(G4double incidentAngleDeg, const PDF*& pdfLow, const PDF*& pdfHigh,
                           G4double& weightLow, G4double& weightHigh) const;
-    
-    // ============================================================
-    // FUNCTION B: Continuous interpolation helpers
-    // ============================================================
+
+    // Function B: Continuous interpolation helpers
     std::vector<G4double> CreateContinuousPDF(const std::vector<G4double>& theta,
                                                const std::vector<G4double>& intensity,
                                                G4int nFineBins = 360) const;
@@ -78,13 +78,15 @@ private:
     static TTree* fReflectionTree;
     static G4double fRecordedIncident;
     static G4double fRecordedReflected;
+    static G4double fRecordedPx;
+    static G4double fRecordedPy;
+    static G4double fRecordedPz;
+    static G4double fRecordedNx;
+    static G4double fRecordedNy;
+    static G4double fRecordedNz;
     static G4int fRecordedEventID;
     static G4int fReflectionCounter;
     static G4int fCurrentEventNumber;
-    
-    // Safety parameters
-    static constexpr G4double fMinAngle = 5.0;   // avoid stuck tracks
-    static constexpr G4double fMaxAngle = 85.0;  // avoid grazing angles
 };
 
 #endif

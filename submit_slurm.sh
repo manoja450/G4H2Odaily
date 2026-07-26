@@ -1,16 +1,16 @@
 #!/bin/bash
 #SBATCH -J G4h2o
-#SBATCH -p shortjobs
-#SBATCH -t 5:00:00
+#SBATCH -p longjobs
+#SBATCH -t 100:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --mem=80G
-#SBATCH -o /home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o/SLURMOUT/slurm-%j.out
-#SBATCH -e /home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o/SLURMOUT/slurm-%j.out
+#SBATCH --mem=1300G
+#SBATCH -o /home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/SLURMOUT/slurm-%j.out
+#SBATCH -e /home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/SLURMOUT/slurm-%j.out
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-BASE_DIR="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o"
+BASE_DIR="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN"
 OUTPUT_DIR="${BASE_DIR}/OUTPUT/run_${TIMESTAMP}"
 SLURM_DIR="${BASE_DIR}/SLURMOUT"
 
@@ -48,7 +48,7 @@ echo "========================================="
 
 echo "/run/beamOn" > ${OUTPUT_DIR}/input.txt
 
-./build/G4d2o < ${OUTPUT_DIR}/input.txt > ${OUTPUT_DIR}/simulation.log 2>&1
+./build/G4d2o  
 
 echo "========================================="
 echo "Simulation finished at $(date)"

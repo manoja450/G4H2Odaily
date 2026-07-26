@@ -8,9 +8,9 @@ Real data: 104921 events
   Mean: 249.86 P.E.
   Std:  121.31 P.E.
 
-Simulation: 165 events
-  Mean: 118.30 P.E.
-  Std:  51.93 P.E.
+Simulation: 373 events
+  Mean: 131.52 P.E.
+  Std:  53.02 P.E.
 
 Standard binning fit results (40 PE bins):
   Real fit: μ = 215.92 ± 0.67 PE
@@ -19,8 +19,8 @@ Standard binning fit results (40 PE bins):
             R² = 0.9843
             χ²/dof = 22.87
 
-  Simulation fit: μ = 60.00 ± 35.10 PE
-                  σ = 64.93 ± 16.37 PE
-                  FWHM = 152.92 PE
-                  R² = 0.9959
-                  χ²/dof = 0.92
+  Simulation fit: μ = 107.91 ± 6.55 PE
+                  σ = 55.26 ± 5.01 PE
+                  FWHM = 130.14 PE
+                  R² = 0.9951
+                  χ²/dof = 0.59
