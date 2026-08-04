@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH -J angular_analysis
-#SBATCH -p longjobs
-#SBATCH -t 100:00:00
+#SBATCH -p shortjobs
+#SBATCH -t 10:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --mem=1300G
+#SBATCH --mem=80G
 #SBATCH -o /home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/mac/SLURMOUT/angular_analysis-%j.out
 #SBATCH -e /home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/mac/SLURMOUT/angular_analysis-%j.out
 
@@ -48,7 +48,7 @@ echo "========================================="
 
 # Run the Python script
 python3 angular_analysis.py
-
+#python3 two_models_comparison.py
 # Check if the script ran successfully
 if [ $? -eq 0 ]; then
     echo "========================================="

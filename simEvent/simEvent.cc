@@ -1,4 +1,3 @@
-
 #include "simEvent.h"
 #include "TClonesArray.h"
 #include "G4d2oGeom.h"
@@ -11,7 +10,7 @@ using namespace std;
 
 ClassImp(simEvent)
 
-    TClonesArray *simEvent::sPMTHits = 0;
+TClonesArray *simEvent::sPMTHits = 0;
 TClonesArray *simEvent::sAreaPMTHits = 0;
 
 simEvent::simEvent(Int_t maxPMT)
@@ -31,28 +30,24 @@ simEvent::simEvent(Int_t maxPMT)
 
 simEvent::~simEvent()
 {
-
   pmtHits->Clear("C");
   areaPMTHits->Clear("C");
 }
 
 void simEvent::AddPMTHit(Int_t pNum, Double_t eTime, Double_t phEn)
 {
-
   simHit *theHit = (simHit *)pmtHits->ConstructedAt(numHits++);
   theHit->Set(pNum, eTime, phEn);
 }
 
 void simEvent::AddAreaPMTHit(Int_t pNum, Double_t eTime, Double_t phEn, TVector3 hitPos)
 {
-
   simAreaHit *theHit = (simAreaHit *)areaPMTHits->ConstructedAt(numHitsArea++);
   theHit->Set(pNum, eTime, phEn, hitPos);
 }
 
 void simEvent::ClearData()
 {
-
   eventNumber = -1;
   direction0.SetXYZ(0.0, 0.0, 0.0);
   position0.SetXYZ(0.0, 0.0, 0.0);
@@ -66,6 +61,13 @@ void simEvent::ClearData()
   numHits = 0;
   pmtHits->Clear();
 
+  // NEW: Clear instrumentation fields
+  nReflections = 0;
+  totalPathLength = 0.0;
+  nPhotons = 0;
+  meanReflections = 0.0;
+  meanPathLength = 0.0;
+
   numHitsArea = 0;
   areaPMTHits->Clear();
   for (int i = 0; i < 12; i++)
@@ -74,7 +76,6 @@ void simEvent::ClearData()
 
 void simEvent::CopyData(simEvent *dataToCopy)
 {
-
   eventNumber = dataToCopy->eventNumber;
   direction0 = TVector3(dataToCopy->direction0);
   position0 = TVector3(dataToCopy->position0);
@@ -88,6 +89,13 @@ void simEvent::CopyData(simEvent *dataToCopy)
   areaPMTHits = (TClonesArray *)dataToCopy->areaPMTHits->Clone();
   for (int i = 0; i < 12; i++)
     muVetoEnergy[i] = dataToCopy->muVetoEnergy[i];
+
+  // NEW: Copy instrumentation fields
+  nReflections = dataToCopy->nReflections;
+  totalPathLength = dataToCopy->totalPathLength;
+  nPhotons = dataToCopy->nPhotons;
+  meanReflections = dataToCopy->meanReflections;
+  meanPathLength = dataToCopy->meanPathLength;
 }
 
 double simEvent::MeanX() const

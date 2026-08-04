@@ -10,7 +10,7 @@
 #include "TStopwatch.h"
 
 #define NUMINT 13
-#define NUMDOUBLE 6
+#define NUMDOUBLE 8   // increased from 6 to 8 for ReflectionModel and ModuleType
 #define NUMCHAR 1
 #define NUMLONG 1
 
@@ -19,7 +19,6 @@
 class GenericInputHolder
 {
 public:
-    
     GenericInputHolder() {;}
 
     Int_t iPar[NUMINT];
@@ -27,14 +26,12 @@ public:
 
     Long64_t lPar[NUMLONG];
     Char_t lDesc[NUMLONG][100];
-    
+
     Double_t dPar[NUMDOUBLE];
     Char_t dDesc[NUMDOUBLE][100];
-    
+
     TString sPar[NUMCHAR];
     Char_t sDesc[NUMCHAR][100];
-    
-  
 };
 
 using namespace std;
@@ -42,18 +39,17 @@ using namespace std;
 class inputVariables : public TObject
 {
 public:
-    
     static inputVariables * ptrIV;
     static ofstream * ptrOF;
-    
+
     inputVariables(int argc=0, char** argv=0);
     ~inputVariables();
-    
+
     static inputVariables* GetIVPointer( int argc=0, char** argv=0 );
     ofstream* GetOutputFile( void );
 
     inline void SetNumberOfEvents(G4int numEntries) {nevents = numEntries;}
-    
+
     inline G4int GetRunNumber() {return runno;}
     inline G4int GetNumberOfEvents() {return nevents;}
     inline G4int GetVisualization() {return ivis;}
@@ -75,7 +71,11 @@ public:
     inline G4double GetH2oRefl() {return h2oRefl;}
     inline G4double GetReflectivity() {return reflectivity;}
     inline G4double GetSpecialEnergy() {return specialEnergy;}
-    
+
+    // NEW: model selection
+    inline G4int GetReflectionModel() {return reflectionModel;} // 0=Unified, 1=Data-Driven
+    inline G4int GetModuleType() {return moduleType;}          // 0=Module1 (H2O+D2O), 1=Module2 (both H2O)
+
     Bool_t ReadCurrentFile();
     Bool_t UpdateValues(int argc, char** argv);
     void WriteValues(GenericInputHolder *theVals, Bool_t bFile=true, TString sBOFileName="beamOn.dat");
@@ -90,13 +90,11 @@ public:
     Int_t targCollID[MAX_SEN_DET];
     G4int GetNewCollectionID(G4int iType);
     G4int GetNumHitsCollections() {return numHitsColl;}
-    
-private:
 
-    //I/O variables
+private:
     ofstream outfile;
     TObjArray *thePTracFiles;
-    
+
     G4int runno, nevents, ivis, iprint, irand, iPGA;
     G4int iPhysics, iNeutronHP, iSideLining, iUseBottomPMTs, iPMTQE, iUseBottomVeto, iUseBottomShielding;
     G4int isave;
@@ -104,11 +102,14 @@ private:
     G4long userSEED;
     TString outputDir;
 
-    TDatime *dateTime;
+    // NEW
+    G4int reflectionModel;   // 0=Unified, 1=Data-Driven
+    G4int moduleType;        // 0=Module1 (H2O+D2O), 1=Module2 (both H2O)
 
+    TDatime *dateTime;
     GenericInputHolder *currentVals;
     GenericInputHolder *newVals;
-    
+
     const Int_t indexRunNum = 0;
     const Int_t indexNumEvents = 1;
     const Int_t indexVis = 2;
@@ -122,17 +123,19 @@ private:
     const Int_t indexPMTQE = 10;
     const Int_t indexUseBottomVeto = 11;
     const Int_t indexUseBottomShielding = 12;
+
     const Int_t indexPMTDiam = 0;
     const Int_t indexTailThick = 1;
     const Int_t indexShieldThick = 2;
     const Int_t indexH2oRefl = 3;
     const Int_t indexReflectivity = 4;
     const Int_t indexSpecialEnergy = 5;
+    // NEW indices
+    const Int_t indexReflectionModel = 6;
+    const Int_t indexModuleType = 7;
+
     const Int_t indexOutDir = 0;
     const Int_t indexUserSEED = 0;
-
-    
-};//END of class inputVariables
-
+};
 
 #endif

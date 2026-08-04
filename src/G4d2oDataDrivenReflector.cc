@@ -39,7 +39,7 @@ G4d2oDataDrivenReflector::G4d2oDataDrivenReflector(G4double reflectivity)
     G4cout << "  Function A: Incident angle interpolation: ENABLED" << G4endl;
     G4cout << "  Function B: Continuous PDF interpolation: ENABLED" << G4endl;
     G4cout << "  Function C: CDF sampling: ENABLED" << G4endl;
-    G4cout << "  Soft clamp: min angle = 0.5°, max angle = 89.5°" << G4endl;
+    G4cout << "  Soft clamp: min angle = 0.5deg, max angle = 89.5deg" << G4endl;
     G4cout << "  Recording global direction (px, py, pz) for diagnostics" << G4endl;
     G4cout << "=========================================================\n" << G4endl;
 }
@@ -143,7 +143,7 @@ void G4d2oDataDrivenReflector::NormalizeAndBuildCDF(PDF& pdf) {
 void G4d2oDataDrivenReflector::LoadPDF(G4double incidentAngleDeg, const G4String& filename) {
     PDF pdf;
 
-    // Read raw data from thesis (coarse grid, ~5° resolution)
+    // Read raw data from thesis (coarse grid, ~5deg resolution)
     std::vector<G4double> coarseTheta, coarseIntensity;
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -166,9 +166,9 @@ void G4d2oDataDrivenReflector::LoadPDF(G4double incidentAngleDeg, const G4String
     G4cout << "  Read " << coarseTheta.size() << " coarse points from " << filename << G4endl;
 
     // ============================================================
-    // FUNCTION B: Interpolate to continuous fine grid (0.5° resolution)
+    // FUNCTION B: Interpolate to continuous fine grid (0.5deg resolution)
     // ============================================================
-    const G4int nFineBins = 360;  // -90 to 90 in 0.5° steps
+    const G4int nFineBins = 360;  // -90 to 90 in 0.5deg steps
     pdf.theta.reserve(nFineBins + 1);
     pdf.intensity.reserve(nFineBins + 1);
 
@@ -187,7 +187,7 @@ void G4d2oDataDrivenReflector::LoadPDF(G4double incidentAngleDeg, const G4String
     NormalizeAndBuildCDF(pdf);
     fPDFs[static_cast<G4int>(incidentAngleDeg)] = pdf;
 
-    G4cout << "  Loaded PDF for incident " << incidentAngleDeg << "° -> interpolated to "
+    G4cout << "  Loaded PDF for incident " << incidentAngleDeg << "deg -> interpolated to "
            << pdf.theta.size() << " continuous points" << G4endl;
 }
 
@@ -218,8 +218,8 @@ void G4d2oDataDrivenReflector::PrintLoadedAngles() const {
     G4cout << "\n========== PDF LIBRARY SUMMARY ==========" << G4endl;
     G4cout << "Function A: Incident angles available:" << G4endl;
     for (auto& pair : fPDFs) {
-        G4cout << "  " << pair.first << "°: " << pair.second.theta.size()
-               << " continuous points (0.5° resolution)" << G4endl;
+        G4cout << "  " << pair.first << "deg: " << pair.second.theta.size()
+               << " continuous points (0.5deg resolution)" << G4endl;
     }
     G4cout << "Function B: Continuous interpolation applied" << G4endl;
     G4cout << "Function C: CDF sampling ready" << G4endl;
@@ -336,14 +336,14 @@ G4double G4d2oDataDrivenReflector::GetThetaOut(G4double incidentAngleDeg) const 
 }
 
 // ============================================================
-// FUNCTION C: Sample Outgoing Angle – with SOFT CLAMP
+// FUNCTION C: Sample Outgoing Angle - with SOFT CLAMP
 // ============================================================
 G4double G4d2oDataDrivenReflector::SampleOutgoingAngle(G4double incidentAngleDeg) const {
     // Get the raw angle from the thesis PDF
     G4double theta = GetThetaOut(incidentAngleDeg);
 
     // ============================================================
-    // SOFT CLAMP: Avoid exact 0° and ±90° which cause stuck tracks
+    // SOFT CLAMP: Avoid exact 0deg and +/-90deg which cause stuck tracks
     // ============================================================
     const G4double min_angle = 0.5;
     const G4double max_angle = 89.5;
@@ -363,6 +363,9 @@ G4double G4d2oDataDrivenReflector::SampleOutgoingAngle(G4double incidentAngleDeg
 
 // ============================================================
 // Reflection Direction (Main interface for Geant4)
+// NOTE: not currently called from the active PostStepDoIt path (which
+// builds finalDir itself in G4d2oCustomOpBoundary.cc) - kept here for
+// API compatibility, with the matching fixes applied.
 // ============================================================
 
 G4ThreeVector G4d2oDataDrivenReflector::GetReflectionDirection(const G4ThreeVector& incomingDirection,
@@ -389,13 +392,12 @@ G4ThreeVector G4d2oDataDrivenReflector::GetReflectionDirection(const G4ThreeVect
     // Bitangent
     G4ThreeVector bitangent = norm.cross(tangent);
 
-    // Reflection direction in plane
-    G4ThreeVector reflectedInPlane = -std::cos(thetaOutRad) * norm + std::sin(thetaOutRad) * tangent;
-
-    // Random azimuth (isotropic out-of-plane)
+    // Random azimuth (isotropic out-of-plane), built as a true rotation
+    // about norm so the normal component stays cos(thetaOut) for every
+    // azimuth (see G4d2oCustomOpBoundary.cc step 10 for the same fix).
     G4double azimuth = 2.0 * M_PI * fRandDist(fRNG);
-    G4ThreeVector reflectedDir = std::cos(azimuth) * reflectedInPlane +
-                                  std::sin(azimuth) * bitangent;
+    G4ThreeVector tangentialDir = std::cos(azimuth) * tangent + std::sin(azimuth) * bitangent;
+    G4ThreeVector reflectedDir = std::cos(thetaOutRad) * norm + std::sin(thetaOutRad) * tangentialDir;
 
     return reflectedDir.unit();
 }
@@ -405,12 +407,12 @@ G4ThreeVector G4d2oDataDrivenReflector::GetReflectionDirection(const G4ThreeVect
 // ============================================================
 
 void G4d2oDataDrivenReflector::ValidatePDF(G4double incidentAngleDeg, G4int nSamples) const {
-    G4cout << "\n========== VALIDATING incident " << incidentAngleDeg << "° ==========" << G4endl;
+    G4cout << "\n========== VALIDATING incident " << incidentAngleDeg << "deg ==========" << G4endl;
 
     // Find the PDF for this incident angle
     auto it = fPDFs.find(static_cast<G4int>(incidentAngleDeg));
     if (it == fPDFs.end()) {
-        G4cerr << "ERROR: No PDF loaded for " << incidentAngleDeg << "°" << G4endl;
+        G4cerr << "ERROR: No PDF loaded for " << incidentAngleDeg << "deg" << G4endl;
         return;
     }
 
@@ -424,7 +426,7 @@ void G4d2oDataDrivenReflector::ValidatePDF(G4double incidentAngleDeg, G4int nSam
         samples.push_back(SampleOutgoingAngle(incidentAngleDeg));
     }
 
-    // Create histogram (2.5° bins for comparison)
+    // Create histogram (2.5deg bins for comparison)
     const G4int nBins = 72;
     G4double binMin = -90.0, binMax = 90.0;
     G4double binWidth = (binMax - binMin) / nBins;
@@ -470,11 +472,11 @@ void G4d2oDataDrivenReflector::ValidatePDF(G4double incidentAngleDeg, G4int nSam
     G4cout << "  Shape correlation = " << shapeCorr << G4endl;
 
     if (shapeCorr > 0.99) {
-        G4cout << "  ✅ EXCELLENT - Functions A, B, C working correctly" << G4endl;
+        G4cout << "  EXCELLENT - Functions A, B, C working correctly" << G4endl;
     } else if (shapeCorr > 0.95) {
-        G4cout << "  ⚠️ GOOD - Acceptable, minor deviations" << G4endl;
+        G4cout << "  GOOD - Acceptable, minor deviations" << G4endl;
     } else {
-        G4cout << "  ❌ POOR - Check PDF loading or digitization" << G4endl;
+        G4cout << "  POOR - Check PDF loading or digitization" << G4endl;
     }
     G4cout << "=========================================================\n" << G4endl;
 }

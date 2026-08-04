@@ -12,13 +12,13 @@ ofstream * inputVariables::ptrOF = NULL;
 inputVariables::inputVariables(int argc, char** argv)
 {
     G4cerr << "Instance of inputVariables Constructed!" << G4endl;
-    
+
     currentVals = new GenericInputHolder();
     newVals = new GenericInputHolder();
     thePTracFiles = new TObjArray();
-    
+
     ReadCurrentFile();
-    
+
     if(argc==2 && (strcmp(argv[1],"--help")==0 || strcmp(argv[1], "help")==0)){
         PrintHelp(argv[0]);
         exit(0);
@@ -26,7 +26,7 @@ inputVariables::inputVariables(int argc, char** argv)
     else if(argc==2 && strcmp(argv[1],"ShowCurrent")==0){
         printf("\nCurrent beamOn.dat\n\n");
         WriteValues(currentVals,false);
-        printf("\n\n"); 
+        printf("\n\n");
         exit(0);
     }
     else if(argc>1 && strcmp(argv[1],"Setup")==0){
@@ -46,7 +46,7 @@ inputVariables::inputVariables(int argc, char** argv)
         PrintCommandLine(argv,currentVals);
         exit(0);
     }
-    
+
     //Setting values here (no change to beamOn.dat)
     if(argc==1) SetValues(currentVals); //use values from the file
     else{
@@ -57,76 +57,55 @@ inputVariables::inputVariables(int argc, char** argv)
         SetValues(newVals);
     }
     SetupDirectory();
-    
-    
+
     //Writing a new beamOn.dat file
     WriteValues(newVals,true,Form("%s/beamOnFiles/beamOn%03d.dat",outputDir.Data(),runno));
-    // Disabling cp'ing to current directory as this breaks the model of submitting jobs from the saming directory with different output directories on a cluster
-    //system(Form("cp %s/beamOnFiles/beamOn%03d.dat beamOn.dat",outputDir.Data(),runno));
-    
+
     dateTime = new TDatime();
-    
+
     numHitsColl = 0;
     numDetHC = 0;
     numSrcHC = 0;
     numTargHC = 0;
-    
-    
-}//END of constructor
+}
 
 inputVariables::~inputVariables()
 {
     G4cerr<<"Deleting inputVariables...";
-    
     delete currentVals;
     delete newVals;
-    
     G4cerr<<"done"<<G4endl;
-}//END of destructor
+}
 
 void inputVariables::SetupDirectory(){
-    
     system(Form("mkdir -p %s",outputDir.Data()));
     system(Form("mkdir -p %s/fileHistories",outputDir.Data()));
     system(Form("mkdir -p %s/beamOnFiles",outputDir.Data()));
-    
 }
-
 
 inputVariables* inputVariables::GetIVPointer( int argc, char** argv )
 {
-    
     if(!ptrIV) ptrIV = new inputVariables(argc, argv);
-    
     return ptrIV;
-    
-}//END of GetIVPointer()
+}
 
 ofstream * inputVariables::GetOutputFile( void )
 {
-    
     if( ptrOF==NULL ){
-        //Get Date and Time
         dateTime->Set();
-        
         ptrOF = new ofstream( "tracking_hits.dat", ios::out );
-        
         *ptrOF <<dateTime->GetMonth()<<"/"<<dateTime->GetDay()<<"/"<<dateTime->GetYear()<<"   "<<dateTime->GetHour();
         if(dateTime->GetMinute() < 10) *ptrOF<<":0";
         if(dateTime->GetMinute() >= 10) *ptrOF<<":";
         *ptrOF<<dateTime->GetMinute()<<G4endl;
         *ptrOF <<" Run Number: "<<runno<<G4endl;
-        
     }
-    
     return ptrOF;
-    
-}//END of GetOutputFile()
+}
 
 Bool_t inputVariables::ReadCurrentFile(){
-    
     ifstream infile("beamOn.dat");
-    
+
     for(Int_t i=0; i<NUMINT; i++)
         infile >> currentVals->iPar[i] >> currentVals->iDesc[i];
     for(Int_t i=0; i<NUMLONG; i++)
@@ -135,15 +114,15 @@ Bool_t inputVariables::ReadCurrentFile(){
         infile >> currentVals->dPar[i] >> currentVals->dDesc[i];
     for(Int_t i=0; i<NUMCHAR; i++)
         infile >> currentVals->sPar[i] >> currentVals->sDesc[i];
-    
+
     infile.close();
-    
+
     ifstream infile0("beamOn0.dat");
     if(!infile0){
         printf("\tError in inputVariables::ReadCurrentFile() - can't find the template input file: beamOn0.dat.\n\n");
         exit(0);
     }
-    
+
     TString sDum;
     for(Int_t i=0; i<NUMINT; i++)
         infile0 >> sDum >> currentVals->iDesc[i];
@@ -153,9 +132,9 @@ Bool_t inputVariables::ReadCurrentFile(){
         infile0 >> sDum >> currentVals->dDesc[i];
     for(Int_t i=0; i<NUMCHAR; i++)
         infile0 >> sDum >> currentVals->sDesc[i];
-    
+
     infile0.close();
-    
+
     for(Int_t i=0; i<NUMINT; i++){
         newVals->iPar[i] = currentVals->iPar[i];
         sprintf(newVals->iDesc[i],"%s",currentVals->iDesc[i]);
@@ -172,16 +151,14 @@ Bool_t inputVariables::ReadCurrentFile(){
         newVals->sPar[i] = currentVals->sPar[i];
         sprintf(newVals->sDesc[i],"%s",currentVals->sDesc[i]);
     }
-    
+
     return true;
-    
 }
 
 void inputVariables::WriteValues(GenericInputHolder *theVals, Bool_t bFile, TString sBOFileName){
-    
     ofstream newFile;
     if(bFile) newFile.open(sBOFileName);
-    
+
     for(Int_t i=0; i<NUMINT; i++){
         if(!bFile) cout<<theVals->iPar[i]<<"\t\t"<<theVals->iDesc[i]<<endl;
         else{
@@ -189,27 +166,24 @@ void inputVariables::WriteValues(GenericInputHolder *theVals, Bool_t bFile, TStr
             else newFile<<theVals->iPar[i]<<"\t\t"<<theVals->iDesc[i]<<endl;
         }
     }
-    
+
     for(Int_t i=0; i<NUMLONG; i++){
         if(!bFile) cout<<theVals->lPar[i]<<"\t\t"<<theVals->lDesc[i]<<endl;
         else newFile<<theVals->lPar[i]<<"\t\t"<<theVals->lDesc[i]<<endl;
     }
-    
+
     for(Int_t i=0; i<NUMDOUBLE; i++){
         if(!bFile) cout<<theVals->dPar[i]<<"\t\t"<<theVals->dDesc[i]<<endl;
         else newFile<<theVals->dPar[i]<<"\t\t"<<theVals->dDesc[i]<<endl;
     }
-    
+
     for(Int_t i=0; i<NUMCHAR; i++){
         if(!bFile) cout<<theVals->sPar[i]<<"\t\t"<<theVals->sDesc[i]<<endl;
         else newFile<<theVals->sPar[i]<<"\t\t"<<theVals->sDesc[i]<<endl;
     }
-    
 }
 
-
 void inputVariables::SetValues(GenericInputHolder *theVals){
-    
     runno               = theVals->iPar[indexRunNum];
     nevents             = theVals->iPar[indexNumEvents];
     ivis                = theVals->iPar[indexVis];
@@ -220,51 +194,50 @@ void inputVariables::SetValues(GenericInputHolder *theVals){
     iPGA                = theVals->iPar[indexPGA];
     iSideLining         = theVals->iPar[indexSideLining];
     iUseBottomPMTs      = theVals->iPar[indexUseBottomPMTs];
+    iPMTQE              = theVals->iPar[indexPMTQE];
     iUseBottomVeto      = theVals->iPar[indexUseBottomVeto];
     iUseBottomShielding = theVals->iPar[indexUseBottomShielding];
-    iPMTQE              = theVals->iPar[indexPMTQE];
-                       
+
     pmtDiameter         = theVals->dPar[indexPMTDiam];
     tailThick           = theVals->dPar[indexTailThick];
     shieldThick         = theVals->dPar[indexShieldThick];
     h2oRefl             = theVals->dPar[indexH2oRefl];
     reflectivity        = theVals->dPar[indexReflectivity];
     specialEnergy       = theVals->dPar[indexSpecialEnergy];
-                       
+
+    // NEW: read model parameters
+    reflectionModel     = (G4int)theVals->dPar[indexReflectionModel];
+    moduleType          = (G4int)theVals->dPar[indexModuleType];
+
     userSEED            = theVals->lPar[indexUserSEED];
-                       
     outputDir           = theVals->sPar[indexOutDir];
-    
 }
 
-
 void inputVariables::PrintCommandLine(char** argv, GenericInputHolder *theVals){
-    
-    
     printf("\n");
     printf("Shell command:\n");
     printf("%s %d ",argv[0],theVals->iPar[indexRunNum]);
-    
+
     printf("Events %d ",theVals->iPar[indexNumEvents]);
-    
+
     if(theVals->iPar[indexVis]==0) printf("NoVis ");
     else if(theVals->iPar[indexVis]==1) printf("OpenGL ");
     else if(theVals->iPar[indexVis]==2) printf("Wired ");
     else if(theVals->iPar[indexVis]==3) printf("Dawn ");
-    
+
     if(theVals->iPar[indexDebug]==0) printf("NoTracks ");
     else if(theVals->iPar[indexDebug]==1) printf("TrackScreen ");
     else if(theVals->iPar[indexDebug]==2) printf("TrackFile ");
-    
+
     if(theVals->iPar[indexSeed]==0) printf("FixSeed ");
     else if(theVals->iPar[indexSeed]==1) printf("ClockSeed ");
-    
+
     if(theVals->iPar[indexPhysics]==0) printf("PhysicsOff ");
     else if(theVals->iPar[indexPhysics]==1) printf("PhysicsOn ");
-    
+
     if(theVals->iPar[indexNeutronHP]==0) printf("NoNeutronHP ");
     else if(theVals->iPar[indexNeutronHP]==1) printf("NeutronHP ");
-    
+
     if(theVals->iPar[indexPGA]==0) printf("PhotonPGA ");
     else if(theVals->iPar[indexPGA]==1) printf("ElectronPGA ");
     else if(theVals->iPar[indexPGA]==2) printf("CosmicPGA ");
@@ -272,7 +245,7 @@ void inputVariables::PrintCommandLine(char** argv, GenericInputHolder *theVals){
 
     if(theVals->iPar[indexSideLining]==0) printf("SideTeflon ");
     else if(theVals->iPar[indexSideLining]==1) printf("SidePMTs ");
-    
+
     if(theVals->iPar[indexUseBottomPMTs]==0) printf("BottomTeflon ");
     else if(theVals->iPar[indexUseBottomPMTs]==1) printf("BottomPMTs ");
 
@@ -281,49 +254,45 @@ void inputVariables::PrintCommandLine(char** argv, GenericInputHolder *theVals){
 
     if(theVals->iPar[indexUseBottomVeto]==0) printf("NoBottomVeto ");
     else if(theVals->iPar[indexUseBottomVeto]==1) printf("UseBottomVeto ");
-    
+
     if(theVals->iPar[indexUseBottomShielding]==0) printf("NoBottomShielding ");
     else if(theVals->iPar[indexUseBottomShielding]==1) printf("UseBottomShielding ");
-    
+
     printf("PMTd %g ",theVals->dPar[indexPMTDiam]);
-
     printf("TailThick %g ",theVals->dPar[indexTailThick]);
-
     printf("ShieldThick %g ",theVals->dPar[indexShieldThick]);
-
     printf("H2oRefl %g ",theVals->dPar[indexH2oRefl]);
-
     printf("Reflectivity %g ",theVals->dPar[indexReflectivity]);
     printf("SpecialEnergy %g ",theVals->dPar[indexSpecialEnergy]);
 
-    printf("UserSEED %lld ",theVals->lPar[indexUserSEED]);
+    // NEW: print model choices
+    printf("ReflectionModel %d ",(G4int)theVals->dPar[indexReflectionModel]);
+    printf("ModuleType %d ",(G4int)theVals->dPar[indexModuleType]);
 
+    printf("UserSEED %lld ",theVals->lPar[indexUserSEED]);
     printf("OutputDir %s ",theVals->sPar[indexOutDir].Data());
     printf("\n\n");
-    
 }
 
 Bool_t inputVariables::UpdateValues(int argc, char** argv){
-    
     if(argc<2) return true;
-    
+
     Int_t iStart = 2;
-    
+
     if(argc>1){
-        
         Bool_t bDigit = false;
         if(isdigit(argv[1][0])) bDigit = true;
         else if( ((argv[1][0]=='+') || (argv[1][0]=='-')) && isdigit(argv[1][1]) ) bDigit = true;
-        
+
         Bool_t bSetup = false;
         if( strcmp(argv[1], "Setup")==0) bSetup = true;
-        
+
         if(!bDigit && !bSetup){
             printf("\nError in inputVariables::UpdateValues() - first argument \"%s\" must be:\n",argv[1]);
             printf("\ta run number, \"ShowCurrent\", \"Setup\", or \"help\". \n\n");
             return false;
         }
-        
+
         if(!bSetup){
             if(argv[1][0]=='+' || argv[1][0]=='-' || argv[1][0]=='0'){
                 newVals->iPar[indexRunNum] += atoi(argv[1]);
@@ -338,10 +307,9 @@ Bool_t inputVariables::UpdateValues(int argc, char** argv){
             iStart++;
         }
     }
-    
+
     if(argc>iStart){
         for(Int_t iArg=iStart; iArg<argc; iArg++){
-            
             if(!strcmp(argv[iArg], "EVENTS") || !strcmp(argv[iArg], "Events") || !strcmp(argv[iArg], "events")){
                 if(iArg+1 < argc){
                     newVals->iPar[indexNumEvents] = atoi(argv[iArg+1]);
@@ -370,7 +338,6 @@ Bool_t inputVariables::UpdateValues(int argc, char** argv){
                 newVals->iPar[indexSeed] = 0;
             else if(!strcmp(argv[iArg], "CLOCKSEED") || !strcmp(argv[iArg], "ClockSeed") || !strcmp(argv[iArg], "clockseed"))
                 newVals->iPar[indexSeed] = 1;
-            
             else if(!strcmp(argv[iArg], "PHOTONPGA") || !strcmp(argv[iArg], "PhotonPGA") || !strcmp(argv[iArg], "photonPGA"))
                 newVals->iPar[indexPGA] = 0;
             else if(!strcmp(argv[iArg], "ELECTRONPGA") || !strcmp(argv[iArg], "ElectronPGA") || !strcmp(argv[iArg], "electronPGA"))
@@ -379,7 +346,6 @@ Bool_t inputVariables::UpdateValues(int argc, char** argv){
                 newVals->iPar[indexPGA] = 2;
             else if(!strcmp(argv[iArg], "MICHELELECTRONPGA") || !strcmp(argv[iArg], "MichelElectronPGA") || !strcmp(argv[iArg], "michelelectronPGA"))
                 newVals->iPar[indexPGA] = 3;
-            
             else if(!strcmp(argv[iArg], "PHYSICSON") || !strcmp(argv[iArg], "PhysicsOn") || !strcmp(argv[iArg], "physicson"))
                 newVals->iPar[indexPhysics] = 1;
             else if(!strcmp(argv[iArg], "PHYSICSOFF") || !strcmp(argv[iArg], "PhysicsOff") || !strcmp(argv[iArg], "physicsoff"))
@@ -400,22 +366,18 @@ Bool_t inputVariables::UpdateValues(int argc, char** argv){
                     !strcmp(argv[iArg], "BOTTOMPMT") || !strcmp(argv[iArg], "BottomPMT") || !strcmp(argv[iArg], "bottomPMT") ||
                     !strcmp(argv[iArg], "bottompmt") || !strcmp(argv[iArg], "bottompmts"))
                 newVals->iPar[indexUseBottomPMTs] = 1;
-
             else if(!strcmp(argv[iArg], "STANDARDQE") || !strcmp(argv[iArg], "StandardQE") || !strcmp(argv[iArg], "standardQE"))
                 newVals->iPar[indexPMTQE] = 0;
             else if(!strcmp(argv[iArg], "HIGHQE") || !strcmp(argv[iArg], "HighQE") || !strcmp(argv[iArg], "highQE"))
                 newVals->iPar[indexPMTQE] = 1;
-
             else if(!strcmp(argv[iArg], "NOBOTTOMVETO") || !strcmp(argv[iArg], "NoBottomVeto") || !strcmp(argv[iArg], "noBottomVeto"))
                 newVals->iPar[indexUseBottomVeto] = 0;
             else if(!strcmp(argv[iArg], "USEBOTTOMVETO") || !strcmp(argv[iArg], "UseBottomVeto") || !strcmp(argv[iArg], "useBottomVeto"))
                 newVals->iPar[indexUseBottomVeto] = 1;
-
             else if(!strcmp(argv[iArg], "NOBOTTOMSHIELDING") || !strcmp(argv[iArg], "NoBottomShielding") || !strcmp(argv[iArg], "noBottomShielding"))
                 newVals->iPar[indexUseBottomShielding] = 0;
             else if(!strcmp(argv[iArg], "USEBOTTOMSHIELDING") || !strcmp(argv[iArg], "UseBottomShielding") || !strcmp(argv[iArg], "useBottomShielding"))
                 newVals->iPar[indexUseBottomShielding] = 1;
-
             else if(!strcmp(argv[iArg], "PMTd") || !strcmp(argv[iArg], "pmtd") || !strcmp(argv[iArg], "PMTdiameter") || !strcmp(argv[iArg], "pmtdiameter")){
                 if(iArg+1 < argc){
                     newVals->dPar[indexPMTDiam] = strtod(argv[iArg+1],NULL);
@@ -466,7 +428,6 @@ Bool_t inputVariables::UpdateValues(int argc, char** argv){
                     return false;
                 }
             }
-
             else if(!strcmp(argv[iArg], "SpecialEnergy") || !strcmp(argv[iArg], "specialEnergy") ) {
                 if(iArg+1 < argc) {
                     newVals->dPar[indexSpecialEnergy] = strtod(argv[iArg+1],NULL);
@@ -477,7 +438,28 @@ Bool_t inputVariables::UpdateValues(int argc, char** argv){
                     return false;
                 }
             }
-
+            // NEW: ReflectionModel command-line option
+            else if(!strcmp(argv[iArg], "ReflectionModel") || !strcmp(argv[iArg], "reflectionmodel") ) {
+                if(iArg+1 < argc) {
+                    newVals->dPar[indexReflectionModel] = strtod(argv[iArg+1],NULL);
+                    iArg++;
+                }
+                else{
+                    printf("Error in inputVariables::UpdateValues() - ReflectionModel must follow command \"%s\"\n",argv[iArg]);
+                    return false;
+                }
+            }
+            // NEW: ModuleType command-line option
+            else if(!strcmp(argv[iArg], "ModuleType") || !strcmp(argv[iArg], "moduletype") ) {
+                if(iArg+1 < argc) {
+                    newVals->dPar[indexModuleType] = strtod(argv[iArg+1],NULL);
+                    iArg++;
+                }
+                else{
+                    printf("Error in inputVariables::UpdateValues() - ModuleType must follow command \"%s\"\n",argv[iArg]);
+                    return false;
+                }
+            }
             else if(!strcmp(argv[iArg], "UserSEED") || !strcmp(argv[iArg], "UserSeed") || !strcmp(argv[iArg], "userSeed") || !strcmp(argv[iArg], "userseed")){
                 if(iArg+1 < argc){
                     newVals->lPar[indexUserSEED] = (G4long)(strtoul(argv[iArg+1],NULL,10)&0x7FFFFFFFFFFFFFFF);
@@ -502,15 +484,12 @@ Bool_t inputVariables::UpdateValues(int argc, char** argv){
                 printf("Error in inputVariables::UpdateValues() - Unrecognized command \"%s\"\n",argv[iArg]);
                 return false;
             }
-            
         }
     }
-    
     return true;
 }
 
 void inputVariables::PrintHelp(Char_t *exeName){
-    
     printf("\n\tNo arguments executes with no changes to current beamOn.dat:\n");
     printf("\t\t%s \n",exeName);
     printf("\n\tCommand line usage with absolute run number specified:\n");
@@ -520,7 +499,7 @@ void inputVariables::PrintHelp(Char_t *exeName){
     printf("\t\t%s [ -n ] [options (below)]       # (n = current run number reduced by n)\n",exeName);
     printf("\n\tTo see the command line argument corresponding to the current setup:\n");
     printf("\t\t%s CommandLine\n",exeName);
-    
+
     cout<<"\n\tOptions:"<<endl;
     cout<<"\t\t[EVENTS #]                                                 "<<currentVals->iDesc[indexNumEvents]<<endl;
     cout<<"\t\t[NoVis | OPENGL | WIRED | DAWN]                            "<<currentVals->iDesc[indexVis]<<endl;
@@ -540,16 +519,17 @@ void inputVariables::PrintHelp(Char_t *exeName){
     cout<<"\t\t[H2oRefl # ]                                               "<<currentVals->dDesc[indexH2oRefl]<<endl;
     cout<<"\t\t[Reflectivity # ]                                          "<<currentVals->dDesc[indexReflectivity]<<endl;
     cout<<"\t\t[SpecialEnergy # ]                                         "<<currentVals->dDesc[indexSpecialEnergy]<<endl;
+    // NEW help lines
+    cout<<"\t\t[ReflectionModel # ]                                       "<<"0=Unified, 1=Data-Driven"<<endl;
+    cout<<"\t\t[ModuleType # ]                                            "<<"0=Module1 (H2O+D2O), 1=Module2 (both H2O)"<<endl;
     cout<<"\t\t[UserSeed # ]                                              "<<currentVals->lDesc[indexUserSEED]<<endl;
     cout<<"\t\t[OutputDir <dirPath>]                                      "<<currentVals->sDesc[indexOutDir]<<endl;
-    
+
     printf("\n\n");
-    
 }
 
 G4int inputVariables::GetNewCollectionID(G4int iType)
 {
-    
     G4int iReturn = GetNumHitsCollections();
     numHitsColl++;
     if(iType==0){
@@ -584,4 +564,3 @@ G4int inputVariables::GetNewCollectionID(G4int iType)
     }
     return iReturn;
 }
-

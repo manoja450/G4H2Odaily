@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH -J G4h2o
-#SBATCH -p longjobs
-#SBATCH -t 100:00:00
+#SBATCH -p shortjobs
+#SBATCH -t 6:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --mem=1300G
+#SBATCH --mem=80G
 #SBATCH -o /home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/SLURMOUT/slurm-%j.out
 #SBATCH -e /home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/SLURMOUT/slurm-%j.out
 

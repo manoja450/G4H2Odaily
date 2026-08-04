@@ -10,14 +10,14 @@ public:
     // Azimuthal model selection
     // The thesis only measures the in-plane (1D) distribution.
     // The out-of-plane (azimuthal) distribution is NOT measured.
-    // These models represent different assumptions for extending 1D->3D.
+    // These models represent different assumptions for extending 1D→3D.
     enum AzimuthalModel {
-        kUniform,           // phi = Uniform(0, 2pi) [thesis default assumption]
-        kGaussian15,        // phi ~ Gaussian(0, 15deg) [narrow spread hypothesis]
-        kGaussian30,        // phi ~ Gaussian(0, 30deg) [thesis Super-K comparison value]
-        kGaussian35,        // phi ~ Gaussian(0, 35deg) [test slightly wider than 30deg]
-        kGaussian45,        // phi ~ Gaussian(0, 45deg) [moderate spread hypothesis]
-        kGaussian60,        // phi ~ Gaussian(0, 60deg) [broad spread hypothesis]
+        kUniform,           // phi = Uniform(0, 2π) [thesis default assumption]
+        kGaussian15,        // phi ~ Gaussian(0, 15°) [narrow spread hypothesis]
+        kGaussian30,        // phi ~ Gaussian(0, 30°) [thesis Super-K comparison value]
+        kGaussian35,        // phi ~ Gaussian(0, 35°) [test slightly wider than 30°]
+        kGaussian45,        // phi ~ Gaussian(0, 45°) [moderate spread hypothesis]
+        kGaussian60,        // phi ~ Gaussian(0, 60°) [broad spread hypothesis]
         kLambertianAzimuth  // phi weighted by cos(phi) [Lambertian-like hypothesis]
     };
 
@@ -39,12 +39,6 @@ private:
 
     // Helper: Sample azimuthal angle based on selected model
     G4double SampleAzimuthalAngle() const;
-
-    // Helper: surface normal at a step point, computed correctly for
-    // translated/rotated volumes (e.g. tyvekCapBotPhysV) by transforming
-    // into the solid's local frame before calling SurfaceNormal(), then
-    // rotating the result back to global. See .cc for the full rationale.
-    static G4ThreeVector GetLocalFrameSurfaceNormal(const G4StepPoint* point);
 
     // Random number generators
     mutable std::mt19937 fRNG;

@@ -5,6 +5,7 @@
 #include "G4d2oDetector.hh"
 #include "G4d2oRunAction.hh"
 #include "G4d2oMaterialsDefinition.hh"
+#include "G4d2oSteppingAction.hh"
 #include "G4Navigator.hh"
 #include "G4TransportationManager.hh"
 
@@ -86,7 +87,6 @@ G4d2oEventAction::G4d2oEventAction(void)
         hPMTArray = 0;
         hPMTNumVsTime = 0;
     }
-    //    hPhotonEnergy = new TH1D("hPhotonEnergy","Photon Energy",500,0,1000.0);
     hPhotonEnergy = new TH1D("hPhotonEnergy", "Photon Energy", 500, 1.0, 10.0);
     hTotalPhotons = new TH1D("hTotalPhotons", "Total photons", 1000, 0, 10000);
 
@@ -104,40 +104,18 @@ G4d2oEventAction::G4d2oEventAction(void)
     }
 
     thePGA = (G4d2oPrimaryGeneratorAction *)G4RunManager::GetRunManager()->GetUserPrimaryGeneratorAction();
-    /*
-        // Photons are now thrown out at generation rather than detection
-        const double hc_evnm = 1.23984193 *1e3;
 
-        std::vector<double> qe_bialkali_y = {0.000,0.000,0.000,0.000,
-          0.001,0.003,0.008,0.017,
-          0.033,0.052,0.076,0.106,
-          0.139,0.164,0.193,0.204,
-          0.228,0.240,0.254,0.254,
-          0.240,0.213,0.164,0.032,
-          0.003,0.0};
-
-        std::vector<double> qe_bialkali_xgev = {1.63e-9,1.68e-9,1.72e-9,1.77e-9,
-          1.82e-9,1.88e-9,1.94e-9,2.00e-9,
-          2.07e-9,2.14e-9,2.21e-9,2.30e-9,
-          2.38e-9,2.48e-9,2.58e-9,2.70e-9,
-          2.82e-9,2.95e-9,3.10e-9,3.26e-9,
-          3.44e-9,3.65e-9,3.88e-9,4.13e-9,
-          4.43e-9,4.7e-9};
-
-        std::vector<double> qe_bialkali_xnm;
-
-        for(auto xgev : qe_bialkali_xgev) qe_bialkali_xnm.push_back(hc_evnm/(xgev*1e9));
-
-        gBialkali_ev = new TGraph(qe_bialkali_xgev.size());
-
-        for(int ipoint = 0; ipoint<qe_bialkali_xnm.size(); ipoint++ ){
-            gBialkali_ev->SetPoint(ipoint,qe_bialkali_xgev[ipoint]*1e9,qe_bialkali_y[ipoint]);
-        }
-    */
+    // ============================================================
+    // Add instrumentation branches to Sim_Tree
+    // ============================================================
+    outTree->Branch("nReflections", &theEventData->nReflections, "nReflections/I");
+    outTree->Branch("totalPathLength", &theEventData->totalPathLength, "totalPathLength/D");
+    outTree->Branch("nPhotons", &theEventData->nPhotons, "nPhotons/I");
+    outTree->Branch("meanReflections", &theEventData->meanReflections, "meanReflections/D");
+    outTree->Branch("meanPathLength", &theEventData->meanPathLength, "meanPathLength/D");
 
     G4cerr << "done." << G4endl;
-
-} // END of constructor
+}
 
 G4d2oEventAction::~G4d2oEventAction()
 {
@@ -169,7 +147,6 @@ G4d2oEventAction::~G4d2oEventAction()
 
         fout->mkdir("pmtPositions");
         fout->cd("pmtPositions");
-        // save histograms with coordinates of the front faces of PMTs
         if (theDet->GetPMTPositionHistogram(0))
             theDet->GetPMTPositionHistogram(0)->Write("pmtPosX");
         if (theDet->GetPMTPositionHistogram(1))
@@ -194,19 +171,14 @@ G4d2oEventAction::~G4d2oEventAction()
     G4cout << "\t***   Output File: " << theOutFileName << " " << G4endl;
     G4cout << "\t**********************************************************************************" << G4endl;
     G4cout << G4endl << G4endl;
-
-} // END of destructor
+}
 
 void G4d2oEventAction::BeginOfEventAction(const G4Event *thisEvent)
 {
-
     fVetoEdep = 0.0;
-
     ResetNarrowVetoEdep();
     ResetWideVetoEdep();
-    //    thisEvent = 0;
-
-} // END of BeginOfEventAction()
+}
 
 void G4d2oEventAction::EndOfEventAction(const G4Event *thisEvent)
 {
@@ -221,7 +193,6 @@ void G4d2oEventAction::EndOfEventAction(const G4Event *thisEvent)
     for (int i = 0; i < kWidePanels; ++i)
         theEventData->wide_veto_edep[i] = fWideVetoEdep[i];
 }
-// END of EndOfEventAction()
 
 void G4d2oEventAction::GetHitsCollection(void)
 {
@@ -231,8 +202,7 @@ void G4d2oEventAction::GetHitsCollection(void)
         sourceHC[i] = (G4d2oDetectorHitsCollection *)HCoE->GetHC(input->srcCollID[i]);
     for (Int_t i = 0; i < input->numTargHC; i++)
         targHC[i] = (G4d2oDetectorHitsCollection *)HCoE->GetHC(input->targCollID[i]);
-
-} // END of GetHitsCollection()
+}
 
 void G4d2oEventAction::ProcessEvent(void)
 {
@@ -241,9 +211,16 @@ void G4d2oEventAction::ProcessEvent(void)
     numEvents++;
 
     eventNumber = numEvents;
-    
-    // Set current event number for reflection tracking
+
+    // ============================================================
+    // Set event number for both models
+    // ============================================================
+    // For Data-Driven model: the custom boundary uses this via the reflector.
     G4d2oMaterialsDefinition::SetCurrentEventNumber(eventNumber);
+
+    // For Unified model: the stepping action needs the event ID to fill the tree.
+    G4d2oSteppingAction* stepAct = (G4d2oSteppingAction*)G4RunManager::GetRunManager()->GetUserSteppingAction();
+    if (stepAct) stepAct->SetEventID(eventNumber);
 
     G4d2oDetectorHit *thisHit;
 
@@ -463,12 +440,9 @@ void G4d2oEventAction::ProcessEvent(void)
         theEventData->vol0 = 51;
     }
 
-    // Form("pmtPhysV_%d",iCopy)
-
-    // TODO: Ask Matthew where I can put this more globally
-    std::map<std::string, int> vmuid = {{"muVetoBI", 0}, {"muVetoBO", 1}, {"muVetoTI", 2}, {"muVetoTO", 3}, {"muVetoLI", 4}, {"muVetoLO", 5}, {"muVetoRI", 6}, {"muVetoRO", 7}, {"muVetoNI", 8}, {"muVetoNO", 9}, // Near to walkway
+    std::map<std::string, int> vmuid = {{"muVetoBI", 0}, {"muVetoBO", 1}, {"muVetoTI", 2}, {"muVetoTO", 3}, {"muVetoLI", 4}, {"muVetoLO", 5}, {"muVetoRI", 6}, {"muVetoRO", 7}, {"muVetoNI", 8}, {"muVetoNO", 9},
                                         {"muVetoFI", 10},
-                                        {"muVetoFO", 11}}; // Far to walkway, against wall
+                                        {"muVetoFO", 11}};
 
     // Loop through the detector hits collection
     for (G4int iDetHC = 0; iDetHC < input->numDetHC; iDetHC++)
@@ -521,97 +495,26 @@ void G4d2oEventAction::ProcessEvent(void)
                     G4String hitParticleName = thisHit->GetParticleName();
                     if (hitParticleName == "opticalphoton")
                     {
-
                         G4int hitPMTNumber = thisHit->GetDetectorNumber();
                         G4double hitGlobalTime = thisHit->GetGlobalTime();
                         G4double hitKineticEnergy = thisHit->GetKineticEnergy();
 
-                        // Photons now thrown out at generation not detection
-                        // if(G4UniformRand()>qe_ev(hitKineticEnergy/eV)) continue;
-
-                        //-----------------------------------------------------------
-
-                        // 02/14/2023:
-                        // NEW: Detecting everything based on individual PMT QE,
-                        //     obtained from DATA and MC p.e. distribution ratios.
-
+                        // 02/14/2023: PMT QE scaling
 #if 1
-                        if (hitPMTNumber == 0)
-                        { // pmt_qe_scaling = 0.8329
-                            if (G4UniformRand() > 0.8329)
-                                continue;
-                        }
-
-                        if (hitPMTNumber == 1)
-                        { // pmt_qe_scaling=0.8197
-                            if (G4UniformRand() > 0.8197)
-                                continue;
-                        }
-
-                        if (hitPMTNumber == 2)
-                        { // pmt_qe_scaling=0.9205
-                            if (G4UniformRand() > 0.9205)
-                                continue;
-                        }
-
-                        if (hitPMTNumber == 3)
-                        { // pmt_qe_scaling=0.6747
-                            if (G4UniformRand() > 0.6747)
-                                continue;
-                        }
-
-                        if (hitPMTNumber == 4)
-                        { // pmt_qe_scaling=0.8538
-                            if (G4UniformRand() > 0.8538)
-                                continue;
-                        }
-
-                        if (hitPMTNumber == 5)
-                        { // BAD PMT
-                            if (G4UniformRand() > 1.0000)
-                                continue;
-                        }
-
-                        if (hitPMTNumber == 6)
-                        { // pmt_qe_scaling=0.9951
-                            if (G4UniformRand() > 0.9951)
-                                continue;
-                        }
-
-                        if (hitPMTNumber == 7)
-                        { // pmt_qe_scaling=0.8934
-                            if (G4UniformRand() > 0.8934)
-                                continue;
-                        }
-
-                        if (hitPMTNumber == 8)
-                        { // pmt_qe_scaling=0.7615
-                            if (G4UniformRand() > 0.7615)
-                                continue;
-                        }
-
-                        if (hitPMTNumber == 9)
-                        { // BAD PMT
-                            if (G4UniformRand() > 1.0000)
-                                continue;
-                        }
-
-                        if (hitPMTNumber == 10)
-                        { // pmt_qe_scaling=0.6164
-                            if (G4UniformRand() > 0.6164)
-                                continue;
-                        }
-
-                        if (hitPMTNumber == 11)
-                        { // The one that sees more light
-                            if (G4UniformRand() > 1.0000)
-                                continue;
-                        }
+                        if (hitPMTNumber == 0) { if (G4UniformRand() > 0.8329) continue; }
+                        if (hitPMTNumber == 1) { if (G4UniformRand() > 0.8197) continue; }
+                        if (hitPMTNumber == 2) { if (G4UniformRand() > 0.9205) continue; }
+                        if (hitPMTNumber == 3) { if (G4UniformRand() > 0.6747) continue; }
+                        if (hitPMTNumber == 4) { if (G4UniformRand() > 0.8538) continue; }
+                        if (hitPMTNumber == 5) { if (G4UniformRand() > 1.0000) continue; }
+                        if (hitPMTNumber == 6) { if (G4UniformRand() > 0.9951) continue; }
+                        if (hitPMTNumber == 7) { if (G4UniformRand() > 0.8934) continue; }
+                        if (hitPMTNumber == 8) { if (G4UniformRand() > 0.7615) continue; }
+                        if (hitPMTNumber == 9) { if (G4UniformRand() > 1.0000) continue; }
+                        if (hitPMTNumber ==10) { if (G4UniformRand() > 0.6164) continue; }
+                        if (hitPMTNumber ==11) { if (G4UniformRand() > 1.0000) continue; }
 #endif
 
-                        //-----------------------------------------------------------
-
-                        // normal PMTs
                         if (detHC[iDetHC]->GetSDname() == "pmt")
                         {
                             theEventData->AddPMTHit(hitPMTNumber, hitGlobalTime, hitKineticEnergy);
@@ -620,23 +523,12 @@ void G4d2oEventAction::ProcessEvent(void)
                             if (hPMTNumVsTime)
                                 hPMTNumVsTime->Fill(hitGlobalTime, hitPMTNumber);
                         }
-#if 0
-                        else{
-                            TVector3 hitPosition(thisHit->GetPosition().x(),thisHit->GetPosition().y(),thisHit->GetPosition().z());
-                            theEventData->AddAreaPMTHit(hitPMTNumber, hitGlobalTime, hitKineticEnergy, hitPosition);
-                            if(hitPMTNumber>=0 && hitPMTNumber<=1){
-                                if(hSidePMT[hitPMTNumber]) hSidePMT[hitPMTNumber]->Fill(hitPosition.X(),hitPosition.Z());
-                            }
-                        }
-#endif
                         hPhotonEnergy->Fill(hitKineticEnergy / eV);
+                    }
+                }
+            }
 
-                    } // check for an opticalphoton
-
-                } // loop over hits (i)
-            } // if no muon Veto Hits Collection
-
-            if (detHC[iDetHC]->GetSDname() == "topVetoSD") // && detHC[iDetHC]->GetSize() > 0)
+            if (detHC[iDetHC]->GetSDname() == "topVetoSD")
             {
                 if (detHC[iDetHC]->GetSize() > 0)
                 {
@@ -649,19 +541,36 @@ void G4d2oEventAction::ProcessEvent(void)
                     theEventData->veto_edep = fVetoEdep;
                 }
             }
-            //G4cout << "[EA] SD name seen: " << detHC[iDetHC]->GetSDname() << G4endl;
-if (detHC[iDetHC]->GetSDname() == "VetoNu1SD") {
-  for (int i=0;i<kNarrowPanels;++i)
-    theEventData->narrow_veto_edep[i] = fNarrowVetoEdep[i];
-}
 
-if (detHC[iDetHC]->GetSDname() == "VetoNu2SD") {
-  for (int i=0;i<kWidePanels;++i)
-    theEventData->wide_veto_edep[i] = fWideVetoEdep[i];
-}
+            if (detHC[iDetHC]->GetSDname() == "VetoNu1SD") {
+                for (int i=0;i<kNarrowPanels;++i)
+                    theEventData->narrow_veto_edep[i] = fNarrowVetoEdep[i];
+            }
 
-        } // detHC exists
-    } // loop over dethits collections
+            if (detHC[iDetHC]->GetSDname() == "VetoNu2SD") {
+                for (int i=0;i<kWidePanels;++i)
+                    theEventData->wide_veto_edep[i] = fWideVetoEdep[i];
+            }
+        }
+    }
+
+    // ============================================================
+    // STORE PHOTON INSTRUMENTATION STATISTICS (for Sim_Tree)
+    // ============================================================
+    if (stepAct) {
+        theEventData->nReflections = stepAct->GetReflectionCount();
+        theEventData->totalPathLength = stepAct->GetTotalPathLength() / mm;
+        theEventData->nPhotons = stepAct->GetPhotonCount();
+        if (theEventData->nPhotons > 0) {
+            theEventData->meanReflections = (G4double)theEventData->nReflections / theEventData->nPhotons;
+            theEventData->meanPathLength = theEventData->totalPathLength / theEventData->nPhotons;
+        } else {
+            theEventData->meanReflections = 0.0;
+            theEventData->meanPathLength = 0.0;
+        }
+        stepAct->ResetEventCounters();
+    }
+
     if (eventNumber % 1000 == 0)
     {
         G4cout << "Completed Event " << eventNumber << G4endl;
@@ -671,21 +580,15 @@ if (detHC[iDetHC]->GetSDname() == "VetoNu2SD") {
         }
     }
 
-    // Save to detector variables to pass to tree
-    // if(theEventData->numHits>0)
-    //outTree->Branch("narrow_veto_edep", theEventData->narrow_veto_edep, "narrow_veto_edep[4]/D");
     outTree->Fill();
 
     hTotalPhotons->Fill(theEventData->numHits);
-
-} // END of ProcessEvent()
+}
 
 void G4d2oEventAction::ZeroEventVariables(void)
 {
-
     eventNumber = 0;
-
-} // END of ZeroEventVariables()
+}
 
 double G4d2oEventAction::qe_ev(double energy_ev)
 {

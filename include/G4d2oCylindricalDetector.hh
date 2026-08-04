@@ -42,6 +42,11 @@ protected:
     G4LogicalVolume *GetWideAluminumLogV();
     G4LogicalVolume *GetWideAirLogV();
     G4LogicalVolume *GetNarrowAirLogV();
+
+    // ============================================================
+    // NEW: Module 2 target volume (both H2O)
+    // ============================================================
+    G4LogicalVolume *GetH2OModuleLogV();
   
     //-----------------------------------------------------------
     

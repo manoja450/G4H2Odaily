@@ -2,11 +2,11 @@
 #SBATCH --job-name=py
 #SBATCH --output=michel_py_%j.out
 #SBATCH --error=michel_py_%j.err
-#SBATCH --time=24:00:00
-#SBATCH --partition=longjobs
+#SBATCH --time=4:00:00
+#SBATCH --partition=shortjobs
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=1300G
+#SBATCH --mem=80G
 
 echo "=========================================="
 echo "Michel Spectrum Comparison (Python)"
@@ -32,7 +32,7 @@ echo "Python location: $(which python)"
 # Define file paths
 # ============================================================================
 DATA_DIR="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/data"
-SIM_FILE="${DATA_DIR}/Sim_D2ODetector002.root"
+SIM_FILE="${DATA_DIR}/Sim_D2ODetector194.root"
 REAL_FILE="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/mac/all_histograms.root"
 
 # Check if files exist
@@ -68,7 +68,7 @@ echo "Starting analysis at $(date)"
 echo ""
 
 python SimRealComparison.py --sim "$SIM_FILE" --real "$REAL_FILE" --out "$OUTPUT_DIR" --min-hits 2
-
+#python diagnostic_plots.py /home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN/data/Sim_D2ODetector002.root
 # ============================================================================
 # Check results
 # ============================================================================

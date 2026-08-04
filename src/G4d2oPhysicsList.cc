@@ -1,6 +1,7 @@
 #include "G4d2oPhysicsList.hh"
 #include "G4d2oCustomOpBoundary.hh"
 #include "G4d2oDataDrivenReflector.hh"
+#include "inputVariables.hh"
 
 #include <fstream>
 
@@ -189,25 +190,28 @@ void G4d2oPhysicsList::ConstructOptical()
     G4OpRayleigh* theRayleighScatteringProcess = new G4OpRayleigh();
 
     // ============================================================
-    // CREATE DATA-DRIVEN BOUNDARY PROCESS WITH AZIMUTHAL MODEL
+    // SELECT BOUNDARY PROCESS BASED ON REFLECTION MODEL
     // ============================================================
-    G4d2oCustomOpBoundary* theBoundaryProcess = new G4d2oCustomOpBoundary();
+    inputVariables* input = inputVariables::GetIVPointer();
+    G4int reflectionModel = input->GetReflectionModel();
 
-    // ============================================================
-    // SELECT AZIMUTHAL MODEL HERE
-    // ============================================================
-    // Available models:
-    //   kUniform         - Uniform (0 to 2π) [thesis default]
-    //   kGaussian15      - Gaussian σ = 15°
-    //   kGaussian30      - Gaussian σ = 30° [thesis Super-K value]
-    //   kGaussian35      - Gaussian σ = 35° [test slightly wider than 30°]
-    //   kGaussian45      - Gaussian σ = 45°
-    //   kGaussian60      - Gaussian σ = 60°
-    //   kLambertianAzimuth - cos-weighted
-    // ============================================================
-    theBoundaryProcess->SetAzimuthalModel(G4d2oCustomOpBoundary::kGaussian35);
+    G4cout << "DEBUG: PhysicsList::ConstructOptical() reflectionModel = " << reflectionModel << G4endl;
 
-    G4cout << "  Using azimuthal model: " << theBoundaryProcess->GetAzimuthalModelName() << G4endl;
+    G4OpBoundaryProcess* theBoundaryProcess = nullptr;
+    if (reflectionModel == 1) {
+        // Data-Driven: use custom boundary
+        theBoundaryProcess = new G4d2oCustomOpBoundary();
+        G4cout << "  Using DATA-DRIVEN boundary process" << G4endl;
+        G4d2oCustomOpBoundary* custom = dynamic_cast<G4d2oCustomOpBoundary*>(theBoundaryProcess);
+        if (custom) {
+            custom->SetAzimuthalModel(G4d2oCustomOpBoundary::kGaussian35);
+            G4cout << "  Azimuthal model: " << custom->GetAzimuthalModelName() << G4endl;
+        }
+    } else {
+        // Unified: use standard Geant4 boundary
+        theBoundaryProcess = new G4OpBoundaryProcess();
+        G4cout << "  Using UNIFIED (standard) boundary process" << G4endl;
+    }
 
     GetParticleIterator()->reset();
 

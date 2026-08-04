@@ -9,7 +9,6 @@ class simHit : public TObject
 public:
     simHit() { ; }
     simHit(Int_t pNum, Double_t eTime, Double_t phEn) { Set(pNum, eTime, phEn); }
-    //    virtual ~simHit();
 
     void Set(Int_t pNum, Double_t eTime, Double_t phEn)
     {
@@ -30,7 +29,6 @@ class simAreaHit : public simHit
 public:
     simAreaHit() { ; }
     simAreaHit(Int_t pNum, Double_t eTime, Double_t phEn, TVector3 hitPos) : simHit(pNum, eTime, phEn) { Set(hitPos); }
-    //    virtual ~simHit();
 
     void Set(TVector3 hitPos)
     {
@@ -67,7 +65,6 @@ public:
     bool veto_tag{false};
     double veto_edep{0.0};
 
-
     Double_t sourceParticleEnergy;
 
     Int_t numHits;
@@ -80,6 +77,15 @@ public:
 
     TClonesArray *areaPMTHits;
     static TClonesArray *sAreaPMTHits;
+
+    // ============================================================
+    // NEW: Photon instrumentation fields
+    // ============================================================
+    Int_t nReflections;          // Total reflections in event
+    Double_t totalPathLength;    // Total path length of all photons (mm)
+    Int_t nPhotons;              // Number of optical photons tracked
+    Double_t meanReflections;    // Average reflections per photon
+    Double_t meanPathLength;     // Average path length per photon (mm)
 
     void AddPMTHit(Int_t pNum, Double_t eTime, Double_t phEn);
     void AddAreaPMTHit(Int_t pNum, Double_t eTime, Double_t phEn, TVector3 hitPos);
@@ -97,7 +103,7 @@ public:
 
     virtual void ClearData();
     virtual void CopyData(simEvent *dataToCopy);
-    ClassDef(simEvent, 5)
+    ClassDef(simEvent, 6)
 };
 
 #endif

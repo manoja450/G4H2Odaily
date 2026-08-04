@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include <fstream>
 #include <sys/time.h>
@@ -16,6 +15,7 @@
 
 #include "G4d2oEventAction.hh"
 #include "G4d2oStackingAction.hh"
+#include "G4d2oSteppingAction.hh"   // <-- ADDED for instrumentation
 
 #include "G4d2oPhotonGun.hh"
 #include "G4d2oElectronGun.hh"
@@ -151,8 +151,10 @@ int main(int argc, char** argv)
     runManager->SetUserAction(new G4d2oRunAction);
     G4cerr<<"Constructing event action..."<<G4endl;
     runManager->SetUserAction(new G4d2oEventAction);
-    G4cout<<"Constructing tracking action..."<<G4endl;
+    G4cout<<"Constructing stacking action..."<<G4endl;
     runManager->SetUserAction(new G4d2oStackingAction(detCon->GetDetectorPtr() ) );
+    G4cout<<"Constructing stepping action..."<<G4endl;          // <-- ADDED
+    runManager->SetUserAction(new G4d2oSteppingAction());        // <-- ADDED
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Initialize G4 kernel

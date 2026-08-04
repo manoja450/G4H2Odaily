@@ -1,5 +1,5 @@
-002       	//Run-number
-1000		//primaries-to-generate
+195       	//Run-number
+100000		//primaries-to-generate
 0		//Visualization:0=no,1=yes
 0		//Debug:0=no-debug,1=debugToScreen,2=DebugToFile
 0		//RandomSeed:0=use-default-seed,1=use-clock
@@ -15,7 +15,9 @@
 -8		//PMTDiameter(inches),negNumUsesEllipsoidalPMT
 10		//TailCatcherThickness(cm)
 2		//ShieldThickness(in)
-0.28    	//H2oAttenuationLengthCoefficient
-1		//ReflectivityOfTyvek
+0.302    	//H2oAttenuationLengthCoefficient
+0.930		//ReflectivityOfTyvek
 10.0		//SpecialEnergy
+1             // ReflectionModel (0=Unified, 1=Data-Driven)
+1             // ModuleType (0=Module1 H2O+D2O, 1=Module2 both H2O)
 ./data		//outputDir
