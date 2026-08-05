@@ -1,122 +1,26 @@
-*********************************************************************************
-Status as of December 29, 2025:
 
-This repo was created by Igor Bernardi (me) when I was still a graduate student.
-At the moment you are reading this, I have graduated with my PhD and am no longer
-a part of COHERENT Collaboration.
+## Status as of August 4, 2026
 
-The overall folder and file structure was allegedly created by Matthew Blackstone,
-as word of mouth goes, since this is not written anywhere available to me.
-Karla Tellez worked on these files, but she also is no longer a part of coherent.
+This repository was originally created and developed by **Igor Bernardi** during his Ph.D. work with the COHERENT Collaboration. The overall folder and file structure is believed to have originated from **Matthew Blackstone**, while **Karla Tellez** also contributed to the development of the simulation framework during her time in the collaboration.
 
-The entire geometry of everything except the photomultiplier tubes was done by me
-and reflects the detetor, as built, with dimensions as updated as humanly doable.
+The complete detector geometry—including essentially all detector components except the photomultiplier tubes—was developed by Igor Bernardi and represents the detector as built using the best available engineering dimensions. The original geometry and optical simulation were developed for the **Module 1 (D₂O + H₂O)** detector.
 
-My "two" branches are main and development, and they will be exactly the same the
-moment I send my last "git push". The idea is that I test things on development,
-and then merge them into main.
+In the original implementation, the Tyvek reflector was modelled using a **100% diffuse (Lambertian cosine)** reflection model, where every reflected optical photon was sampled from a cosine distribution independent of the incident angle. Although this approximation was sufficient for the original detector simulation, it did not accurately reproduce the optical response observed in the **Module 2** detector. A noticeable discrepancy was found between the simulated optical response and the experimental detector data.
 
-Two other branches have been created semi-recently by other collaborators. As far
-as I know, feature/nueOgen was created by Japan-based collaborators, mainly
-Masayuki Harada. Branch Lead_Shielding was created by Gen Li of CMU. Main and
-development branches, to my understanding, will be passed on to Justin Skweres
-(UTK) effective January 1, 2025.
+To improve the optical simulation for Module 2, I (**Manoj Adhikari**) developed and implemented a **Data-Driven Tyvek Optical Reflection Model** based on experimental measurements of Tyvek reflectivity in water reported by:
 
-This Geant4 code is made to run on Geant4 version 11.2.1. If you run cosmics,
-you should also have CRY version 1.7 installed. Apparently CRY is no longer
-maintained, so good luck with that. Our collaborator Andrew Erlandson has a lot
-of experience with the cry module.
+> **Álvaro Chavarría**
+> *A Study on the Reflective Properties of Tyvek in Air and Underwater*
+> Department of Physics, Duke University (2007)
+> https://phy.duke.edu/~schol/superk/alvaro_thesis.pdf
 
-Rebecca Rapp is probably the remaining collaborator who has worked with G4d2o
-the longest, so you might want to ask her for help as well with Geant4/G4d2o
-related subjects.
+Instead of assuming purely diffuse reflection, the new implementation models Tyvek reflection as an **angle-dependent combination of a diffused-specular (Gaussian) component and a Lambertian (cosine) component**. The Gaussian width and the relative contributions of the specular and Lambertian components are determined from digitized experimental measurements reported by Chavarría. Consequently, the reflected photon direction depends explicitly on the incident angle, providing a significantly more realistic description of Tyvek optical behavior in water than the original Lambertian-only model.
 
-*********************************************************************************
-Instructions:
+The implementation is primarily contained in:
 
-0 - Install everything you should normally have for HEP (cmake, root, etc.).
-Have root in your environment ("sourced") before you proceed:
+* `G4d2oDataDrivenReflector.cc`
+* `G4d2oDataDrivenReflector.hh`
+* `G4d2oCustomOpBoundary.cc`
+* `G4d2oMaterialsDefinition::SetDataDrivenReflector()`
 
-1 - Install Geant4 on Linux or Mac.
-
-Make sure you can build and run exampleB1, with interactive visualization and all.
-
-2 - Install CRY if you plan on using it (skip if you want).
-Add the line below
-source /path/to/cry_v1.7/setup
-to your .zshrc/.bashrc
-
-3 - Git clone this repo
-Switch to branch development, create a new branch, get authorization to work on
-someone else's branch, or just work locally, or something.
-
-4 - Do the following commands:
-cp beamOn0.dat beamOn.dat
-cp setupBuild.sh.bak setupBuild.sh
-
-Edit the file setupBuild.sh and fix the file paths in the beginning of the file
-
-5 - For a clean install, do:
-
-. ./setupBuild.sh makefile
-./compileApp makefile
-
-6 - To run, adjust beamOn.dat to match what you want. Then do:
-./G4d2o
-
-7 - Done.
-
-You can do:
-./G4d2o CommandLine to see the information that would be input from beamOn.dat
-when running. Alternatively, you could run
-./G4d2o ...........
-where the multiple dots are user inputs.
-They have to be placed in correct order and semantics, so
-I strongly suggest you do NOT do that, and always change the contents of your
-beamOn.dat file instead.
-
-Whenever running G4d2o, you should have both root and Geant4 in your environment,
-and CRY as well if you plan on doing cosmics.
-
-If you are debugging, you can do:
-. ./setupBuild.sh clean
-To delete all your built files before you try again.
-
-*********************************************************************************
-Extra info:
-
-The "scripts" folder has a bunch of scripts, the most important of them is load_dictionary.C.
-That is the script you run to load the dictionary for data files generated with G4d2o.
-Once you run the script, with root still open, you can run other scripts, like:
-
-.x my_other_script.C
-
-And it should be able to fetch information from the .root file you load in your script.
-
-I have left them there for reference, and they have not been properly maintained, so be careful when
-just changing file paths and running them to make sure that they do what you expect them to do.
-I used to constantly change them to do/test/debug on the fly, and none of them is guaranteed to work
-at this stage.
-
------------------------------------------------------------------------------------------------------
-The xscnData folder is populated with .root files that were generated by "a former student of Kate
-Scholberg". The .png images I simply produced by opening those .root files.
-
------------------------------------------------------------------------------------------------------
-CRY module:
-
-https://nuclear.llnl.gov/simulation/main.html
-
------------------------------------------------------------------------------------------------------
-I never had to do anything with these (below), but those were instructions
-Karla said she got from Becca: If you get linking errors when "make"-ing your application...
-
-Edit CMakeLists.txt in the G4d2o main directory.  I needed to make 3 changes:
-
-1. Anywhere ${CRYHOME} appears, change it to $ENV{CRYHOME}
-2. Find where we are GLOBing the sources and headers, and add the following line:
-"file(GLOB crylibs $ENV{CRYHOME}/lib/libCRY.a)"
-3. Find where target_link_libraries occurs.  Comment out the existing, and replace it with:
-"target_link_libraries G4d2o ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} simEvent ${crylibs}"
-
------------------------------------------------------------------------------------------------------
+The new optical model was validated using the complete **Module 2** detector geometry. Simulated reflection-angle distributions were analysed and compared directly with the experimental measurements reported by Chavarría. For each incident angle, the simulated reflection distribution was fitted using a **Gaussian + Lambertian** model, and the ratio of the **integrated Gaussian and Lambertian components** was compared with the published experimental values. The implemented model shows good agreement with the measured Tyvek reflectivity over the full measured incident-angle range (0°–80°) while significantly improving the agreement between the Module 2 detector simulation and experimental data compared with the original 100% diffuse reflection model.

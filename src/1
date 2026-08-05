@@ -1,0 +1,111 @@
+#include "G4d2oCustomOpBoundary.hh"
+#include "G4PhysicalConstants.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4OpticalPhoton.hh"
+#include "G4Step.hh"
+#include "G4Track.hh"
+#include "G4StepPoint.hh"
+#include "G4VPhysicalVolume.hh"
+#include "G4LogicalVolume.hh"
+#include "G4VSolid.hh"
+#include "G4ParticleChange.hh"
+#include "G4OpticalSurface.hh"
+#include <random>
+#include <cstdio>
+
+static G4int gPrintCount = 0;
+static G4int gMaxPrint = 100;
+static G4bool gPrintLimitReached = false;
+
+G4d2oCustomOpBoundary::G4d2oCustomOpBoundary(const G4String& processName)
+    : G4OpBoundaryProcess(processName) {
+    G4cout << "\n=========================================================" << G4endl;
+    G4cout << "G4d2oCustomOpBoundary: Created (UNBIASED)" << G4endl;
+    G4cout << "  Using thesis data for reflection angles" << G4endl;
+    G4cout << "  NO artificial bias applied" << G4endl;
+    G4cout << "=========================================================\n" << G4endl;
+}
+
+G4d2oCustomOpBoundary::~G4d2oCustomOpBoundary() {}
+
+G4VParticleChange* G4d2oCustomOpBoundary::PostStepDoIt(const G4Track& track, const G4Step& step) {
+    
+    const G4StepPoint* postStepPoint = step.GetPostStepPoint();
+    G4ThreeVector incomingDirection = track.GetMomentumDirection();
+    G4ThreeVector position = postStepPoint->GetPosition();
+    
+    G4VPhysicalVolume* volume = postStepPoint->GetPhysicalVolume();
+    G4ThreeVector normal(0, 0, 1);
+    
+    if (volume != nullptr && volume->GetLogicalVolume() != nullptr && 
+        volume->GetLogicalVolume()->GetSolid() != nullptr) {
+        normal = volume->GetLogicalVolume()->GetSolid()->SurfaceNormal(position);
+    }
+    
+    G4ThreeVector incoming = incomingDirection.unit();
+    G4ThreeVector norm = normal.unit();
+    
+    if (incoming.dot(norm) > 0) {
+        norm = -norm;
+    }
+    
+    G4double incidentAngleRad = incoming.angle(-norm);
+    G4double incidentDeg = incidentAngleRad / deg;
+    
+    if (incidentDeg > 90.0) incidentDeg = 90.0;
+    if (incidentDeg < 0) incidentDeg = 0;
+    
+    G4d2oDataDrivenReflector* reflector = G4d2oDataDrivenReflector::GetInstance();
+    
+    G4ParticleChange* particleChange = new G4ParticleChange();
+    particleChange->Initialize(track);
+    
+    if (reflector != nullptr) {
+        
+        G4double thetaOutDeg = reflector->SampleOutgoingAngle(incidentDeg);
+        G4double thetaOutRad = thetaOutDeg * deg;
+        
+        G4ThreeVector perp = incoming - (incoming.dot(norm)) * norm;
+        if (perp.mag() < 1e-10) {
+            perp = G4ThreeVector(1, 0, 0);
+            if (std::abs(norm.dot(perp)) > 0.9999) perp = G4ThreeVector(0, 1, 0);
+        }
+        perp = perp.unit();
+        
+        G4ThreeVector reflected = -std::cos(thetaOutRad) * norm + std::sin(thetaOutRad) * perp;
+        
+        std::uniform_real_distribution<G4double> dist(0.0, 2.0 * M_PI);
+        static std::mt19937 rng(std::random_device{}());
+        G4double azimuth = dist(rng);
+        
+        G4ThreeVector perp2 = norm.cross(perp).unit();
+        G4ThreeVector rotated = std::cos(azimuth) * reflected + std::sin(azimuth) * perp2;
+        rotated = rotated.unit();
+        
+        if (!gPrintLimitReached) {
+            if (gPrintCount < gMaxPrint) {
+                gPrintCount++;
+                printf("  [REFLECTION %d] incident=%.2f°, outgoing=%.2f°\n", 
+                       gPrintCount, incidentDeg, thetaOutDeg);
+                fflush(stdout);
+            }
+            if (gPrintCount >= gMaxPrint && !gPrintLimitReached) {
+                gPrintLimitReached = true;
+                printf("  ... (further reflections not printed)\n");
+                fflush(stdout);
+            }
+        }
+        
+        reflector->RecordReflection(incidentDeg, thetaOutDeg);
+        
+        particleChange->ProposeMomentumDirection(rotated);
+        particleChange->ProposeEnergy(track.GetKineticEnergy());
+        particleChange->ProposeLocalEnergyDeposit(0.0);
+        particleChange->SetNumberOfSecondaries(0);
+        
+        return particleChange;
+        
+    } else {
+        return G4OpBoundaryProcess::PostStepDoIt(track, step);
+    }
+}

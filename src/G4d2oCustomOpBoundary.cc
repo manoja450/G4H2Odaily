@@ -90,19 +90,19 @@ const char* G4d2oCustomOpBoundary::GetAzimuthalModelName() const {
 // ============================================================
 
 G4double G4d2oCustomOpBoundary::SoftClampAngle(G4double angleDeg) const {
-    const G4double min_angle = 0.5;
-    const G4double max_angle = 89.5;
+    const G4double min_angle = 0; //was 0.5
+    const G4double max_angle = 90; //was 89.5
 
     if (std::abs(angleDeg) < min_angle && angleDeg != 0.0) {
-        G4double offset = min_angle + fRandDist(fRNG) * 0.5;
+        G4double offset = min_angle + fRandDist(fRNG) * 0; // was 0.5
         return (angleDeg > 0) ? offset : -offset;
     }
     if (angleDeg > max_angle) {
-        G4double offset = fRandDist(fRNG) * 0.5;
+        G4double offset = fRandDist(fRNG) * 0;   //was 0.5
         return max_angle - offset;
     }
     if (angleDeg < -max_angle) {
-        G4double offset = fRandDist(fRNG) * 0.5;
+        G4double offset = fRandDist(fRNG) * 0; //was 0.5
         return -max_angle + offset;
     }
     return angleDeg;
@@ -254,15 +254,6 @@ G4VParticleChange* G4d2oCustomOpBoundary::PostStepDoIt(const G4Track& track,
 
     if (isTyvekBoundary) gTyvekReflections++; else gOtherReflections++;
 
-    if ((gTyvekCrossings + gOtherCrossings) % 5000 == 0) {
-        printf("  [BOUNDARY STATS] TYVEK: crossings=%ld reflected=%ld (%.1f%%) | OTHER: crossings=%ld reflected=%ld (%.1f%%)\n",
-               (long)gTyvekCrossings, (long)gTyvekReflections,
-               gTyvekCrossings > 0 ? 100.0 * gTyvekReflections / gTyvekCrossings : 0.0,
-               (long)gOtherCrossings, (long)gOtherReflections,
-               gOtherCrossings > 0 ? 100.0 * gOtherReflections / gOtherCrossings : 0.0);
-        fflush(stdout);
-    }
-
     // Only apply the thesis-sampled Tyvek angular model at Tyvek
     // boundaries. Anywhere else this process reflects (acrylic/D2O,
     // top-cap Tyvek via SetReflector, PMT photocathode, etc.), leave
@@ -290,7 +281,7 @@ G4VParticleChange* G4d2oCustomOpBoundary::PostStepDoIt(const G4Track& track,
     // --- 7. Sample outgoing angle (in-plane) ---
     G4double thetaOutDeg = reflector->SampleOutgoingAngle(incidentDeg);
     G4double originalTheta = thetaOutDeg;
-    thetaOutDeg = SoftClampAngle(thetaOutDeg);
+   // thetaOutDeg = SoftClampAngle(thetaOutDeg);  //uncommented to do test
     G4double thetaOutRad = thetaOutDeg * deg;
 
     // --- 8. Print (limited) ---

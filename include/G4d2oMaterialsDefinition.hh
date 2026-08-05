@@ -45,15 +45,6 @@ public:
     
     static void SetDataDrivenReflector(G4VPhysicalVolume*, G4VPhysicalVolume*, G4double, const G4String&);
 
-    // UNIFIED model Tyvek reflector: REFLECTIVITY as before, plus a
-    // small specular lobe mixed with a dominant diffuse (Lambertian)
-    // lobe via the UNIFIED model's SPECULARLOBECONSTANT/
-    // DIFFUSELOBECONSTANT optical-surface properties. theSigmaAlpha is
-    // in radians (Geant4's native angle unit), not degrees.
-    static void SetTyvekReflector(G4VPhysicalVolume *theExitingVolume, G4VPhysicalVolume *theEnteringVolume,
-                      G4double theReflectivity, G4double theSpecularFraction, G4double theSigmaAlpha,
-                      G4SurfaceType type=dielectric_dielectric);
-
     static void AttachReflectionTree(TFile* file);
     static void CloseReflectionTree();
     static void SetCurrentEventNumber(G4int eventNum);

@@ -1,7 +1,6 @@
 #include "G4d2oPhysicsList.hh"
 #include "G4d2oCustomOpBoundary.hh"
 #include "G4d2oDataDrivenReflector.hh"
-#include "inputVariables.hh"
 
 #include <fstream>
 
@@ -190,28 +189,12 @@ void G4d2oPhysicsList::ConstructOptical()
     G4OpRayleigh* theRayleighScatteringProcess = new G4OpRayleigh();
 
     // ============================================================
-    // SELECT BOUNDARY PROCESS BASED ON REFLECTION MODEL
+    // BOUNDARY PROCESS: Data-Driven only (Unified model removed)
     // ============================================================
-    inputVariables* input = inputVariables::GetIVPointer();
-    G4int reflectionModel = input->GetReflectionModel();
-
-    G4cout << "DEBUG: PhysicsList::ConstructOptical() reflectionModel = " << reflectionModel << G4endl;
-
-    G4OpBoundaryProcess* theBoundaryProcess = nullptr;
-    if (reflectionModel == 1) {
-        // Data-Driven: use custom boundary
-        theBoundaryProcess = new G4d2oCustomOpBoundary();
-        G4cout << "  Using DATA-DRIVEN boundary process" << G4endl;
-        G4d2oCustomOpBoundary* custom = dynamic_cast<G4d2oCustomOpBoundary*>(theBoundaryProcess);
-        if (custom) {
-            custom->SetAzimuthalModel(G4d2oCustomOpBoundary::kGaussian35);
-            G4cout << "  Azimuthal model: " << custom->GetAzimuthalModelName() << G4endl;
-        }
-    } else {
-        // Unified: use standard Geant4 boundary
-        theBoundaryProcess = new G4OpBoundaryProcess();
-        G4cout << "  Using UNIFIED (standard) boundary process" << G4endl;
-    }
+    G4d2oCustomOpBoundary* theBoundaryProcess = new G4d2oCustomOpBoundary();
+    G4cout << "  Using DATA-DRIVEN boundary process" << G4endl;
+    theBoundaryProcess->SetAzimuthalModel(G4d2oCustomOpBoundary::kUniform);
+    G4cout << "  Azimuthal model: " << theBoundaryProcess->GetAzimuthalModelName() << G4endl;
 
     GetParticleIterator()->reset();
 

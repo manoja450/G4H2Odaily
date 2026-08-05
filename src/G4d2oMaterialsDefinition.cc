@@ -472,64 +472,6 @@ void G4d2oMaterialsDefinition::SetDataDrivenReflector(G4VPhysicalVolume *theExit
            << theExitingVolume->GetName() << " -> " << theEnteringVolume->GetName() << G4endl;
 }
 
-// ============================================================
-// UNIFIED model Tyvek reflector
-// ============================================================
-void G4d2oMaterialsDefinition::SetTyvekReflector(G4VPhysicalVolume *theExitingVolume,
-                                                  G4VPhysicalVolume *theEnteringVolume,
-                                                  G4double theReflectivity,
-                                                  G4double theSpecularFraction,
-                                                  G4double theSigmaAlpha,
-                                                  G4SurfaceType type)
-{
-    G4OpticalSurface* optSurf = new G4OpticalSurface("Tyvek_Unified_Reflector");
-    optSurf->SetType(type);
-    optSurf->SetModel(unified);
-    if (theSigmaAlpha <= 0.0) {
-        optSurf->SetFinish(polished);
-    } else {
-        optSurf->SetFinish(ground);
-        optSurf->SetSigmaAlpha(theSigmaAlpha);
-    }
-
-    const G4int numEnergies = 3;
-    G4double energy[numEnergies] = {1.5*eV, 4.25*eV, 7.0*eV};
-    G4double reflectivity[numEnergies]  = {theReflectivity, theReflectivity, theReflectivity};
-    G4double transmittance[numEnergies] = {1.0 - theReflectivity, 1.0 - theReflectivity, 1.0 - theReflectivity};
-    G4double specularLobe[numEnergies]  = {theSpecularFraction, theSpecularFraction, theSpecularFraction};
-    G4double specularSpike[numEnergies] = {0.0, 0.0, 0.0};
-    G4double backscatter[numEnergies]   = {0.0, 0.0, 0.0};
-    G4double diffuseLobe[numEnergies]   = {1.0 - theSpecularFraction, 1.0 - theSpecularFraction, 1.0 - theSpecularFraction};
-
-    G4MaterialPropertiesTable* mpt = new G4MaterialPropertiesTable();
-    
-    // Standard properties (always work)
-    mpt->AddProperty("REFLECTIVITY", energy, reflectivity, numEnergies);
-    mpt->AddProperty("TRANSMITTANCE", energy, transmittance, numEnergies);
-    
-    // ============================================================
-    // FIX: Use AddProperty with explicit createNewKey flag for
-    // non-standard property names.
-    // ============================================================
-    mpt->AddProperty("SPECULARLOBECONSTANT", energy, specularLobe, numEnergies, true);
-    mpt->AddProperty("SPECULARSPIKECONSTANT", energy, specularSpike, numEnergies, true);
-    mpt->AddProperty("BACKSCATTERCONSTANT", energy, backscatter, numEnergies, true);
-    mpt->AddProperty("DIFFUSELOBECONSTANT", energy, diffuseLobe, numEnergies, true);
-
-    optSurf->SetMaterialPropertiesTable(mpt);
-
-    G4String surfaceName(Form("TyvekUnified_%s_%s",
-                              theExitingVolume->GetName().data(),
-                              theEnteringVolume->GetName().data()));
-    new G4LogicalBorderSurface(surfaceName, theExitingVolume, theEnteringVolume, optSurf);
-
-    G4cout << "SetTyvekReflector: Created UNIFIED-model Tyvek reflector for "
-           << theExitingVolume->GetName() << " -> " << theEnteringVolume->GetName()
-           << " (reflectivity=" << theReflectivity
-           << ", specularFraction=" << theSpecularFraction
-           << ", sigmaAlpha=" << theSigmaAlpha << " rad)" << G4endl;
-}
-
 void G4d2oMaterialsDefinition::AttachReflectionTree(TFile* file)
 {
     G4d2oDataDrivenReflector::SetRootFile(file);
@@ -544,3 +486,4 @@ void G4d2oMaterialsDefinition::SetCurrentEventNumber(G4int eventNum)
 {
     G4d2oDataDrivenReflector::SetCurrentEventNumber(eventNum);
 }
+

@@ -205,8 +205,7 @@ void inputVariables::SetValues(GenericInputHolder *theVals){
     reflectivity        = theVals->dPar[indexReflectivity];
     specialEnergy       = theVals->dPar[indexSpecialEnergy];
 
-    // NEW: read model parameters
-    reflectionModel     = (G4int)theVals->dPar[indexReflectionModel];
+    // NEW: read model parameter
     moduleType          = (G4int)theVals->dPar[indexModuleType];
 
     userSEED            = theVals->lPar[indexUserSEED];
@@ -265,8 +264,7 @@ void inputVariables::PrintCommandLine(char** argv, GenericInputHolder *theVals){
     printf("Reflectivity %g ",theVals->dPar[indexReflectivity]);
     printf("SpecialEnergy %g ",theVals->dPar[indexSpecialEnergy]);
 
-    // NEW: print model choices
-    printf("ReflectionModel %d ",(G4int)theVals->dPar[indexReflectionModel]);
+    // NEW: print model choice
     printf("ModuleType %d ",(G4int)theVals->dPar[indexModuleType]);
 
     printf("UserSEED %lld ",theVals->lPar[indexUserSEED]);
@@ -438,17 +436,6 @@ Bool_t inputVariables::UpdateValues(int argc, char** argv){
                     return false;
                 }
             }
-            // NEW: ReflectionModel command-line option
-            else if(!strcmp(argv[iArg], "ReflectionModel") || !strcmp(argv[iArg], "reflectionmodel") ) {
-                if(iArg+1 < argc) {
-                    newVals->dPar[indexReflectionModel] = strtod(argv[iArg+1],NULL);
-                    iArg++;
-                }
-                else{
-                    printf("Error in inputVariables::UpdateValues() - ReflectionModel must follow command \"%s\"\n",argv[iArg]);
-                    return false;
-                }
-            }
             // NEW: ModuleType command-line option
             else if(!strcmp(argv[iArg], "ModuleType") || !strcmp(argv[iArg], "moduletype") ) {
                 if(iArg+1 < argc) {
@@ -519,8 +506,7 @@ void inputVariables::PrintHelp(Char_t *exeName){
     cout<<"\t\t[H2oRefl # ]                                               "<<currentVals->dDesc[indexH2oRefl]<<endl;
     cout<<"\t\t[Reflectivity # ]                                          "<<currentVals->dDesc[indexReflectivity]<<endl;
     cout<<"\t\t[SpecialEnergy # ]                                         "<<currentVals->dDesc[indexSpecialEnergy]<<endl;
-    // NEW help lines
-    cout<<"\t\t[ReflectionModel # ]                                       "<<"0=Unified, 1=Data-Driven"<<endl;
+    // NEW help line
     cout<<"\t\t[ModuleType # ]                                            "<<"0=Module1 (H2O+D2O), 1=Module2 (both H2O)"<<endl;
     cout<<"\t\t[UserSeed # ]                                              "<<currentVals->lDesc[indexUserSEED]<<endl;
     cout<<"\t\t[OutputDir <dirPath>]                                      "<<currentVals->sDesc[indexOutDir]<<endl;

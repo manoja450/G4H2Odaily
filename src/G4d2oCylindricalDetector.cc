@@ -136,9 +136,6 @@ G4LogicalVolume * G4d2oCylindricalDetector::GetDetector(){
     // Get input variables for model selection
     inputVariables* input = inputVariables::GetIVPointer();
     G4int moduleType = input->GetModuleType();
-    G4int reflectionModel = input->GetReflectionModel();
-
-    G4cout << "DEBUG: GetDetector() reflectionModel = " << reflectionModel << G4endl;
 
     ///// create total detector volume /////
     G4LogicalVolume *totalDetLogV = GetTotalDetectorLogV();
@@ -236,34 +233,15 @@ G4LogicalVolume * G4d2oCylindricalDetector::GetDetector(){
     G4VPhysicalVolume *tyvekCapBotPhysV = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -(h2oHeight-tyvekThickness-0.5*pmtLegLength-0.5*pmtMinorAxis)/2.0), tyvekCapBot, "tyvekCapBotPhysV", h2oLogV, false, 0, true);
 
     // ============================================================
-    // SELECT REFLECTOR MODEL BASED ON INPUT FLAG
+    // REFLECTOR MODEL: Data-Driven only (Unified model removed)
     // ============================================================
-    if (reflectionModel == 0) {
-        // UNIFIED MODEL: use wavelength‑dependent Tyvek reflector with small specular lobe
-        G4cout << "\n>>> USING UNIFIED MODEL <<<" << G4endl;
-        G4double tyvekSpecularFraction = 0.05;  // typical for Tyvek (small specular lobe)
-        matPtr->SetTyvekReflector(tyvekPhysV, h2oPhysV,
-                                  tyvekReflectivity, tyvekSpecularFraction,
-                                  tyvekSigmaAlpha);
-        matPtr->SetTyvekReflector(h2oPhysV, tyvekPhysV,
-                                  tyvekReflectivity, tyvekSpecularFraction,
-                                  tyvekSigmaAlpha);
-        matPtr->SetTyvekReflector(h2oPhysV, tyvekCapBotPhysV,
-                                  tyvekReflectivity, tyvekSpecularFraction,
-                                  tyvekSigmaAlpha);
-        matPtr->SetTyvekReflector(tyvekCapBotPhysV, h2oPhysV,
-                                  tyvekReflectivity, tyvekSpecularFraction,
-                                  tyvekSigmaAlpha);
-    } else {
-        // DATA-DRIVEN MODEL
-        G4cout << "\n>>> USING DATA-DRIVEN MODEL <<<" << G4endl;
-        G4String dataDir = "angular_data";
-        G4d2oDataDrivenReflector::CreateInstance(tyvekReflectivity, dataDir);
-        matPtr->SetDataDrivenReflector(tyvekPhysV, h2oPhysV, tyvekReflectivity, dataDir);
-        matPtr->SetDataDrivenReflector(h2oPhysV, tyvekPhysV, tyvekReflectivity, dataDir);
-        matPtr->SetDataDrivenReflector(h2oPhysV, tyvekCapBotPhysV, tyvekReflectivity, dataDir);
-        matPtr->SetDataDrivenReflector(tyvekCapBotPhysV, h2oPhysV, tyvekReflectivity, dataDir);
-    }
+    G4cout << "\n>>> USING DATA-DRIVEN MODEL <<<" << G4endl;
+    G4String dataDir = "angular_data";
+    G4d2oDataDrivenReflector::CreateInstance(tyvekReflectivity, dataDir);
+    matPtr->SetDataDrivenReflector(tyvekPhysV, h2oPhysV, tyvekReflectivity, dataDir);
+    matPtr->SetDataDrivenReflector(h2oPhysV, tyvekPhysV, tyvekReflectivity, dataDir);
+    matPtr->SetDataDrivenReflector(h2oPhysV, tyvekCapBotPhysV, tyvekReflectivity, dataDir);
+    matPtr->SetDataDrivenReflector(tyvekCapBotPhysV, h2oPhysV, tyvekReflectivity, dataDir);
 
     // setting other reflectivities
     acrylicReflectivity = 0.0263;
@@ -1020,3 +998,4 @@ void G4d2oCylindricalDetector::PlacePMTs(G4LogicalVolume *thePMTLogV, G4LogicalV
     std::cout <<(vetoOuterLength);
     std::cout << "\n offset = \n\n";
 }
+
