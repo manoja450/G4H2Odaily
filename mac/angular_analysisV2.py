@@ -25,8 +25,9 @@ editing the dict is the only change needed to re-tune any angle.
 UNCERTAINTY METHODOLOGY (SIMPLE POISSON ERRORS ONLY):
 
 All uncertainties are based solely on Poisson counting statistics.
-For histogram bins:
-    Error(bin) = sqrt(N_bin) / (N_total * bin_width)
+For histogram bins (NO bin‑width division):
+    p_i = N_i / N_total
+    Error(bin) = sqrt(N_i) / N_total
 
 For the S/L integral ratio, the uncertainty is estimated from the total
 number of events used in the fit:
@@ -136,19 +137,6 @@ tyvek_angles = [0, 10, 20, 30, 40, 50, 60, 70, 80]
 
 # ============================================================================
 # TOLERANCE: per-angle now
-# ============================================================================
-#TOLERANCE_MAP = {
-#    0:  0.01,
- #   10: 0.001,
-  #  13: 0.01,
-  #  20: 0.01,
-   # 30: 0.01,
-   # 40: 0.01,
-   # 50: 0.01,
-   # 60: 0.01,
-   # 70: 0.01,
-   # 80: 0.01,
-#}
 # ============================================================================
 TOLERANCE_MAP = {
      0: 0.01,
@@ -301,13 +289,13 @@ if hist_counts_cache is None:
 # ============================================================================
 
 def get_histogram_for_angle(angle):
-    """Returns (bin_centers, pdf, errors, n_total) with simple Poisson errors."""
+    """Returns (bin_centers, p_i, errors, n_total) with p_i = N_i / N_total (NO bin width)."""
     counts = hist_counts_cache.get(angle)
     n_total = n_events_cache.get(angle, 0)
     if counts is None or n_total == 0:
         return HIST_BIN_CENTERS, np.zeros(HIST_BINS), np.zeros(HIST_BINS), 0
-    pdf = counts / (n_total * HIST_BIN_WIDTH)
-    errors = np.sqrt(counts) / (n_total * HIST_BIN_WIDTH)   # Simple Poisson
+    pdf = counts / n_total                       # no bin width
+    errors = np.sqrt(counts) / n_total           # simple Poisson
     return HIST_BIN_CENTERS, pdf, errors, n_total
 
 # ============================================================================
@@ -551,7 +539,7 @@ def plot_function_a():
         ax.errorbar(bin_centers, pdf, yerr=errors, fmt='ro', markersize=5, capsize=3, elinewidth=1.5, alpha=0.8, label='13° Simulation (Geant4)')
 
     ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=14, fontweight='bold')
-    ax.set_ylabel('Probability Density', fontsize=14, fontweight='bold')
+    ax.set_ylabel('Normalised counts per bin', fontsize=14, fontweight='bold')
     ax.set_title('Interpolation for 13° Incidence', fontsize=16, fontweight='bold')
     ax.legend(loc='upper right', fontsize=11)
     ax.grid(True, alpha=0.3)
@@ -598,7 +586,7 @@ def plot_function_a_all():
             title_text = f'Incident Angle = {angle}°'
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold')
-        ax.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
+        ax.set_ylabel('Normalised counts per bin', fontsize=12, fontweight='bold')
         ax.set_title(title_text, fontweight='bold')
         ax.legend(fontsize=8, loc='upper right')
         ax.grid(True, alpha=0.3)
@@ -630,7 +618,7 @@ def plot_function_b():
         ax.plot(theta_fine, pdf_fine, 'r-', lw=3, label='Continuous (0.5°)')
         ax.fill_between(theta_fine, 0, pdf_fine, alpha=0.2, color='red')
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Probability density', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {angle}°', fontsize=14, fontweight='bold')
         ax.legend(fontsize=10, loc='upper right')
         ax.grid(True, alpha=0.3)
@@ -669,12 +657,13 @@ def plot_function_c():
         if n_total > 0:
             ax.errorbar(bin_centers, pdf_sim, yerr=errors, fmt='ro', markersize=5, capsize=3, elinewidth=1.5, alpha=0.7, label='Simulation (Geant4)')
 
-        hist_sampled, edges_sampled = np.histogram(sampled_angles, bins=HIST_EDGES, density=True)
+        hist_sampled, edges_sampled = np.histogram(sampled_angles, bins=HIST_EDGES, density=False)
+        p_samp = hist_sampled / n_samples
         bc_sampled = 0.5 * (edges_sampled[:-1] + edges_sampled[1:])
-        ax.plot(bc_sampled, hist_sampled, 'g-', lw=1.5, alpha=0.7, label='CDF Sampled (Theory)')
+        ax.plot(bc_sampled, p_samp, 'g-', lw=1.5, alpha=0.7, label='CDF Sampled (Theory)')
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {angle}°', fontsize=14, fontweight='bold')
         ax.legend(fontsize=10, loc='upper right')
         ax.grid(True, alpha=0.3)
@@ -718,7 +707,7 @@ def plot_complete_workflow():
     ax1.plot(theta_10, pdf_10, 'b-', lw=2, label='10° PDF')
     ax1.plot(theta_20, pdf_20, 'g-', lw=2, label='20° PDF')
     ax1.plot(theta_common, pdf_13_weighted, 'r--', lw=2.5, label=r'13° = 0.7$\times$10 + 0.3$\times$20')
-    ax1.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax1.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
+    ax1.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax1.set_ylabel('Probability density', fontsize=12, fontweight='bold')
     ax1.set_title('Weighted Average', fontweight='bold')
     ax1.legend(fontsize=9); ax1.grid(True, alpha=0.3)
     ax1.set_xlim(-90, 90)
@@ -727,7 +716,7 @@ def plot_complete_workflow():
     ax2.plot(theta_common, pdf_13_weighted, 'bo', markersize=8, label='Discrete (5° bins)')
     ax2.plot(theta_fine, pdf_13_continuous, 'r-', lw=2.5, label='Continuous (0.5°)')
     ax2.fill_between(theta_fine, 0, pdf_13_continuous, alpha=0.2, color='red')
-    ax2.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax2.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
+    ax2.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax2.set_ylabel('Probability density', fontsize=12, fontweight='bold')
     ax2.set_title('Continuous Interpolation', fontweight='bold')
     ax2.legend(fontsize=9); ax2.grid(True, alpha=0.3)
     ax2.set_xlim(-90, 90)
@@ -743,17 +732,18 @@ def plot_complete_workflow():
     ax4 = axes[1,0]
     ax4.plot(theta_fine, pdf_13_continuous, 'b-', lw=2.5, label='PDF')
     ax4.fill_between(theta_fine, 0, pdf_13_continuous, alpha=0.2, color='blue')
-    ax4.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax4.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
+    ax4.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax4.set_ylabel('Probability density', fontsize=12, fontweight='bold')
     ax4.set_title('Continuous Probability Density', fontweight='bold')
     ax4.grid(True, alpha=0.3)
     ax4.set_xlim(-90, 90)
 
     ax5 = axes[1,1]
-    hist_sampled, edges_sampled = np.histogram(sampled_angles, bins=HIST_EDGES, density=True)
+    hist_sampled, edges_sampled = np.histogram(sampled_angles, bins=HIST_EDGES, density=False)
+    p_samp = hist_sampled / n_samples
     bc_sampled = 0.5 * (edges_sampled[:-1] + edges_sampled[1:])
     ax5.plot(theta_fine, pdf_13_continuous, 'b-', lw=2, label='Reference PDF')
-    ax5.bar(bc_sampled, hist_sampled, width=5, alpha=0.5, color='red', label='CDF Sampled')
-    ax5.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax5.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
+    ax5.bar(bc_sampled, p_samp, width=5, alpha=0.5, color='red', label='CDF Sampled')
+    ax5.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax5.set_ylabel('Normalised counts per bin', fontsize=12, fontweight='bold')
     ax5.set_title('Sampling Validation', fontweight='bold')
     ax5.legend(fontsize=9); ax5.grid(True, alpha=0.3)
     ax5.set_xlim(-90, 90)
@@ -762,7 +752,7 @@ def plot_complete_workflow():
     ax6.plot(theta_fine, pdf_13_continuous, 'b-', lw=2, label='Interpolated PDF')
     if n_total > 0:
         ax6.errorbar(bin_centers, pdf_sim, yerr=errors, fmt='ro', markersize=4, capsize=2, elinewidth=1.0, alpha=0.7, label='Geant4 Simulation')
-    ax6.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax6.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
+    ax6.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax6.set_ylabel('Normalised counts per bin', fontsize=12, fontweight='bold')
     ax6.set_title('Simulation vs Interpolated PDF', fontweight='bold')
     ax6.legend(fontsize=9); ax6.grid(True, alpha=0.3)
     ax6.set_xlim(-90, 90)
@@ -797,12 +787,13 @@ def plot_tyvek_gaussian_lambertian_fits():
             ax.text(0.5, 0.5, f"No data for {phi_target}°", ha='center', va='center', transform=ax.transAxes, fontweight='bold')
             ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
             ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-            ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+            ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
             ax.set_xlim(-90, 90)
             continue
 
         try:
-            result = perform_fit(bin_centers, pdf, n_total)
+            # Fit to counts: pdf * n_total
+            result = perform_fit(bin_centers, pdf * n_total, n_total)
         except Exception as e:
             print(f"Fit failed for {phi_target} deg: {e}")
             result = None
@@ -812,7 +803,7 @@ def plot_tyvek_gaussian_lambertian_fits():
         if result is not None and result['ratio'] < 100:
             results.append({**result, 'phi': phi_target, 'n_events': n_total})
             theta_smooth = np.linspace(-90, 90, 200)
-            fit_curve = gaussian_lambertian(theta_smooth, *result['popt'])
+            fit_curve = gaussian_lambertian(theta_smooth, *result['popt']) / n_total
             ax.plot(theta_smooth, fit_curve, 'r-', lw=3, label='Total Fit')
 
             err_str = f"{result['ratio_err']:.3f}" if result['ratio_err'] is not None else "n/a"
@@ -825,7 +816,7 @@ def plot_tyvek_gaussian_lambertian_fits():
             print(f"  phi={phi_target:2d} deg: Fit unstable, N={n_total:,}")
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right')
@@ -874,9 +865,9 @@ def plot_tyvek_gaussian_lambertian_fit_components(results):
         if result is not None:
             p1, p2, p3, p4 = result['popt']
             theta_smooth = np.linspace(-90, 90, 300)
-            fit_curve = gaussian_lambertian(theta_smooth, p1, p2, p3, p4)
-            lambertian_curve = p1 * np.cos(np.radians(theta_smooth))
-            gaussian_curve = p2 * np.exp(-(theta_smooth - p3)**2 / (2 * p4**2))
+            fit_curve = gaussian_lambertian(theta_smooth, p1, p2, p3, p4) / n_total
+            lambertian_curve = p1 * np.cos(np.radians(theta_smooth)) / n_total
+            gaussian_curve = p2 * np.exp(-(theta_smooth - p3)**2 / (2 * p4**2)) / n_total
 
             ax.plot(theta_smooth, fit_curve, 'r-', lw=2.5, label='Total Fit')
             ax.plot(theta_smooth, lambertian_curve, 'g--', lw=1.5, alpha=0.6, label='Lambertian')
@@ -887,7 +878,7 @@ def plot_tyvek_gaussian_lambertian_fit_components(results):
             print(f"  phi={phi_target:2d} deg: No fit result available")
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right', fontsize=8)
@@ -913,7 +904,7 @@ def plot_tyvek_sim_vs_chavarria_measurement():
             ax.text(0.5, 0.5, f"No data for {phi_target}°", ha='center', va='center', transform=ax.transAxes, fontweight='bold')
             ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
             ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-            ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+            ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
             ax.set_xlim(-90, 90)
             continue
 
@@ -924,13 +915,14 @@ def plot_tyvek_sim_vs_chavarria_measurement():
             ax.set_xlim(-90, 90)
             continue
 
-        chavarria_interp = np.interp(bin_centers, chavarria_theta, chavarria_pdf)
+        # Convert Chavarria density to per‑bin probability for comparison
+        chavarria_interp = np.interp(bin_centers, chavarria_theta, chavarria_pdf) * HIST_BIN_WIDTH
 
         ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color='blue', markersize=6, capsize=3, label='Simulation')
         ax.plot(bin_centers, chavarria_interp, 's', color='red', markersize=6, label='Chavarria Measurement')
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°  (N = {n_total:,})', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right')
@@ -956,7 +948,7 @@ def plot_tyvek_sim_vs_chavarria_measurement_no_Nevent():
             ax.text(0.5, 0.5, f"No data for {phi_target}°", ha='center', va='center', transform=ax.transAxes, fontweight='bold')
             ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
             ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-            ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+            ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
             ax.set_xlim(-90, 90)
             continue
 
@@ -967,14 +959,13 @@ def plot_tyvek_sim_vs_chavarria_measurement_no_Nevent():
             ax.set_xlim(-90, 90)
             continue
 
-        chavarria_interp = np.interp(bin_centers, chavarria_theta, chavarria_pdf)
+        chavarria_interp = np.interp(bin_centers, chavarria_theta, chavarria_pdf) * HIST_BIN_WIDTH
 
         ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color='blue', markersize=6, capsize=3, label='Simulation')
         ax.plot(bin_centers, chavarria_interp, 's', color='red', markersize=6, label='Chavarria Measurement')
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
-        # Title WITHOUT the (N = ...) part
+        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right')
@@ -1045,7 +1036,7 @@ def plot_tyvek_overlay_all_angles():
             ax1.plot(bin_centers, pdf, '-', color=colors[i], lw=2.5, label=f'{angle}°')
 
     ax1.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-    ax1.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+    ax1.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
     ax1.set_title('Simulation Results', fontweight='bold')
     ax1.grid(True, alpha=0.3); ax1.legend(ncol=2)
     ax1.set_xlim(-90, 90)
@@ -1054,11 +1045,11 @@ def plot_tyvek_overlay_all_angles():
     for i, angle in enumerate(tyvek_angles):
         chavarria_theta, chavarria_pdf = load_chavarria_pdf(angle)
         if chavarria_theta is not None:
-            pdf_interp = np.interp(HIST_BIN_CENTERS, chavarria_theta, chavarria_pdf)
-            ax2.plot(HIST_BIN_CENTERS, pdf_interp, '-', color=colors[i], lw=2.5, label=f'{angle}°')
+            p_ch = np.interp(HIST_BIN_CENTERS, chavarria_theta, chavarria_pdf) * HIST_BIN_WIDTH
+            ax2.plot(HIST_BIN_CENTERS, p_ch, '-', color=colors[i], lw=2.5, label=f'{angle}°')
 
     ax2.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-    ax2.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+    ax2.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
     ax2.set_title('Chavarria Experimental Measurement Data', fontweight='bold')
     ax2.grid(True, alpha=0.3); ax2.legend(ncol=2)
     ax2.set_xlim(-90, 90)
@@ -1093,17 +1084,18 @@ def plot_new_chavarria_model_fit():
             ax.set_xlim(-90, 90)
             continue
 
-        result = perform_chavarria_model_fit(bin_centers, pdf, phi_target, n_total)
+        # Fit to counts
+        result = perform_chavarria_model_fit(bin_centers, pdf * n_total, phi_target, n_total)
 
         ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color='blue', markersize=5, capsize=3, label='Data')
 
         if result is not None:
             results.append({**result, 'n_events': n_total})
             theta_smooth = np.linspace(-90, 90, 300)
-            fit_curve = chavarria_model_fit(theta_smooth, phi_target, result['C1'], result['C2'], result['s'])
+            fit_curve = chavarria_model_fit(theta_smooth, phi_target, result['C1'], result['C2'], result['s']) / n_total
             ax.plot(theta_smooth, fit_curve, 'r-', lw=2.5, label='Total Fit')
-            ax.plot(theta_smooth, result['C2'] * np.cos(np.radians(theta_smooth)), 'g--', lw=1.5, alpha=0.6, label='Lambertian')
-            ax.plot(theta_smooth, result['C1'] * np.exp(-(theta_smooth + phi_target)**2 / result['s']), 'b--', lw=1.5, alpha=0.6, label='Gaussian')
+            ax.plot(theta_smooth, result['C2'] * np.cos(np.radians(theta_smooth)) / n_total, 'g--', lw=1.5, alpha=0.6, label='Lambertian')
+            ax.plot(theta_smooth, result['C1'] * np.exp(-(theta_smooth + phi_target)**2 / result['s']) / n_total, 'b--', lw=1.5, alpha=0.6, label='Gaussian')
             ax.axvline(x=-phi_target, color='purple', linestyle=':', lw=1.5, alpha=0.5, label=fr'$-\phi$ = {-phi_target}°')
             err_str = f"{result['ratio_err']:.3f}" if result['ratio_err'] is not None else "n/a"
             print(f"  phi={phi_target:2d} deg: S/L={result['ratio']:.3f} +/- {err_str} (simple Poisson), s={result['s']:.1f}, N={n_total:,}")
@@ -1111,7 +1103,7 @@ def plot_new_chavarria_model_fit():
             print(f"  phi={phi_target:2d} deg: Fit failed, N={n_total:,}")
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right', fontsize=8)
@@ -1145,17 +1137,17 @@ def plot_new_constrained_fit():
             ax.set_xlim(-90, 90)
             continue
 
-        result = perform_constrained_fit(bin_centers, pdf, phi_target, n_total)
+        result = perform_constrained_fit(bin_centers, pdf * n_total, phi_target, n_total)
 
         ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color='blue', markersize=5, capsize=3, label='Data')
 
         if result is not None:
             results.append({**result, 'n_events': n_total})
             theta_smooth = np.linspace(-90, 90, 300)
-            fit_curve = constrained_chavarria_model_fit(theta_smooth, phi_target, result['C1'], result['C2'], result['s'], result['center'])
+            fit_curve = constrained_chavarria_model_fit(theta_smooth, phi_target, result['C1'], result['C2'], result['s'], result['center']) / n_total
             ax.plot(theta_smooth, fit_curve, 'r-', lw=2.5, label='Total Fit')
-            ax.plot(theta_smooth, result['C2'] * np.cos(np.radians(theta_smooth)), 'g--', lw=1.5, alpha=0.6, label='Lambertian')
-            ax.plot(theta_smooth, result['C1'] * np.exp(-(theta_smooth - result['center'])**2 / result['s']), 'b--', lw=1.5, alpha=0.6, label='Gaussian')
+            ax.plot(theta_smooth, result['C2'] * np.cos(np.radians(theta_smooth)) / n_total, 'g--', lw=1.5, alpha=0.6, label='Lambertian')
+            ax.plot(theta_smooth, result['C1'] * np.exp(-(theta_smooth - result['center'])**2 / result['s']) / n_total, 'b--', lw=1.5, alpha=0.6, label='Gaussian')
             ax.axvline(x=result['center'], color='orange', linestyle='--', lw=1.5, alpha=0.7, label=f'peak = {result["center"]:.1f}°')
             ax.axvline(x=-phi_target, color='purple', linestyle=':', lw=1.5, alpha=0.5, label=fr'$-\phi$ = {-phi_target}°')
             ax.axvspan(-phi_target - 5, -phi_target + 5, alpha=0.1, color='purple')
@@ -1166,7 +1158,7 @@ def plot_new_constrained_fit():
             print(f"  phi={phi_target:2d} deg: Fit failed, N={n_total:,}")
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right', fontsize=8)
@@ -1229,7 +1221,7 @@ def plot_ratio_no_errors_generic(results, output_filename, method_label):
     print(f"{method_label} ratio comparison (no errors) saved: {output_file}")
 
 # ============================================================================
-# 13. NEW DIAGNOSTIC PLOTS
+# 13. NEW DIAGNOSTIC PLOTS (Original)
 # ============================================================================
 
 def plot_0_5_degree_bin_check():
@@ -1241,20 +1233,19 @@ def plot_0_5_degree_bin_check():
     print("DIAGNOSTIC: Check 0-5° Incident Angle Bin")
     print("="*70)
 
-    # Get simulation S/L for 0°
     bin_centers, pdf, errors, n_total = get_histogram_for_angle(0)
     if n_total == 0:
         print("No simulation data for 0°, skipping.")
         return
 
-    result = perform_fit(bin_centers, pdf, n_total)
+    # Fit to counts
+    result = perform_fit(bin_centers, pdf * n_total, n_total)
     if result is None:
         print("Fit failed for 0°, skipping.")
         return
     sim_ratio = result['ratio']
     sim_err = result['ratio_err']
 
-    # Evaluate analytical S/L at 0°, 2.5°, 5°
     angles = [0.0, 2.5, 5.0]
     theta_grid = np.linspace(INTEGRATION_RANGE[0], INTEGRATION_RANGE[1], INTEGRATION_POINTS)
     analytical_ratios = []
@@ -1269,15 +1260,12 @@ def plot_0_5_degree_bin_check():
         r = _fit_free_peak_to_curve(theta_grid, pdf_fine)
         analytical_ratios.append(r)
 
-    # Create plot
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    # Plot analytical points
     valid_angles = [a for a, r in zip(angles, analytical_ratios) if r is not None]
     valid_ratios = [r for r in analytical_ratios if r is not None]
     ax.plot(valid_angles, valid_ratios, 'ro-', markersize=8, label='Analytical (Chavarria)')
 
-    # Plot simulation point at 0° (with error bar)
     ax.errorbar(0, sim_ratio, yerr=sim_err, fmt='bs', markersize=10,
                 capsize=5, label=f'Simulation 0° (tolerance ±0.5°), S/L={sim_ratio:.3f}')
 
@@ -1288,10 +1276,8 @@ def plot_0_5_degree_bin_check():
     ax.legend(loc='best')
     ax.set_xlim(-0.5, 6)
 
-    # Add vertical span for the 0° tolerance window
     tol = TOLERANCE_MAP[0]
     ax.axvspan(0, tol, alpha=0.2, color='gray', label=f'Tolerance window (±{tol}°)')
-    # Also show the full 0-5° range
     ax.axvspan(0, 5, alpha=0.1, color='blue', label='0-5° range (for reference)')
 
     output_file = OUTPUT_DIR / 'diagnostic_0_5_degree_bin_check.png'
@@ -1308,7 +1294,6 @@ def plot_tail_behavior():
     print("DIAGNOSTIC: Tail Behavior Check")
     print("="*70)
 
-    # Choose tail angles (we'll do 70 and 80, but you can add more)
     tail_angles = [70, 80]
     fig, axes = plt.subplots(1, len(tail_angles), figsize=(14, 6))
     if len(tail_angles) == 1:
@@ -1323,18 +1308,16 @@ def plot_tail_behavior():
             ax.set_title(f'Incident Angle = {phi_target}°')
             continue
 
-        # Simulation histogram
         ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color='blue',
                     markersize=4, capsize=2, label='Simulation data')
 
-        # Fit result from the free-peak fit
-        result = perform_fit(bin_centers, pdf, n_total)
+        result = perform_fit(bin_centers, pdf * n_total, n_total)
         if result is not None:
             p1, p2, p3, p4 = result['popt']
             theta_smooth = np.linspace(-90, 90, 300)
-            fit_curve = gaussian_lambertian(theta_smooth, p1, p2, p3, p4)
-            lambertian_curve = p1 * np.cos(np.radians(theta_smooth))
-            gaussian_curve = p2 * np.exp(-(theta_smooth - p3)**2 / (2 * p4**2))
+            fit_curve = gaussian_lambertian(theta_smooth, p1, p2, p3, p4) / n_total
+            lambertian_curve = p1 * np.cos(np.radians(theta_smooth)) / n_total
+            gaussian_curve = p2 * np.exp(-(theta_smooth - p3)**2 / (2 * p4**2)) / n_total
 
             ax.plot(theta_smooth, fit_curve, 'r-', lw=2, label='Total fit')
             ax.plot(theta_smooth, lambertian_curve, 'g--', lw=1.5, alpha=0.7, label='Lambertian')
@@ -1343,15 +1326,14 @@ def plot_tail_behavior():
         else:
             ax.text(0.5, 0.5, "Fit failed", ha='center', va='center', transform=ax.transAxes)
 
-        # Analytical Chavarria PDF (interpolated to the same bin centers)
         chavarria_theta, chavarria_pdf = load_chavarria_pdf(phi_target)
         if chavarria_theta is not None:
-            chavarria_interp = np.interp(bin_centers, chavarria_theta, chavarria_pdf)
+            chavarria_interp = np.interp(bin_centers, chavarria_theta, chavarria_pdf) * HIST_BIN_WIDTH
             ax.plot(bin_centers, chavarria_interp, 's', color='magenta',
                     markersize=5, label='Chavarria measurement')
 
         ax.set_xlabel('Reflection Angle (Degrees)', fontsize=12, fontweight='bold')
-        ax.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
+        ax.set_ylabel('Normalised counts per bin', fontsize=12, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°  (N={n_total:,})', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right', fontsize=8)
@@ -1378,19 +1360,16 @@ def plot_S_and_L_separate(results):
         print("No fit results available, skipping.")
         return
 
-    # Extract values
     phi_vals = [r['phi'] for r in results]
     S_vals = [r['S'] for r in results]
     L_vals = [r['L'] for r in results]
     n_events = [r['n_events'] for r in results]
 
-    # Compute errors: simple Poisson propagation
     S_errs = [S / np.sqrt(N) if N > 0 else 0 for S, N in zip(S_vals, n_events)]
     L_errs = [L / np.sqrt(N) if N > 0 else 0 for L, N in zip(L_vals, n_events)]
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    # Plot S and L with error bars
     ax.errorbar(phi_vals, S_vals, yerr=S_errs, fmt='o-', color='blue',
                 capsize=5, markersize=8, label='S (Specular/Gaussian)')
     ax.errorbar(phi_vals, L_vals, yerr=L_errs, fmt='s-', color='red',

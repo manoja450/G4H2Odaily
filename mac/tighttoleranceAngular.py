@@ -79,7 +79,7 @@ DATA_DIR = "/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/
 
 PROCESS_ALL_EVENTS = True
 MAX_EVENTS_TO_PROCESS = 1000000
-USE_SPECIFIC_FILE = "Sim_D2ODetector007.root"
+USE_SPECIFIC_FILE = "Sim_D2ODetector002.root"
 
 INTEGRATION_RANGE = (-90.0, 90.0)
 INTEGRATION_POINTS = 4000
@@ -137,30 +137,17 @@ tyvek_angles = [0, 10, 20, 30, 40, 50, 60, 70, 80]
 # ============================================================================
 # TOLERANCE: per-angle now
 # ============================================================================
-#TOLERANCE_MAP = {
-#    0:  0.01,
- #   10: 0.001,
-  #  13: 0.01,
-  #  20: 0.01,
-   # 30: 0.01,
-   # 40: 0.01,
-   # 50: 0.01,
-   # 60: 0.01,
-   # 70: 0.01,
-   # 80: 0.01,
-#}
-# ============================================================================
 TOLERANCE_MAP = {
-     0: 0.01,
-    10: 0.01,
-    13: 0.01,
-    20: 0.01,
-    30: 0.01,
-    40: 0.01,
-    50: 0.01,
-    60: 0.01,
-    70: 0.01,
-    80: 0.01,
+    0:  0.5,
+    10: 0.5,
+    13: 0.5,
+    20: 0.5,
+    30: 0.5,
+    40: 0.5,
+    50: 0.5,
+    60: 0.5,
+    70: 0.5,
+    80: 0.5,
 }
 
 missing_tol = [a for a in target_angles if a not in TOLERANCE_MAP]

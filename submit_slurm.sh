@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -J G4h2o
 #SBATCH -p shortjobs
-#SBATCH -t 6:00:00
+#SBATCH -t 10:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem=80G

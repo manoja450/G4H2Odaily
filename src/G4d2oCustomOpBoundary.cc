@@ -49,23 +49,16 @@ G4d2oCustomOpBoundary::G4d2oCustomOpBoundary(const G4String& processName)
       fRNG(std::random_device{}()),
       fRandDist(0.0, 1.0),
       fGaussDist(0.0, 1.0) {
-    G4cout << "\n=========================================================" << G4endl;
-    G4cout << "G4d2oCustomOpBoundary: Created" << G4endl;
-    G4cout << "  Data-driven reflector (Chavarria 2007 thesis)" << G4endl;
-    G4cout << "  In-plane distribution: digitized thesis PDF (1D)" << G4endl;
-    G4cout << "  Out-of-plane (azimuthal) model: " << GetAzimuthalModelName() << G4endl;
-    G4cout << "=========================================================\n" << G4endl;
+    // Startup banner removed on request - it printed GetAzimuthalModelName()
+    // at construction time, before SetAzimuthalModel() (called afterward in
+    // G4d2oPhysicsList::ConstructProcess()) actually takes effect, so it
+    // always showed the kUniform default regardless of what was configured.
 }
 
 G4d2oCustomOpBoundary::~G4d2oCustomOpBoundary() {
-    G4cout << "G4d2oCustomOpBoundary: TYVEK crossings=" << gTyvekCrossings
-           << " reflected=" << gTyvekReflections << " ("
-           << (gTyvekCrossings > 0 ? 100.0 * gTyvekReflections / gTyvekCrossings : 0.0)
-           << "%)" << G4endl;
-    G4cout << "G4d2oCustomOpBoundary: OTHER crossings=" << gOtherCrossings
-           << " reflected=" << gOtherReflections << " ("
-           << (gOtherCrossings > 0 ? 100.0 * gOtherReflections / gOtherCrossings : 0.0)
-           << "%)" << G4endl;
+    // Summary print removed on request. gTyvekCrossings/gTyvekReflections/
+    // gOtherCrossings/gOtherReflections are still incremented in
+    // PostStepDoIt() below - only the end-of-run printout is gone.
 }
 
 // ============================================================
@@ -83,29 +76,6 @@ const char* G4d2oCustomOpBoundary::GetAzimuthalModelName() const {
         case kLambertianAzimuth: return "LAMBERTIAN (cos-weighted)";
         default:                 return "UNKNOWN";
     }
-}
-
-// ============================================================
-// Helper: Soft clamp to avoid stuck tracks
-// ============================================================
-
-G4double G4d2oCustomOpBoundary::SoftClampAngle(G4double angleDeg) const {
-    const G4double min_angle = 0; //was 0.5
-    const G4double max_angle = 90; //was 89.5
-
-    if (std::abs(angleDeg) < min_angle && angleDeg != 0.0) {
-        G4double offset = min_angle + fRandDist(fRNG) * 0; // was 0.5
-        return (angleDeg > 0) ? offset : -offset;
-    }
-    if (angleDeg > max_angle) {
-        G4double offset = fRandDist(fRNG) * 0;   //was 0.5
-        return max_angle - offset;
-    }
-    if (angleDeg < -max_angle) {
-        G4double offset = fRandDist(fRNG) * 0; //was 0.5
-        return -max_angle + offset;
-    }
-    return angleDeg;
 }
 
 // ============================================================
@@ -280,23 +250,15 @@ G4VParticleChange* G4d2oCustomOpBoundary::PostStepDoIt(const G4Track& track,
 
     // --- 7. Sample outgoing angle (in-plane) ---
     G4double thetaOutDeg = reflector->SampleOutgoingAngle(incidentDeg);
-    G4double originalTheta = thetaOutDeg;
-   // thetaOutDeg = SoftClampAngle(thetaOutDeg);  //uncommented to do test
     G4double thetaOutRad = thetaOutDeg * deg;
 
     // --- 8. Print (limited) ---
     if (!gPrintLimitReached && gPrintCount < gMaxPrint) {
         gPrintCount++;
         gReflectionCount++;
-        if (originalTheta != thetaOutDeg) {
-            printf("  [REFLECTION %d] incident=%.2f deg, sampled=%.2f deg -> clamped=%.2f deg [AZIMUTH=%s]\n",
-                   gReflectionCount, incidentDeg, originalTheta, thetaOutDeg,
-                   GetAzimuthalModelName());
-        } else {
-            printf("  [REFLECTION %d] incident=%.2f deg, reflected=%.2f deg [AZIMUTH=%s]\n",
-                   gReflectionCount, incidentDeg, thetaOutDeg,
-                   GetAzimuthalModelName());
-        }
+        printf("  [REFLECTION %d] incident=%.2f deg, reflected=%.2f deg [AZIMUTH=%s]\n",
+               gReflectionCount, incidentDeg, thetaOutDeg,
+               GetAzimuthalModelName());
         fflush(stdout);
         if (gPrintCount >= gMaxPrint) {
             gPrintLimitReached = true;
@@ -353,3 +315,4 @@ G4VParticleChange* G4d2oCustomOpBoundary::PostStepDoIt(const G4Track& track,
 
     return particleChange;
 }
+

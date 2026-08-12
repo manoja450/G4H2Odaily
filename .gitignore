@@ -1,6 +1,4 @@
-# -----------------------------
 # Build directories
-# -----------------------------
 build/
 build*/
 G4d2o-build/
@@ -14,7 +12,7 @@ cmake_install.cmake
 Makefile
 compile_commands.json
 
-# Executables/Libraries
+# Executables and libraries
 *.o
 *.obj
 *.a
@@ -24,26 +22,29 @@ compile_commands.json
 *.rootmap
 G4d2o
 
-# -----------------------------
 # Simulation output
-# -----------------------------
 OUTPUT/
 SLURMOUT/
 ModuleType/
 
-# Simulation result directories
-mac/PLOTS/
-mac/validation_plots/
-mac/diagnostic_plots/
-mac/Sim*/
+# Simulation/result directories
+Sim/
 Sim*/
 Simulation/
 Results/
 
+# Analysis plots
+mac/PLOTS/
+mac/PLOTS*/
+mac/validation_plots/
+mac/diagnostic_plots/
+mac/*plots*/
+mac/*Plots*/
+
 # ROOT files
 *.root
 
-# Images
+# Image files
 *.png
 *.jpg
 *.jpeg
@@ -56,11 +57,21 @@ Results/
 slurm-*
 nohup.out
 
+# Simulation history/data
+data/beamOnFiles/
+data/fileHistories/
+seedHistory.dat
+
 # Temporary files
 *.sw?
+*.swp
+*.swo
 *.bak
 *~
 .nfs*
+
+# Backup files
+*.BACKUP
 
 # Python cache
 __pycache__/

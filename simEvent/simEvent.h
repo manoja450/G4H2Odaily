@@ -70,6 +70,17 @@ public:
     Int_t numHits;
     Int_t numHitsArea;
 
+    // PMT-resolution-smeared photoelectron count. numHits itself is a bare
+    // photon-counting tally (see G4d2oSensitiveDetector.cc) with none of the
+    // extra broadening real PMT charge reconstruction has (single-PE gain
+    // resolution, dark noise, afterpulsing). numHitsSmeared = numHits plus a
+    // Gaussian jitter fit against real Michel electron data (see
+    // G4d2oEventAction::EndOfEventAction) - kept as a SEPARATE field so
+    // numHits and pmtHits stay in sync (numHits is also used as the index
+    // count into pmtHits - see AddPMTHit/GetHit/MeanX/MeanY/MeanZ/TimeRMS),
+    // and so raw and smeared values are both available for comparison.
+    Double_t numHitsSmeared;
+
     Double_t muVetoEnergy[12];
 
     TClonesArray *pmtHits;
@@ -103,7 +114,8 @@ public:
 
     virtual void ClearData();
     virtual void CopyData(simEvent *dataToCopy);
-    ClassDef(simEvent, 6)
+    ClassDef(simEvent, 7)
 };
 
 #endif
+

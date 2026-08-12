@@ -59,6 +59,7 @@ void simEvent::ClearData()
   for (int i=0;i<kNarrowPanels;++i) narrow_veto_edep[i] = 0.0;
   for (int i=0;i<kWidePanels;++i) wide_veto_edep[i] = 0.0;
   numHits = 0;
+  numHitsSmeared = 0.0;
   pmtHits->Clear();
 
   // NEW: Clear instrumentation fields
@@ -83,6 +84,7 @@ void simEvent::CopyData(simEvent *dataToCopy)
   vol0 = dataToCopy->vol0;
 
   numHits = dataToCopy->numHits;
+  numHitsSmeared = dataToCopy->numHitsSmeared;
   pmtHits = (TClonesArray *)dataToCopy->pmtHits->Clone();
 
   numHitsArea = dataToCopy->numHitsArea;
@@ -175,3 +177,4 @@ int simEvent::NumVetoPairs(double threshold /*MeV*/) const
   }
   return numpairs;
 }
+

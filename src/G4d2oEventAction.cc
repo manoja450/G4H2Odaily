@@ -13,12 +13,27 @@
 #include "G4HCofThisEvent.hh"
 #include "G4UnitsTable.hh"
 #include "G4RunManager.hh"
+#include "Randomize.hh"
 
 #include "TFile.h"
 #include "TMath.h"
 #include "TString.h"
 #include "TClassTable.h"
 #include "inputVariables.hh"
+
+// PMT-resolution smearing width (PE), fit against real Michel electron data
+// via chi^2 minimization of the reflected (numHits>=60 PE) spectrum shape -
+// see plot_michel_comparison_root.C / michel_smearing_scan.py. Real "PE
+// counts" are reconstructed from integrated PMT charge, which has extra
+// broadening (single-PE gain resolution, dark noise, afterpulsing) beyond
+// the simulation's bare photon-counting numHits tally; this closes that gap.
+// Written into numHitsSmeared (a SEPARATE field from numHits - see
+// simEvent.h) in EndOfEventAction, so raw and smeared PE counts are both
+// available side by side for comparison, and numHits/pmtHits stay in sync.
+// NOTE: fit only against the Michel-electron light-yield range (~60-800 PE),
+// taken with Module 2 (both H2O) - the only module the detector now builds
+// (G4d2oCylindricalDetector::GetDetector() no longer switches modules).
+static const G4double kPMTResolutionSigmaPE = 42.0;
 
 G4d2oEventAction::G4d2oEventAction(void)
 {
@@ -113,6 +128,7 @@ G4d2oEventAction::G4d2oEventAction(void)
     outTree->Branch("nPhotons", &theEventData->nPhotons, "nPhotons/I");
     outTree->Branch("meanReflections", &theEventData->meanReflections, "meanReflections/D");
     outTree->Branch("meanPathLength", &theEventData->meanPathLength, "meanPathLength/D");
+    outTree->Branch("numHitsSmeared", &theEventData->numHitsSmeared, "numHitsSmeared/D");
 
     G4cerr << "done." << G4endl;
 }
@@ -580,6 +596,17 @@ void G4d2oEventAction::ProcessEvent(void)
         }
     }
 
+    // ============================================================
+    // PMT-resolution-smeared photoelectron count (see kPMTResolutionSigmaPE
+    // comment near the top of this file). Computed on the FINAL numHits for
+    // this event, right before the tree is filled, and written into a
+    // separate field so numHits/pmtHits stay internally consistent (numHits
+    // is also the index count into pmtHits - see simEvent.h).
+    //
+    // ============================================================
+    theEventData->numHitsSmeared = theEventData->numHits + G4RandGauss::shoot(0.0, kPMTResolutionSigmaPE);
+    if (theEventData->numHitsSmeared < 0.0) theEventData->numHitsSmeared = 0.0;
+
     outTree->Fill();
 
     hTotalPhotons->Fill(theEventData->numHits);
@@ -598,3 +625,4 @@ double G4d2oEventAction::qe_ev(double energy_ev)
         return 0.0;
     return gBialkali_ev->Eval(energy_ev, 0, "");
 }
+

@@ -10,7 +10,7 @@
 #include "TStopwatch.h"
 
 #define NUMINT 13
-#define NUMDOUBLE 7   // increased from 6 to 7 for ModuleType (ReflectionModel removed - Data-Driven only)
+#define NUMDOUBLE 6
 #define NUMCHAR 1
 #define NUMLONG 1
 
@@ -72,9 +72,6 @@ public:
     inline G4double GetReflectivity() {return reflectivity;}
     inline G4double GetSpecialEnergy() {return specialEnergy;}
 
-    // NEW: model selection
-    inline G4int GetModuleType() {return moduleType;}          // 0=Module1 (H2O+D2O), 1=Module2 (both H2O)
-
     Bool_t ReadCurrentFile();
     Bool_t UpdateValues(int argc, char** argv);
     void WriteValues(GenericInputHolder *theVals, Bool_t bFile=true, TString sBOFileName="beamOn.dat");
@@ -101,9 +98,6 @@ private:
     G4long userSEED;
     TString outputDir;
 
-    // NEW
-    G4int moduleType;        // 0=Module1 (H2O+D2O), 1=Module2 (both H2O)
-
     TDatime *dateTime;
     GenericInputHolder *currentVals;
     GenericInputHolder *newVals;
@@ -128,11 +122,10 @@ private:
     const Int_t indexH2oRefl = 3;
     const Int_t indexReflectivity = 4;
     const Int_t indexSpecialEnergy = 5;
-    // NEW index
-    const Int_t indexModuleType = 6;
 
     const Int_t indexOutDir = 0;
     const Int_t indexUserSEED = 0;
 };
 
 #endif
+

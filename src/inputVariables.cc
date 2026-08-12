@@ -205,9 +205,6 @@ void inputVariables::SetValues(GenericInputHolder *theVals){
     reflectivity        = theVals->dPar[indexReflectivity];
     specialEnergy       = theVals->dPar[indexSpecialEnergy];
 
-    // NEW: read model parameter
-    moduleType          = (G4int)theVals->dPar[indexModuleType];
-
     userSEED            = theVals->lPar[indexUserSEED];
     outputDir           = theVals->sPar[indexOutDir];
 }
@@ -263,9 +260,6 @@ void inputVariables::PrintCommandLine(char** argv, GenericInputHolder *theVals){
     printf("H2oRefl %g ",theVals->dPar[indexH2oRefl]);
     printf("Reflectivity %g ",theVals->dPar[indexReflectivity]);
     printf("SpecialEnergy %g ",theVals->dPar[indexSpecialEnergy]);
-
-    // NEW: print model choice
-    printf("ModuleType %d ",(G4int)theVals->dPar[indexModuleType]);
 
     printf("UserSEED %lld ",theVals->lPar[indexUserSEED]);
     printf("OutputDir %s ",theVals->sPar[indexOutDir].Data());
@@ -436,17 +430,6 @@ Bool_t inputVariables::UpdateValues(int argc, char** argv){
                     return false;
                 }
             }
-            // NEW: ModuleType command-line option
-            else if(!strcmp(argv[iArg], "ModuleType") || !strcmp(argv[iArg], "moduletype") ) {
-                if(iArg+1 < argc) {
-                    newVals->dPar[indexModuleType] = strtod(argv[iArg+1],NULL);
-                    iArg++;
-                }
-                else{
-                    printf("Error in inputVariables::UpdateValues() - ModuleType must follow command \"%s\"\n",argv[iArg]);
-                    return false;
-                }
-            }
             else if(!strcmp(argv[iArg], "UserSEED") || !strcmp(argv[iArg], "UserSeed") || !strcmp(argv[iArg], "userSeed") || !strcmp(argv[iArg], "userseed")){
                 if(iArg+1 < argc){
                     newVals->lPar[indexUserSEED] = (G4long)(strtoul(argv[iArg+1],NULL,10)&0x7FFFFFFFFFFFFFFF);
@@ -506,8 +489,6 @@ void inputVariables::PrintHelp(Char_t *exeName){
     cout<<"\t\t[H2oRefl # ]                                               "<<currentVals->dDesc[indexH2oRefl]<<endl;
     cout<<"\t\t[Reflectivity # ]                                          "<<currentVals->dDesc[indexReflectivity]<<endl;
     cout<<"\t\t[SpecialEnergy # ]                                         "<<currentVals->dDesc[indexSpecialEnergy]<<endl;
-    // NEW help line
-    cout<<"\t\t[ModuleType # ]                                            "<<"0=Module1 (H2O+D2O), 1=Module2 (both H2O)"<<endl;
     cout<<"\t\t[UserSeed # ]                                              "<<currentVals->lDesc[indexUserSEED]<<endl;
     cout<<"\t\t[OutputDir <dirPath>]                                      "<<currentVals->sDesc[indexOutDir]<<endl;
 
@@ -550,3 +531,4 @@ G4int inputVariables::GetNewCollectionID(G4int iType)
     }
     return iReturn;
 }
+

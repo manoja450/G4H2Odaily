@@ -193,7 +193,7 @@ void G4d2oPhysicsList::ConstructOptical()
     // ============================================================
     G4d2oCustomOpBoundary* theBoundaryProcess = new G4d2oCustomOpBoundary();
     G4cout << "  Using DATA-DRIVEN boundary process" << G4endl;
-    theBoundaryProcess->SetAzimuthalModel(G4d2oCustomOpBoundary::kUniform);
+    theBoundaryProcess->SetAzimuthalModel(G4d2oCustomOpBoundary::kGaussian35);
     G4cout << "  Azimuthal model: " << theBoundaryProcess->GetAzimuthalModelName() << G4endl;
 
     GetParticleIterator()->reset();

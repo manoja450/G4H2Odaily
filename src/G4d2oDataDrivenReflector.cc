@@ -39,8 +39,6 @@ G4d2oDataDrivenReflector::G4d2oDataDrivenReflector(G4double reflectivity)
     G4cout << "  Function A: Incident angle interpolation: ENABLED" << G4endl;
     G4cout << "  Function B: Continuous PDF interpolation: ENABLED" << G4endl;
     G4cout << "  Function C: CDF sampling: ENABLED" << G4endl;
-    G4cout << "  Soft clamp: min angle = 0.5deg, max angle = 89.5deg" << G4endl;
-    G4cout << "  Recording global direction (px, py, pz) for diagnostics" << G4endl;
     G4cout << "=========================================================\n" << G4endl;
 }
 
@@ -336,29 +334,10 @@ G4double G4d2oDataDrivenReflector::GetThetaOut(G4double incidentAngleDeg) const 
 }
 
 // ============================================================
-// FUNCTION C: Sample Outgoing Angle - with SOFT CLAMP
+// FUNCTION C: Sample Outgoing Angle
 // ============================================================
 G4double G4d2oDataDrivenReflector::SampleOutgoingAngle(G4double incidentAngleDeg) const {
-    // Get the raw angle from the thesis PDF
-    G4double theta = GetThetaOut(incidentAngleDeg);
-
-    // ============================================================
-    // SOFT CLAMP: Avoid exact 0deg and +/-90deg which cause stuck tracks
-    // ============================================================
-    const G4double min_angle = 0.5;
-    const G4double max_angle = 89.5;
-
-    if (std::abs(theta) < min_angle && theta != 0.0) {
-        G4double offset = min_angle + fRandDist(fRNG) * 0.5;
-        theta = (theta > 0) ? offset : -offset;
-    }
-
-    if (std::abs(theta) > max_angle) {
-        G4double offset = fRandDist(fRNG) * 0.5;
-        theta = (theta > 0) ? max_angle - offset : -(max_angle - offset);
-    }
-
-    return theta;
+    return GetThetaOut(incidentAngleDeg);
 }
 
 // ============================================================
@@ -373,7 +352,7 @@ G4ThreeVector G4d2oDataDrivenReflector::GetReflectionDirection(const G4ThreeVect
                                                                  G4double incidentAngleRad) const {
     G4double incidentDeg = incidentAngleRad * 180.0 / M_PI;
 
-    // Sample outgoing angle from thesis data (with soft clamp)
+    // Sample outgoing angle from thesis data
     G4double thetaOutDeg = SampleOutgoingAngle(incidentDeg);
     G4double thetaOutRad = thetaOutDeg * M_PI / 180.0;
 
@@ -419,7 +398,7 @@ void G4d2oDataDrivenReflector::ValidatePDF(G4double incidentAngleDeg, G4int nSam
     const PDF& refPDF = it->second;
     G4cout << "Reference PDF has " << refPDF.theta.size() << " continuous bins" << G4endl;
 
-    // Sample nSamples angles (with soft clamp)
+    // Sample nSamples angles
     std::vector<G4double> samples;
     samples.reserve(nSamples);
     for (G4int i = 0; i < nSamples; ++i) {
@@ -535,3 +514,4 @@ void G4d2oDataDrivenReflector::RecordReflection(G4double incidentAngleDeg, G4dou
 void G4d2oDataDrivenReflector::SetCurrentEventNumber(G4int eventNum) {
     fCurrentEventNumber = eventNum;
 }
+

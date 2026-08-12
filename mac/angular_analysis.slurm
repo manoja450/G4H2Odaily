@@ -47,7 +47,9 @@ echo "Running angular_analysis.py..."
 echo "========================================="
 
 # Run the Python script
-python3 angular_analysis.py
+#python3 tighttoleranceAngular.py
+#python3 angular_analysis.py
+python3 angular_analysisV2.py
 #python3 two_models_comparison.py
 # Check if the script ran successfully
 if [ $? -eq 0 ]; then

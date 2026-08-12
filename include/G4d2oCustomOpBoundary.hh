@@ -34,9 +34,6 @@ public:
     const char* GetAzimuthalModelName() const;
 
 private:
-    // Helper: Soft clamp to avoid stuck tracks
-    G4double SoftClampAngle(G4double angleDeg) const;
-
     // Helper: Sample azimuthal angle based on selected model
     G4double SampleAzimuthalAngle() const;
 
@@ -56,3 +53,4 @@ private:
 };
 
 #endif
+

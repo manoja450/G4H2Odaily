@@ -42,7 +42,7 @@ void G4d2oSteppingAction::UserSteppingAction(const G4Step* step) {
         G4double dot = fPrevDirection.dot(currentDir);
 
         // ============================================================
-        // FIX: only count reflections if direction changed AND we crossed a real boundary
+        //  only count reflections if direction changed AND we crossed a real boundary
         // ============================================================
         if (dot < 0.998 && step->GetPostStepPoint()->GetStepStatus() == fGeomBoundary) {
             fReflectionCount++;

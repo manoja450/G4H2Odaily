@@ -133,10 +133,6 @@ G4LogicalVolume * G4d2oCylindricalDetector::GetDetector(){
     //Materials pointer
     matPtr = G4d2oRunAction::GetMaterialsPointer();
 
-    // Get input variables for model selection
-    inputVariables* input = inputVariables::GetIVPointer();
-    G4int moduleType = input->GetModuleType();
-
     ///// create total detector volume /////
     G4LogicalVolume *totalDetLogV = GetTotalDetectorLogV();
 
@@ -159,16 +155,10 @@ G4LogicalVolume * G4d2oCylindricalDetector::GetDetector(){
     G4LogicalVolume *acrylicLogV = GetAcrylicLogV();
 
     // ============================================================
-    // MODULE SELECTION: target volume (D2O or H2O)
+    // MODULE: Module 2 only (both H2O) - no Module 1/Module 2 switching.
     // ============================================================
-    G4LogicalVolume *targetLogV = 0;
-    if (moduleType == 0) {
-        targetLogV = GetD2OLogV();   // Module 1: H2O + D2O
-        G4cout << "\n>>> USING MODULE 1 (H2O + D2O) <<<" << G4endl;
-    } else {
-        targetLogV = GetH2OModuleLogV(); // Module 2: both H2O
-        G4cout << "\n>>> USING MODULE 2 (both H2O) <<<" << G4endl;
-    }
+    G4LogicalVolume *targetLogV = GetH2OModuleLogV();
+    G4cout << "\n>>> USING MODULE 2 (both H2O) <<<" << G4endl;
 
     ///// PMTs with mu-metal shield /////
     G4LogicalVolume *pmtLogV = 0;
@@ -207,7 +197,7 @@ G4LogicalVolume * G4d2oCylindricalDetector::GetDetector(){
     //              -> H2O tank
     //                 -(1)-> PMTs
     //                 -(2)-> acrylic tank
-    //                        -> target (D2O or H2O)
+    //                        -> target (H2O, Module 2)
 
     ///// Place the target in acrylic tank /////
     G4VPhysicalVolume *targetPhysV = new G4PVPlacement(0,G4ThreeVector(0,0,0),targetLogV,"targetPhysV",acrylicLogV,false,0,true);
@@ -603,17 +593,6 @@ G4LogicalVolume *G4d2oCylindricalDetector::GetAcrylicLogV(){
     visAcrylic->SetColour(G4Color::Magenta());
     acrylicLogV->SetVisAttributes( visAcrylic );
     return acrylicLogV;
-}
-
-G4LogicalVolume *G4d2oCylindricalDetector::GetD2OLogV(){
-    G4Tubs* d2oSolid = new G4Tubs("d2oSolid",0.0,d2oLength/2.0,d2oHeight/2.0,0.0,360.0*deg);
-    G4LogicalVolume *d2oLogV = new G4LogicalVolume(d2oSolid,
-                                                   matPtr->GetMaterial( H2O ),
-                                                   "d2oLogV");
-    G4VisAttributes *visAttD2O = new G4VisAttributes();
-    visAttD2O->SetColour(G4Colour(0.0, 0.6, 1.0));
-    d2oLogV->SetVisAttributes( visAttD2O );
-    return d2oLogV;
 }
 
 G4LogicalVolume *G4d2oCylindricalDetector::GetTyvekLiningCapLogV(const char * name, bool boundPMTs=true){
