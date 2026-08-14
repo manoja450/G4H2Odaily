@@ -12,6 +12,23 @@ reflection-angle range - NOT the raw fit-amplitude ratio (C1/C2 or
 p2/p1). integrate_S_over_L() computes this and is the only ratio
 reported/plotted anywhere.
 ================================================================================
+UNITS: both the simulation histogram (get_histogram_for_angle) and the
+Chavarria thesis loader (load_chavarria_pdf) use the SAME convention:
+"probability per bin" (counts / n_total), NOT divided by bin width. The
+y-axis label everywhere just says "Probability Density" for readability -
+note this is a LABEL ONLY; the underlying values are still per-bin
+probabilities (counts / n_total), not true densities divided by bin width.
+================================================================================
+COLOR CONSISTENCY: every plot in this file pulls its colors from the single
+COLORS dict below, using plain/common color names (not hex) so they're easy
+to tell apart. The three most important, used consistently EVERYWHERE:
+    - red   = Chavarria measurement DATA POINTS
+    - blue  = Simulation (Geant4) DATA POINTS
+    - black = Fit CURVE (total Gaussian + Lambertian fit)
+No other series is ever drawn in red, blue, or black anywhere in this file.
+A standalone reference plot (plot_color_legend) documents every color and
+its meaning - it's generated first, before any data plots.
+================================================================================
 PER-ANGLE TOLERANCE: the single global `tolerance` scalar is replaced by
 TOLERANCE_MAP, a dict of {incident angle: tolerance in deg}. Every target
 angle can now be tuned independently - e.g. a wider window at angles with
@@ -69,6 +86,34 @@ class Tee:
 # Thesis-style typography: serif text + Computer Modern mathtext
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['mathtext.fontset'] = 'cm'
+
+# ============================================================================
+# GLOBAL COLOR SCHEME - one color = one meaning, everywhere in this file
+# ============================================================================
+# Plain/common color names on purpose (not hex) so they're easy to tell apart.
+# The three that matter most and are used identically in every single plot:
+#   chavarria  -> red    (Chavarria measurement DATA POINTS)
+#   simulation -> blue   (Geant4 simulation DATA POINTS)
+#   fit_total  -> black  (the TOTAL fit curve)
+# Everything else below is secondary decoration and never reuses red/blue/black.
+# See plot_color_legend() for a generated reference image of all of these.
+
+COLORS = {
+    'chavarria':             'red',     # Chavarria measurement DATA POINTS - always, everywhere
+    'simulation':             'blue',    # Simulation (Geant4) DATA POINTS - always, everywhere
+    'fit_total':               'black',   # Fit CURVE (total Gaussian + Lambertian fit) - always, everywhere
+
+    # secondary/supporting colors - never reused for the three above
+    'chavarria_secondary':     'brown',   # a 2nd Chavarria series in the SAME plot (e.g. 20 deg when 10 deg is red)
+    'interpolated':            'orange',  # any INTERPOLATED / derived PDF curve (dashed)
+    'lambertian':              'green',   # Lambertian / diffuse component line (part of the fit, not the total)
+    'gaussian':                'purple',  # Gaussian / specular component line (part of the fit, not the total)
+    'cdf_sampled':             'cyan',    # CDF-sampled theoretical draw
+    'peak_marker':             'orange',  # vertical line marking an ACTUAL fitted peak (shares 'interpolated')
+    'reference':               'gray',    # reference/guide lines (y=1, expected -phi, etc.)
+    'reference_band':          'gray',    # shaded reference regions (distinguished from tolerance_band by alpha/label only)
+    'tolerance_band':          'gray',    # shaded tolerance-window regions
+}
 
 # ============================================================================
 # CONFIGURATION
@@ -136,7 +181,7 @@ target_angles = [0, 10, 13, 20, 30, 40, 50, 60, 70, 80]
 tyvek_angles = [0, 10, 20, 30, 40, 50, 60, 70, 80]
 
 # ============================================================================
-# TOLERANCE: per-angle now
+# TOLERANCE: per-angle now (unchanged - all 0.01)
 # ============================================================================
 TOLERANCE_MAP = {
      0: 0.01,
@@ -191,6 +236,13 @@ PHI_LABEL = 'Angle of Incidence (Degrees)'
 chavarria_cache = {}
 
 def load_chavarria_pdf(incident_deg):
+    """
+    Returns (theta, pdf) where pdf is PROBABILITY PER BIN (sums to 1),
+    matching the convention used by get_histogram_for_angle() for the
+    simulation (counts / n_total, no bin-width division). This is
+    intentionally NOT a probability density - do not multiply or divide
+    by bin width when comparing directly against the simulation's pdf.
+    """
     if incident_deg in chavarria_cache:
         return chavarria_cache[incident_deg]
 
@@ -202,8 +254,7 @@ def load_chavarria_pdf(incident_deg):
     data = np.loadtxt(filename)
     theta = data[:, 0]
     intensity = data[:, 1]
-    bin_width = np.abs(theta[1] - theta[0]) if len(theta) > 1 else 1.0
-    pdf = intensity / (np.sum(intensity) * bin_width)
+    pdf = intensity / np.sum(intensity)          # per-bin probability, NOT density
 
     chavarria_cache[incident_deg] = (theta, pdf)
     return theta, pdf
@@ -303,7 +354,11 @@ def get_histogram_for_angle(angle):
 # ============================================================================
 
 def get_interpolated_chavarria_pdf(incident_angle):
-    """Interpolates Chavarria PDF between measured grid points."""
+    """
+    Interpolates Chavarria PDF between measured grid points. Returned values
+    are on the same "sums to 1" per-bin convention as load_chavarria_pdf -
+    NOT a density - so no bin_width factor is used in the renormalization.
+    """
     incident_angle = float(np.clip(incident_angle, 0.0, 80.0))
     lower = int(incident_angle // 10) * 10
     upper = min(lower + 10, 80)
@@ -318,7 +373,7 @@ def get_interpolated_chavarria_pdf(incident_angle):
     theta_common = theta_low
     pdf_high_interp = np.interp(theta_common, theta_high, pdf_high)
     pdf_interp = weight_low * pdf_low + weight_high * pdf_high_interp
-    pdf_interp = pdf_interp / np.sum(pdf_interp * (theta_common[1] - theta_common[0]))
+    pdf_interp = pdf_interp / np.sum(pdf_interp)     # renormalize to sum=1 (per-bin), not a density
     return theta_common, pdf_interp
 
 def _fit_free_peak_to_curve(theta_grid, pdf_fine):
@@ -513,6 +568,72 @@ def perform_constrained_fit(theta, counts, phi, n_total):
         return None
 
 # ============================================================================
+# COLOR LEGEND PLOT - shows every color used in this file and its meaning
+# ============================================================================
+
+def plot_color_legend():
+    """
+    Standalone reference plot: one row per entry in COLORS, showing the
+    color swatch next to a plain-English description of what it means.
+    Also documents the one color scheme NOT in the COLORS dict (the viridis
+    colormap used for angle-encoding in plot_tyvek_overlay_all_angles).
+    Run this any time you forget which color means what.
+    """
+    print("\n" + "="*70)
+    print("PLOT: Color Legend (reference key for all plots in this file)")
+    print("="*70)
+
+    # (dict key, plain-English description) - order matches how colors
+    # are introduced in the file: the 3 primary ones first, then the rest.
+    legend_entries = [
+        ('chavarria',            'Chavarria measurement DATA POINTS (primary series)'),
+        ('simulation',            'Simulation (Geant4) DATA POINTS'),
+        ('fit_total',              'Total FIT CURVE (Gaussian + Lambertian combined)'),
+        ('chavarria_secondary',    'A 2nd Chavarria measurement series in the SAME plot'),
+        ('interpolated',           'Interpolated / derived PDF curve (e.g. 13deg = 0.7x10 + 0.3x20)'),
+        ('lambertian',             'Lambertian / diffuse FIT COMPONENT (not the total fit)'),
+        ('gaussian',               'Gaussian / specular FIT COMPONENT (not the total fit)'),
+        ('cdf_sampled',            'CDF-sampled theoretical draw'),
+        ('peak_marker',            'Vertical line marking an actual fitted peak location'),
+        ('reference',              'Reference / guide lines (y=1, expected -phi, etc.)'),
+        ('reference_band',         'Shaded reference region (e.g. 0-5deg range)'),
+        ('tolerance_band',         'Shaded tolerance-window region'),
+    ]
+
+    n = len(legend_entries)
+    fig, ax = plt.subplots(figsize=(9, 0.55 * n + 1.5))
+
+    swatch_x0, swatch_x1 = 0.05, 0.20
+    text_x = 0.24
+
+    for i, (key, description) in enumerate(legend_entries):
+        y = n - i  # top to bottom
+        color = COLORS[key]
+        ax.add_patch(plt.Rectangle((swatch_x0, y - 0.35), swatch_x1 - swatch_x0, 0.7,
+                                    facecolor=color, edgecolor='black', linewidth=1.2))
+        ax.text(text_x, y, f"{color}  -  {description}",
+                va='center', ha='left', fontsize=11)
+
+    # Note the one deliberate exception: the viridis colormap used for
+    # angle-encoding (a different dimension entirely, not a COLORS entry).
+    ax.text(swatch_x0, 0, "viridis colormap  -  used ONLY in the angle-overlay plot, "
+                          "to encode incident angle (not data type)",
+            va='center', ha='left', fontsize=10, style='italic', color=COLORS['reference'])
+
+    ax.set_xlim(0, 1)
+    ax.set_ylim(-0.7, n + 0.7)
+    ax.axis('off')
+    ax.set_title('Color Legend — what every color means in this analysis',
+                 fontsize=14, fontweight='bold', pad=15)
+
+    plt.tight_layout()
+    output_file = OUTPUT_DIR / 'color_legend.png'
+    plt.savefig(output_file, dpi=200, bbox_inches='tight')
+    plt.close()
+    print(f"Color legend plot saved: {output_file}")
+    return str(output_file)
+
+# ============================================================================
 # 7-10: FUNCTION A/B/C PLOTS
 # ============================================================================
 
@@ -526,20 +647,24 @@ def plot_function_a():
     theta_common = theta_10
     pdf_20_interp = np.interp(theta_common, theta_20, pdf_20)
     pdf_13_interp = 0.7 * pdf_10 + 0.3 * pdf_20_interp
-    pdf_13_interp = pdf_13_interp / np.sum(pdf_13_interp * (theta_common[1] - theta_common[0]))
+    pdf_13_interp = pdf_13_interp / np.sum(pdf_13_interp)   # sum=1, per-bin (not density)
 
     bin_centers, pdf, errors, n_total = get_histogram_for_angle(13)
 
     fig, ax = plt.subplots(figsize=(12, 8))
-    ax.plot(theta_10, pdf_10, 'b-', lw=2.5, label='10° PDF (Chavarria Measurement)')
-    ax.plot(theta_20, pdf_20, 'g-', lw=2.5, label='20° PDF (Chavarria Measurement)')
-    ax.plot(theta_common, pdf_13_interp, 'r--', lw=3, label=r'13° Interpolated = 0.7$\times$10 + 0.3$\times$20')
+    ax.plot(theta_10, pdf_10, '-', color=COLORS['chavarria'], lw=2.5,
+            label='10° PDF (Chavarria Measurement)')
+    ax.plot(theta_20, pdf_20, '-', color=COLORS['chavarria_secondary'], lw=2.5,
+            label='20° PDF (Chavarria Measurement)')
+    ax.plot(theta_common, pdf_13_interp, '--', color=COLORS['interpolated'], lw=3,
+            label=r'13° Interpolated = 0.7$\times$10 + 0.3$\times$20')
 
     if n_total > 0:
-        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='ro', markersize=5, capsize=3, elinewidth=1.5, alpha=0.8, label='13° Simulation (Geant4)')
+        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
+                    markersize=5, capsize=3, elinewidth=1.5, label='13° Simulation (Geant4)')
 
     ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=14, fontweight='bold')
-    ax.set_ylabel('Normalised counts per bin', fontsize=14, fontweight='bold')
+    ax.set_ylabel('Probability Density', fontsize=14, fontweight='bold')
     ax.set_title('Interpolation for 13° Incidence', fontsize=16, fontweight='bold')
     ax.legend(loc='upper right', fontsize=11)
     ax.grid(True, alpha=0.3)
@@ -571,23 +696,21 @@ def plot_function_a_all():
         theta_common = theta_low
         pdf_high_interp = np.interp(theta_common, theta_high, pdf_high)
         pdf_interp = weight_low * pdf_low + weight_high * pdf_high_interp
-        pdf_interp = pdf_interp / np.sum(pdf_interp * (theta_common[1] - theta_common[0]))
+        pdf_interp = pdf_interp / np.sum(pdf_interp)   # sum=1, per-bin (not density)
 
         bin_centers, pdf, errors, n_total = get_histogram_for_angle(angle)
         ax = axes[idx]
-        ax.plot(theta_low, pdf_low, 'b-', lw=1.5, alpha=0.4, label=f'{lower}°')
-        ax.plot(theta_high, pdf_high, 'g-', lw=1.5, alpha=0.4, label=f'{upper}°')
-        ax.plot(theta_common, pdf_interp, 'r-', lw=2.5, label=f'Interpolated {angle}°')
+        ax.plot(theta_low, pdf_low, '-', color=COLORS['chavarria'], lw=1.5, alpha=0.7, label=f'{lower}°')
+        ax.plot(theta_high, pdf_high, '-', color=COLORS['chavarria_secondary'], lw=1.5, alpha=0.7, label=f'{upper}°')
+        ax.plot(theta_common, pdf_interp, '-', color=COLORS['interpolated'], lw=2.5, label=f'Interpolated {angle}°')
 
         if n_total > 0:
-            ax.errorbar(bin_centers, pdf, yerr=errors, fmt='ro', markersize=4, capsize=2, elinewidth=1.0, alpha=0.6, label='Simulation')
-            title_text = f'Incident Angle = {angle}°'
-        else:
-            title_text = f'Incident Angle = {angle}°'
+            ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
+                        markersize=4, capsize=2, elinewidth=1.0, label='Simulation')
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold')
-        ax.set_ylabel('Normalised counts per bin', fontsize=12, fontweight='bold')
-        ax.set_title(title_text, fontweight='bold')
+        ax.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
+        ax.set_title(f'Incident Angle = {angle}°', fontweight='bold')
         ax.legend(fontsize=8, loc='upper right')
         ax.grid(True, alpha=0.3)
         ax.set_xlim(-90, 90)
@@ -614,11 +737,13 @@ def plot_function_b():
         theta_fine = np.linspace(-90, 90, 361)
         pdf_fine = np.interp(theta_fine, theta, pdf)
         ax = axes[idx]
-        ax.plot(theta, pdf, 'bo', markersize=10, label='Coarse data (5° bins)')
-        ax.plot(theta_fine, pdf_fine, 'r-', lw=3, label='Continuous (0.5°)')
-        ax.fill_between(theta_fine, 0, pdf_fine, alpha=0.2, color='red')
+        # Both series here are Chavarria data at different resolutions - same color family,
+        # differentiated by marker/line style rather than hue.
+        ax.plot(theta, pdf, 'o', color=COLORS['chavarria'], markersize=10, label='Coarse data (5° bins)')
+        ax.plot(theta_fine, pdf_fine, '-', color=COLORS['chavarria'], lw=3, alpha=0.85, label='Continuous (0.5°)')
+        ax.fill_between(theta_fine, 0, pdf_fine, alpha=0.25, color=COLORS['chavarria'])
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Probability density', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {angle}°', fontsize=14, fontweight='bold')
         ax.legend(fontsize=10, loc='upper right')
         ax.grid(True, alpha=0.3)
@@ -643,8 +768,8 @@ def plot_function_c():
             axes[idx].text(0.5, 0.5, f'No data for {angle}°', ha='center', va='center', transform=axes[idx].transAxes)
             axes[idx].set_xlim(-90, 90)
             continue
-        bin_width = theta[1] - theta[0]
-        cdf = np.cumsum(pdf * bin_width)
+        # pdf already sums to 1 (per-bin probability) - CDF is just its cumulative sum
+        cdf = np.cumsum(pdf)
         cdf = cdf / cdf[-1]
         n_samples = 10000
         random_numbers = np.random.random(n_samples)
@@ -652,18 +777,19 @@ def plot_function_c():
 
         bin_centers, pdf_sim, errors, n_total = get_histogram_for_angle(angle)
         ax = axes[idx]
-        ax.plot(theta, pdf, 'b-', lw=2.5, label='Reference PDF (Chavarria Measurement)')
+        ax.plot(theta, pdf, '-', color=COLORS['chavarria'], lw=2.5, label='Reference PDF (Chavarria Measurement)')
 
         if n_total > 0:
-            ax.errorbar(bin_centers, pdf_sim, yerr=errors, fmt='ro', markersize=5, capsize=3, elinewidth=1.5, alpha=0.7, label='Simulation (Geant4)')
+            ax.errorbar(bin_centers, pdf_sim, yerr=errors, fmt='o', color=COLORS['simulation'],
+                        markersize=5, capsize=3, elinewidth=1.5, label='Simulation (Geant4)')
 
         hist_sampled, edges_sampled = np.histogram(sampled_angles, bins=HIST_EDGES, density=False)
         p_samp = hist_sampled / n_samples
         bc_sampled = 0.5 * (edges_sampled[:-1] + edges_sampled[1:])
-        ax.plot(bc_sampled, p_samp, 'g-', lw=1.5, alpha=0.7, label='CDF Sampled (Theory)')
+        ax.plot(bc_sampled, p_samp, '-', color=COLORS['cdf_sampled'], lw=1.8, label='CDF Sampled (Theory)')
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {angle}°', fontsize=14, fontweight='bold')
         ax.legend(fontsize=10, loc='upper right')
         ax.grid(True, alpha=0.3)
@@ -687,13 +813,14 @@ def plot_complete_workflow():
     theta_common = theta_10
     pdf_20_interp = np.interp(theta_common, theta_20, pdf_20)
     pdf_13_weighted = 0.7 * pdf_10 + 0.3 * pdf_20_interp
-    pdf_13_weighted = pdf_13_weighted / np.sum(pdf_13_weighted * (theta_common[1] - theta_common[0]))
+    pdf_13_weighted = pdf_13_weighted / np.sum(pdf_13_weighted)   # sum=1, per-bin (not density)
 
     theta_fine = np.linspace(-90, 90, 361)
     pdf_13_continuous = np.interp(theta_fine, theta_common, pdf_13_weighted)
 
-    bin_width = theta_fine[1] - theta_fine[0]
-    cdf = np.cumsum(pdf_13_continuous * bin_width)
+    # cdf normalization (/cdf[-1]) cancels any constant scale factor, so this
+    # is safe regardless of the absolute scale of pdf_13_continuous
+    cdf = np.cumsum(pdf_13_continuous)
     cdf = cdf / cdf[-1]
     n_samples = 10000
     random_numbers = np.random.random(n_samples)
@@ -704,25 +831,26 @@ def plot_complete_workflow():
     fig, axes = plt.subplots(2, 3, figsize=(16, 10))
 
     ax1 = axes[0,0]
-    ax1.plot(theta_10, pdf_10, 'b-', lw=2, label='10° PDF')
-    ax1.plot(theta_20, pdf_20, 'g-', lw=2, label='20° PDF')
-    ax1.plot(theta_common, pdf_13_weighted, 'r--', lw=2.5, label=r'13° = 0.7$\times$10 + 0.3$\times$20')
-    ax1.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax1.set_ylabel('Probability density', fontsize=12, fontweight='bold')
+    ax1.plot(theta_10, pdf_10, '-', color=COLORS['chavarria'], lw=2, label='10° PDF')
+    ax1.plot(theta_20, pdf_20, '-', color=COLORS['chavarria_secondary'], lw=2, label='20° PDF')
+    ax1.plot(theta_common, pdf_13_weighted, '--', color=COLORS['interpolated'], lw=2.5,
+             label=r'13° = 0.7$\times$10 + 0.3$\times$20')
+    ax1.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax1.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
     ax1.set_title('Weighted Average', fontweight='bold')
     ax1.legend(fontsize=9); ax1.grid(True, alpha=0.3)
     ax1.set_xlim(-90, 90)
 
     ax2 = axes[0,1]
-    ax2.plot(theta_common, pdf_13_weighted, 'bo', markersize=8, label='Discrete (5° bins)')
-    ax2.plot(theta_fine, pdf_13_continuous, 'r-', lw=2.5, label='Continuous (0.5°)')
-    ax2.fill_between(theta_fine, 0, pdf_13_continuous, alpha=0.2, color='red')
-    ax2.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax2.set_ylabel('Probability density', fontsize=12, fontweight='bold')
+    ax2.plot(theta_common, pdf_13_weighted, 'o', color=COLORS['interpolated'], markersize=8, label='Discrete (5° bins)')
+    ax2.plot(theta_fine, pdf_13_continuous, '-', color=COLORS['interpolated'], lw=2.5, alpha=0.85, label='Continuous (0.5°)')
+    ax2.fill_between(theta_fine, 0, pdf_13_continuous, alpha=0.25, color=COLORS['interpolated'])
+    ax2.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax2.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
     ax2.set_title('Continuous Interpolation', fontweight='bold')
     ax2.legend(fontsize=9); ax2.grid(True, alpha=0.3)
     ax2.set_xlim(-90, 90)
 
     ax3 = axes[0,2]
-    ax3.plot(theta_fine, cdf, 'b-', lw=2.5)
+    ax3.plot(theta_fine, cdf, '-', color=COLORS['interpolated'], lw=2.5)
     ax3.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax3.set_ylabel('Cumulative Probability', fontsize=12, fontweight='bold')
     ax3.set_title('Cumulative Distribution', fontweight='bold')
     ax3.grid(True, alpha=0.3)
@@ -730,9 +858,9 @@ def plot_complete_workflow():
     ax3.set_ylim(0,1.05)
 
     ax4 = axes[1,0]
-    ax4.plot(theta_fine, pdf_13_continuous, 'b-', lw=2.5, label='PDF')
-    ax4.fill_between(theta_fine, 0, pdf_13_continuous, alpha=0.2, color='blue')
-    ax4.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax4.set_ylabel('Probability density', fontsize=12, fontweight='bold')
+    ax4.plot(theta_fine, pdf_13_continuous, '-', color=COLORS['interpolated'], lw=2.5, label='PDF')
+    ax4.fill_between(theta_fine, 0, pdf_13_continuous, alpha=0.25, color=COLORS['interpolated'])
+    ax4.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax4.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
     ax4.set_title('Continuous Probability Density', fontweight='bold')
     ax4.grid(True, alpha=0.3)
     ax4.set_xlim(-90, 90)
@@ -741,18 +869,19 @@ def plot_complete_workflow():
     hist_sampled, edges_sampled = np.histogram(sampled_angles, bins=HIST_EDGES, density=False)
     p_samp = hist_sampled / n_samples
     bc_sampled = 0.5 * (edges_sampled[:-1] + edges_sampled[1:])
-    ax5.plot(theta_fine, pdf_13_continuous, 'b-', lw=2, label='Reference PDF')
-    ax5.bar(bc_sampled, p_samp, width=5, alpha=0.5, color='red', label='CDF Sampled')
-    ax5.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax5.set_ylabel('Normalised counts per bin', fontsize=12, fontweight='bold')
+    ax5.plot(theta_fine, pdf_13_continuous, '-', color=COLORS['interpolated'], lw=2, label='Reference PDF')
+    ax5.bar(bc_sampled, p_samp, width=5, alpha=0.7, color=COLORS['cdf_sampled'], label='CDF Sampled')
+    ax5.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax5.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
     ax5.set_title('Sampling Validation', fontweight='bold')
     ax5.legend(fontsize=9); ax5.grid(True, alpha=0.3)
     ax5.set_xlim(-90, 90)
 
     ax6 = axes[1,2]
-    ax6.plot(theta_fine, pdf_13_continuous, 'b-', lw=2, label='Interpolated PDF')
+    ax6.plot(theta_fine, pdf_13_continuous, '-', color=COLORS['interpolated'], lw=2, label='Interpolated PDF')
     if n_total > 0:
-        ax6.errorbar(bin_centers, pdf_sim, yerr=errors, fmt='ro', markersize=4, capsize=2, elinewidth=1.0, alpha=0.7, label='Geant4 Simulation')
-    ax6.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax6.set_ylabel('Normalised counts per bin', fontsize=12, fontweight='bold')
+        ax6.errorbar(bin_centers, pdf_sim, yerr=errors, fmt='o', color=COLORS['simulation'],
+                     markersize=4, capsize=2, elinewidth=1.0, label='Geant4 Simulation')
+    ax6.set_xlabel('Angle of Reflection (Degrees)', fontsize=12, fontweight='bold'); ax6.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
     ax6.set_title('Simulation vs Interpolated PDF', fontweight='bold')
     ax6.legend(fontsize=9); ax6.grid(True, alpha=0.3)
     ax6.set_xlim(-90, 90)
@@ -787,7 +916,7 @@ def plot_tyvek_gaussian_lambertian_fits():
             ax.text(0.5, 0.5, f"No data for {phi_target}°", ha='center', va='center', transform=ax.transAxes, fontweight='bold')
             ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
             ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-            ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
+            ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
             ax.set_xlim(-90, 90)
             continue
 
@@ -798,13 +927,14 @@ def plot_tyvek_gaussian_lambertian_fits():
             print(f"Fit failed for {phi_target} deg: {e}")
             result = None
 
-        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color='blue', markersize=6, capsize=3, label='Data')
+        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
+                    markersize=6, capsize=3, label='Data')
 
         if result is not None and result['ratio'] < 100:
             results.append({**result, 'phi': phi_target, 'n_events': n_total})
             theta_smooth = np.linspace(-90, 90, 200)
             fit_curve = gaussian_lambertian(theta_smooth, *result['popt']) / n_total
-            ax.plot(theta_smooth, fit_curve, 'r-', lw=3, label='Total Fit')
+            ax.plot(theta_smooth, fit_curve, '-', color=COLORS['fit_total'], lw=3, label='Total Fit')
 
             err_str = f"{result['ratio_err']:.3f}" if result['ratio_err'] is not None else "n/a"
             print(f"  phi={phi_target:2d} deg: S/L = {result['ratio']:.3f} +/- {err_str} (simple Poisson), N={n_total:,}")
@@ -816,7 +946,7 @@ def plot_tyvek_gaussian_lambertian_fits():
             print(f"  phi={phi_target:2d} deg: Fit unstable, N={n_total:,}")
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right')
@@ -859,7 +989,8 @@ def plot_tyvek_gaussian_lambertian_fit_components(results):
             ax.set_xlim(-90, 90)
             continue
 
-        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color='blue', markersize=5, capsize=3, label='Data')
+        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
+                    markersize=5, capsize=3, label='Data')
 
         result = results_by_phi.get(phi_target)
         if result is not None:
@@ -869,16 +1000,16 @@ def plot_tyvek_gaussian_lambertian_fit_components(results):
             lambertian_curve = p1 * np.cos(np.radians(theta_smooth)) / n_total
             gaussian_curve = p2 * np.exp(-(theta_smooth - p3)**2 / (2 * p4**2)) / n_total
 
-            ax.plot(theta_smooth, fit_curve, 'r-', lw=2.5, label='Total Fit')
-            ax.plot(theta_smooth, lambertian_curve, 'g--', lw=1.5, alpha=0.6, label='Lambertian')
-            ax.plot(theta_smooth, gaussian_curve, 'b--', lw=1.5, alpha=0.6, label='Gaussian')
-            ax.axvline(x=p3, color='orange', linestyle='--', lw=1.5, alpha=0.7, label=f'peak = {p3:.1f}°')
-            ax.axvline(x=-phi_target, color='purple', linestyle=':', lw=1.5, alpha=0.5, label=fr'$-\phi$ = {-phi_target}°')
+            ax.plot(theta_smooth, fit_curve, '-', color=COLORS['fit_total'], lw=2.5, label='Total Fit')
+            ax.plot(theta_smooth, lambertian_curve, '--', color=COLORS['lambertian'], lw=1.8, label='Lambertian')
+            ax.plot(theta_smooth, gaussian_curve, '--', color=COLORS['gaussian'], lw=1.8, label='Gaussian')
+            ax.axvline(x=p3, color=COLORS['peak_marker'], linestyle='--', lw=1.8, label=f'peak = {p3:.1f}°')
+            ax.axvline(x=-phi_target, color=COLORS['reference'], linestyle=':', lw=1.8, label=fr'$-\phi$ = {-phi_target}°')
         else:
             print(f"  phi={phi_target:2d} deg: No fit result available")
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right', fontsize=8)
@@ -904,7 +1035,7 @@ def plot_tyvek_sim_vs_chavarria_measurement():
             ax.text(0.5, 0.5, f"No data for {phi_target}°", ha='center', va='center', transform=ax.transAxes, fontweight='bold')
             ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
             ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-            ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
+            ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
             ax.set_xlim(-90, 90)
             continue
 
@@ -915,14 +1046,15 @@ def plot_tyvek_sim_vs_chavarria_measurement():
             ax.set_xlim(-90, 90)
             continue
 
-        # Convert Chavarria density to per‑bin probability for comparison
-        chavarria_interp = np.interp(bin_centers, chavarria_theta, chavarria_pdf) * HIST_BIN_WIDTH
+        # Both sides are already "per-bin" probability - just interpolate onto sim bin centers
+        chavarria_interp = np.interp(bin_centers, chavarria_theta, chavarria_pdf)
 
-        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color='blue', markersize=6, capsize=3, label='Simulation')
-        ax.plot(bin_centers, chavarria_interp, 's', color='red', markersize=6, label='Chavarria Measurement')
+        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
+                    markersize=6, capsize=3, label='Simulation')
+        ax.plot(bin_centers, chavarria_interp, 's', color=COLORS['chavarria'], markersize=6, label='Chavarria Measurement')
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°  (N = {n_total:,})', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right')
@@ -948,7 +1080,7 @@ def plot_tyvek_sim_vs_chavarria_measurement_no_Nevent():
             ax.text(0.5, 0.5, f"No data for {phi_target}°", ha='center', va='center', transform=ax.transAxes, fontweight='bold')
             ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
             ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-            ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
+            ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
             ax.set_xlim(-90, 90)
             continue
 
@@ -959,13 +1091,14 @@ def plot_tyvek_sim_vs_chavarria_measurement_no_Nevent():
             ax.set_xlim(-90, 90)
             continue
 
-        chavarria_interp = np.interp(bin_centers, chavarria_theta, chavarria_pdf) * HIST_BIN_WIDTH
+        chavarria_interp = np.interp(bin_centers, chavarria_theta, chavarria_pdf)
 
-        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color='blue', markersize=6, capsize=3, label='Simulation')
-        ax.plot(bin_centers, chavarria_interp, 's', color='red', markersize=6, label='Chavarria Measurement')
+        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
+                    markersize=6, capsize=3, label='Simulation')
+        ax.plot(bin_centers, chavarria_interp, 's', color=COLORS['chavarria'], markersize=6, label='Chavarria Measurement')
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right')
@@ -1000,14 +1133,14 @@ def plot_tyvek_ratio_comparison(results):
     ratio_vals = [r['ratio'] for r in results]
     ratio_errs = [r['ratio_err'] if r['ratio_err'] is not None else 0.0 for r in results]
 
-    ax.errorbar(phi_vals, ratio_vals, yerr=ratio_errs, fmt='o', color='blue',
+    ax.errorbar(phi_vals, ratio_vals, yerr=ratio_errs, fmt='o', color=COLORS['simulation'],
                 capsize=6, markersize=10, lw=2, label='Simulation (simple Poisson error)')
 
-    ax.plot(CHAVARRIA_WATER_ANGLES, CHAVARRIA_WATER_RATIO, 's', color='red',
+    ax.plot(CHAVARRIA_WATER_ANGLES, CHAVARRIA_WATER_RATIO, 's', color=COLORS['chavarria'],
             markersize=10, label='Chavarria Experimental Measurement (Water)')
 
-    ax.plot(phi_vals, ratio_vals, 'b--', alpha=0.5, lw=2)
-    ax.plot(CHAVARRIA_WATER_ANGLES, CHAVARRIA_WATER_RATIO, 'r--', alpha=0.5, lw=2)
+    ax.plot(phi_vals, ratio_vals, '--', color=COLORS['simulation'], alpha=0.6, lw=2)
+    ax.plot(CHAVARRIA_WATER_ANGLES, CHAVARRIA_WATER_RATIO, '--', color=COLORS['chavarria'], alpha=0.6, lw=2)
 
     ax.set_xlabel(PHI_LABEL, fontsize=14, fontweight='bold')
     ax.set_ylabel(RATIO_LABEL, fontsize=18, fontweight='bold')
@@ -1015,7 +1148,7 @@ def plot_tyvek_ratio_comparison(results):
     ax.grid(True, alpha=0.3)
     ax.legend(loc='best', fontsize=12)
     ax.set_xlim(-5, 85)
-    ax.axhline(y=1, color='gray', ls='--', lw=2, alpha=0.5)
+    ax.axhline(y=1, color=COLORS['reference'], ls='--', lw=2, alpha=0.7)
 
     y_max = max(max(ratio_vals) if ratio_vals else 0, max(CHAVARRIA_WATER_RATIO)) * 1.2
     ax.set_ylim(0, y_max)
@@ -1027,6 +1160,11 @@ def plot_tyvek_ratio_comparison(results):
     print(f"Tyvek Plot 3 (Water values) saved: {output_file}")
 
 def plot_tyvek_overlay_all_angles():
+    # NOTE: this plot encodes a DIFFERENT dimension (incident angle) as color,
+    # using a sequential colormap - that's intentionally separate from the
+    # COLORS dict above (which encodes data TYPE: simulation vs measurement
+    # vs fit component, etc). The same viridis mapping is used identically
+    # in both panels so "angle -> color" stays consistent within this plot.
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 7))
     colors = plt.cm.viridis(np.linspace(0, 1, len(tyvek_angles)))
 
@@ -1036,7 +1174,7 @@ def plot_tyvek_overlay_all_angles():
             ax1.plot(bin_centers, pdf, '-', color=colors[i], lw=2.5, label=f'{angle}°')
 
     ax1.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-    ax1.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
+    ax1.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
     ax1.set_title('Simulation Results', fontweight='bold')
     ax1.grid(True, alpha=0.3); ax1.legend(ncol=2)
     ax1.set_xlim(-90, 90)
@@ -1045,11 +1183,11 @@ def plot_tyvek_overlay_all_angles():
     for i, angle in enumerate(tyvek_angles):
         chavarria_theta, chavarria_pdf = load_chavarria_pdf(angle)
         if chavarria_theta is not None:
-            p_ch = np.interp(HIST_BIN_CENTERS, chavarria_theta, chavarria_pdf) * HIST_BIN_WIDTH
+            p_ch = np.interp(HIST_BIN_CENTERS, chavarria_theta, chavarria_pdf)
             ax2.plot(HIST_BIN_CENTERS, p_ch, '-', color=colors[i], lw=2.5, label=f'{angle}°')
 
     ax2.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-    ax2.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
+    ax2.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
     ax2.set_title('Chavarria Experimental Measurement Data', fontweight='bold')
     ax2.grid(True, alpha=0.3); ax2.legend(ncol=2)
     ax2.set_xlim(-90, 90)
@@ -1087,23 +1225,26 @@ def plot_new_chavarria_model_fit():
         # Fit to counts
         result = perform_chavarria_model_fit(bin_centers, pdf * n_total, phi_target, n_total)
 
-        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color='blue', markersize=5, capsize=3, label='Data')
+        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
+                    markersize=5, capsize=3, label='Data')
 
         if result is not None:
             results.append({**result, 'n_events': n_total})
             theta_smooth = np.linspace(-90, 90, 300)
             fit_curve = chavarria_model_fit(theta_smooth, phi_target, result['C1'], result['C2'], result['s']) / n_total
-            ax.plot(theta_smooth, fit_curve, 'r-', lw=2.5, label='Total Fit')
-            ax.plot(theta_smooth, result['C2'] * np.cos(np.radians(theta_smooth)) / n_total, 'g--', lw=1.5, alpha=0.6, label='Lambertian')
-            ax.plot(theta_smooth, result['C1'] * np.exp(-(theta_smooth + phi_target)**2 / result['s']) / n_total, 'b--', lw=1.5, alpha=0.6, label='Gaussian')
-            ax.axvline(x=-phi_target, color='purple', linestyle=':', lw=1.5, alpha=0.5, label=fr'$-\phi$ = {-phi_target}°')
+            ax.plot(theta_smooth, fit_curve, '-', color=COLORS['fit_total'], lw=2.5, label='Total Fit')
+            ax.plot(theta_smooth, result['C2'] * np.cos(np.radians(theta_smooth)) / n_total, '--',
+                    color=COLORS['lambertian'], lw=1.8, label='Lambertian')
+            ax.plot(theta_smooth, result['C1'] * np.exp(-(theta_smooth + phi_target)**2 / result['s']) / n_total, '--',
+                    color=COLORS['gaussian'], lw=1.8, label='Gaussian')
+            ax.axvline(x=-phi_target, color=COLORS['reference'], linestyle=':', lw=1.8, label=fr'$-\phi$ = {-phi_target}°')
             err_str = f"{result['ratio_err']:.3f}" if result['ratio_err'] is not None else "n/a"
             print(f"  phi={phi_target:2d} deg: S/L={result['ratio']:.3f} +/- {err_str} (simple Poisson), s={result['s']:.1f}, N={n_total:,}")
         else:
             print(f"  phi={phi_target:2d} deg: Fit failed, N={n_total:,}")
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right', fontsize=8)
@@ -1139,18 +1280,21 @@ def plot_new_constrained_fit():
 
         result = perform_constrained_fit(bin_centers, pdf * n_total, phi_target, n_total)
 
-        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color='blue', markersize=5, capsize=3, label='Data')
+        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
+                    markersize=5, capsize=3, label='Data')
 
         if result is not None:
             results.append({**result, 'n_events': n_total})
             theta_smooth = np.linspace(-90, 90, 300)
             fit_curve = constrained_chavarria_model_fit(theta_smooth, phi_target, result['C1'], result['C2'], result['s'], result['center']) / n_total
-            ax.plot(theta_smooth, fit_curve, 'r-', lw=2.5, label='Total Fit')
-            ax.plot(theta_smooth, result['C2'] * np.cos(np.radians(theta_smooth)) / n_total, 'g--', lw=1.5, alpha=0.6, label='Lambertian')
-            ax.plot(theta_smooth, result['C1'] * np.exp(-(theta_smooth - result['center'])**2 / result['s']) / n_total, 'b--', lw=1.5, alpha=0.6, label='Gaussian')
-            ax.axvline(x=result['center'], color='orange', linestyle='--', lw=1.5, alpha=0.7, label=f'peak = {result["center"]:.1f}°')
-            ax.axvline(x=-phi_target, color='purple', linestyle=':', lw=1.5, alpha=0.5, label=fr'$-\phi$ = {-phi_target}°')
-            ax.axvspan(-phi_target - 5, -phi_target + 5, alpha=0.1, color='purple')
+            ax.plot(theta_smooth, fit_curve, '-', color=COLORS['fit_total'], lw=2.5, label='Total Fit')
+            ax.plot(theta_smooth, result['C2'] * np.cos(np.radians(theta_smooth)) / n_total, '--',
+                    color=COLORS['lambertian'], lw=1.8, label='Lambertian')
+            ax.plot(theta_smooth, result['C1'] * np.exp(-(theta_smooth - result['center'])**2 / result['s']) / n_total, '--',
+                    color=COLORS['gaussian'], lw=1.8, label='Gaussian')
+            ax.axvline(x=result['center'], color=COLORS['peak_marker'], linestyle='--', lw=1.8, label=f'peak = {result["center"]:.1f}°')
+            ax.axvline(x=-phi_target, color=COLORS['reference'], linestyle=':', lw=1.8, label=fr'$-\phi$ = {-phi_target}°')
+            ax.axvspan(-phi_target - 5, -phi_target + 5, alpha=0.25, color=COLORS['gaussian'])
             err_str = f"{result['ratio_err']:.3f}" if result['ratio_err'] is not None else "n/a"
             print(f"  phi={phi_target:2d} deg: S/L={result['ratio']:.3f} +/- {err_str} (simple Poisson), "
                   f"center={result['center']:.1f} deg (expected {-phi_target} deg), N={n_total:,}")
@@ -1158,7 +1302,7 @@ def plot_new_constrained_fit():
             print(f"  phi={phi_target:2d} deg: Fit failed, N={n_total:,}")
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Normalised counts per bin', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right', fontsize=8)
@@ -1194,8 +1338,8 @@ def plot_ratio_no_errors_generic(results, output_filename, method_label):
     phi_vals = [r['phi'] for r in results]
     ratio_vals = [r['ratio'] for r in results]
 
-    ax.plot(phi_vals, ratio_vals, 'o-', color='blue', markersize=10, lw=2, label='Simulation')
-    ax.plot(CHAVARRIA_WATER_ANGLES, CHAVARRIA_WATER_RATIO, 's-', color='red',
+    ax.plot(phi_vals, ratio_vals, 'o-', color=COLORS['simulation'], markersize=10, lw=2, label='Simulation')
+    ax.plot(CHAVARRIA_WATER_ANGLES, CHAVARRIA_WATER_RATIO, 's-', color=COLORS['chavarria'],
             markersize=10, linewidth=2, label='Chavarria Experimental Measurement (Water)')
 
     ax.set_xlabel(PHI_LABEL, fontsize=14, fontweight='bold')
@@ -1204,15 +1348,17 @@ def plot_ratio_no_errors_generic(results, output_filename, method_label):
     ax.grid(True, alpha=0.3)
     ax.legend(loc='best', fontsize=12)
     ax.set_xlim(-5, 85)
-    ax.axhline(y=1, color='gray', ls='--', lw=2, alpha=0.5)
+    ax.axhline(y=1, color=COLORS['reference'], ls='--', lw=2, alpha=0.7)
 
     y_max = max(max(ratio_vals) if ratio_vals else 0, max(CHAVARRIA_WATER_RATIO)) * 1.2
     ax.set_ylim(0, y_max)
 
     for phi, ratio in zip(phi_vals, ratio_vals):
-        ax.annotate(f'{ratio:.2f}', (phi, ratio), textcoords="offset points", xytext=(0, 10), ha='center', fontsize=9)
+        ax.annotate(f'{ratio:.2f}', (phi, ratio), textcoords="offset points", xytext=(0, 10),
+                    ha='center', fontsize=9, color=COLORS['simulation'])
     for phi, ratio in zip(CHAVARRIA_WATER_ANGLES, CHAVARRIA_WATER_RATIO):
-        ax.annotate(f'{ratio:.2f}', (phi, ratio), textcoords="offset points", xytext=(0, -15), ha='center', fontsize=9, color='red')
+        ax.annotate(f'{ratio:.2f}', (phi, ratio), textcoords="offset points", xytext=(0, -15),
+                    ha='center', fontsize=9, color=COLORS['chavarria'])
 
     plt.tight_layout()
     output_file = OUTPUT_DIR / output_filename
@@ -1221,7 +1367,7 @@ def plot_ratio_no_errors_generic(results, output_filename, method_label):
     print(f"{method_label} ratio comparison (no errors) saved: {output_file}")
 
 # ============================================================================
-# 13. NEW DIAGNOSTIC PLOTS (Original)
+# 13. NEW DIAGNOSTIC PLOTS
 # ============================================================================
 
 def plot_0_5_degree_bin_check():
@@ -1264,9 +1410,9 @@ def plot_0_5_degree_bin_check():
 
     valid_angles = [a for a, r in zip(angles, analytical_ratios) if r is not None]
     valid_ratios = [r for r in analytical_ratios if r is not None]
-    ax.plot(valid_angles, valid_ratios, 'ro-', markersize=8, label='Analytical (Chavarria)')
+    ax.plot(valid_angles, valid_ratios, 'o-', color=COLORS['chavarria'], markersize=8, label='Analytical (Chavarria)')
 
-    ax.errorbar(0, sim_ratio, yerr=sim_err, fmt='bs', markersize=10,
+    ax.errorbar(0, sim_ratio, yerr=sim_err, fmt='s', color=COLORS['simulation'], markersize=10,
                 capsize=5, label=f'Simulation 0° (tolerance ±0.5°), S/L={sim_ratio:.3f}')
 
     ax.set_xlabel('Incident Angle (Degrees)', fontsize=13, fontweight='bold')
@@ -1277,8 +1423,8 @@ def plot_0_5_degree_bin_check():
     ax.set_xlim(-0.5, 6)
 
     tol = TOLERANCE_MAP[0]
-    ax.axvspan(0, tol, alpha=0.2, color='gray', label=f'Tolerance window (±{tol}°)')
-    ax.axvspan(0, 5, alpha=0.1, color='blue', label='0-5° range (for reference)')
+    ax.axvspan(0, tol, alpha=0.3, color=COLORS['tolerance_band'], label=f'Tolerance window (±{tol}°)')
+    ax.axvspan(0, 5, alpha=0.2, color=COLORS['reference_band'], label='0-5° range (for reference)')
 
     output_file = OUTPUT_DIR / 'diagnostic_0_5_degree_bin_check.png'
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
@@ -1308,7 +1454,7 @@ def plot_tail_behavior():
             ax.set_title(f'Incident Angle = {phi_target}°')
             continue
 
-        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color='blue',
+        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
                     markersize=4, capsize=2, label='Simulation data')
 
         result = perform_fit(bin_centers, pdf * n_total, n_total)
@@ -1319,21 +1465,21 @@ def plot_tail_behavior():
             lambertian_curve = p1 * np.cos(np.radians(theta_smooth)) / n_total
             gaussian_curve = p2 * np.exp(-(theta_smooth - p3)**2 / (2 * p4**2)) / n_total
 
-            ax.plot(theta_smooth, fit_curve, 'r-', lw=2, label='Total fit')
-            ax.plot(theta_smooth, lambertian_curve, 'g--', lw=1.5, alpha=0.7, label='Lambertian')
-            ax.plot(theta_smooth, gaussian_curve, 'b--', lw=1.5, alpha=0.7, label='Gaussian')
-            ax.axvline(x=p3, color='orange', linestyle='--', lw=1, alpha=0.7, label=f'peak = {p3:.1f}°')
+            ax.plot(theta_smooth, fit_curve, '-', color=COLORS['fit_total'], lw=2, label='Total fit')
+            ax.plot(theta_smooth, lambertian_curve, '--', color=COLORS['lambertian'], lw=1.8, label='Lambertian')
+            ax.plot(theta_smooth, gaussian_curve, '--', color=COLORS['gaussian'], lw=1.8, label='Gaussian')
+            ax.axvline(x=p3, color=COLORS['peak_marker'], linestyle='--', lw=1.5, label=f'peak = {p3:.1f}°')
         else:
             ax.text(0.5, 0.5, "Fit failed", ha='center', va='center', transform=ax.transAxes)
 
         chavarria_theta, chavarria_pdf = load_chavarria_pdf(phi_target)
         if chavarria_theta is not None:
-            chavarria_interp = np.interp(bin_centers, chavarria_theta, chavarria_pdf) * HIST_BIN_WIDTH
-            ax.plot(bin_centers, chavarria_interp, 's', color='magenta',
+            chavarria_interp = np.interp(bin_centers, chavarria_theta, chavarria_pdf)
+            ax.plot(bin_centers, chavarria_interp, 's', color=COLORS['chavarria'],
                     markersize=5, label='Chavarria measurement')
 
         ax.set_xlabel('Reflection Angle (Degrees)', fontsize=12, fontweight='bold')
-        ax.set_ylabel('Normalised counts per bin', fontsize=12, fontweight='bold')
+        ax.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
         ax.set_title(f'Incident Angle = {phi_target}°  (N={n_total:,})', fontweight='bold')
         ax.grid(True, alpha=0.3)
         ax.legend(loc='upper right', fontsize=8)
@@ -1351,6 +1497,9 @@ def plot_S_and_L_separate(results):
     """
     Plot the integrated S (specular) and L (diffuse) components
     as a function of incident angle, with simple Poisson errors.
+    Colors match the Gaussian/Lambertian component colors used everywhere
+    else in this file (S=specular=Gaussian color, L=diffuse=Lambertian color),
+    NOT the simulation/Chavarria colors - S and L are neither of those.
     """
     print("\n" + "="*70)
     print("DIAGNOSTIC: S and L Components vs Incident Angle")
@@ -1370,9 +1519,9 @@ def plot_S_and_L_separate(results):
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    ax.errorbar(phi_vals, S_vals, yerr=S_errs, fmt='o-', color='blue',
+    ax.errorbar(phi_vals, S_vals, yerr=S_errs, fmt='o-', color=COLORS['gaussian'],
                 capsize=5, markersize=8, label='S (Specular/Gaussian)')
-    ax.errorbar(phi_vals, L_vals, yerr=L_errs, fmt='s-', color='red',
+    ax.errorbar(phi_vals, L_vals, yerr=L_errs, fmt='s-', color=COLORS['lambertian'],
                 capsize=5, markersize=8, label='L (Diffuse/Lambertian)')
 
     ax.set_xlabel('Incident Angle (Degrees)', fontsize=13, fontweight='bold')
@@ -1387,7 +1536,122 @@ def plot_S_and_L_separate(results):
     print(f"Diagnostic S and L components saved: {output_file}")
 
 # ============================================================================
-# 14. PRINT SUMMARY TABLES (simple errors only)
+# 14. NEW PLOTS FROM CONVERSATION (with consistent colours)
+# ============================================================================
+
+def plot_interpolation_only_13deg():
+    """Shows only the interpolation (no simulation data) – clean demonstration."""
+    theta_10, pdf_10 = load_chavarria_pdf(10)
+    theta_20, pdf_20 = load_chavarria_pdf(20)
+    if theta_10 is None or theta_20 is None:
+        print("Skipping interpolation_only: missing 10 or 20 deg data")
+        return
+    theta_common = theta_10
+    pdf_20_interp = np.interp(theta_common, theta_20, pdf_20)
+    pdf_13 = 0.7 * pdf_10 + 0.3 * pdf_20_interp
+    pdf_13 /= np.sum(pdf_13)   # sum=1, per-bin (not density)
+
+    fig, ax = plt.subplots(figsize=(10,6))
+    ax.plot(theta_10, pdf_10, '-', color=COLORS['chavarria'], lw=2.5, label='10° Chavarria')
+    ax.plot(theta_20, pdf_20, '-', color=COLORS['chavarria_secondary'], lw=2.5, label='20° Chavarria')
+    ax.plot(theta_common, pdf_13, '--', color=COLORS['interpolated'], lw=3, label='Interpolated 13° (0.7×10 + 0.3×20)')
+    ax.set_xlabel('Reflection Angle (Degrees)', fontsize=14)
+    ax.set_ylabel('Probability Density', fontsize=14)
+    ax.set_title('Interpolation for 13° Incidence (no simulation data)', fontweight='bold')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.set_xlim(-90,90)
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / 'new_interpolation_only_13deg.png', dpi=150)
+    plt.close()
+    print(f"New plot (interpolation only) saved: {OUTPUT_DIR / 'new_interpolation_only_13deg.png'}")
+
+def plot_validation_simulation_vs_interpolation_13deg():
+    """Validation step: interpolated PDF vs simulation histogram."""
+    theta_10, pdf_10 = load_chavarria_pdf(10)
+    theta_20, pdf_20 = load_chavarria_pdf(20)
+    if theta_10 is None:
+        print("Skipping validation: missing 10 deg data")
+        return
+    theta_common = theta_10
+    pdf_20_interp = np.interp(theta_common, theta_20, pdf_20)
+    pdf_13 = 0.7 * pdf_10 + 0.3 * pdf_20_interp
+    pdf_13 /= np.sum(pdf_13)   # sum=1, per-bin (not density)
+
+    bin_centers, pdf_sim, errors, n_total = get_histogram_for_angle(13)
+    fig, ax = plt.subplots(figsize=(10,6))
+    ax.plot(theta_common, pdf_13, '--', color=COLORS['interpolated'], lw=3, label='Interpolated 13° PDF')
+    if n_total > 0:
+        ax.errorbar(bin_centers, pdf_sim, yerr=errors, fmt='o', color=COLORS['simulation'],
+                    markersize=6, capsize=3, label='Simulation (Geant4)')
+    ax.set_xlabel('Reflection Angle (Degrees)', fontsize=14)
+    ax.set_ylabel('Probability Density', fontsize=14)
+    ax.set_title('Validation: Simulation vs Interpolated PDF for 13°', fontweight='bold')
+    ax.text(0.02, 0.98, 'Note: simulation slightly low in central region', transform=ax.transAxes,
+            verticalalignment='top', fontsize=10, color=COLORS['reference'])
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.set_xlim(-90,90)
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / 'new_validation_simulation_vs_interpolation_13deg.png', dpi=150)
+    plt.close()
+    print(f"New plot (validation) saved: {OUTPUT_DIR / 'new_validation_simulation_vs_interpolation_13deg.png'}")
+
+def plot_chavarria_vs_simulation_specific_angle(angle=10):
+    """Direct comparison of digitised Chavarria data points vs simulation."""
+    theta_ch, pdf_ch = load_chavarria_pdf(angle)
+    if theta_ch is None:
+        print(f"Skipping specific angle {angle}: no Chavarria data")
+        return
+    bin_centers, pdf_sim, errors, n_total = get_histogram_for_angle(angle)
+    fig, ax = plt.subplots(figsize=(10,6))
+    ax.plot(theta_ch, pdf_ch, 's-', color=COLORS['chavarria'], markersize=5,
+            label=f'Chavarria data ({angle}°)')
+    if n_total > 0:
+        ax.errorbar(bin_centers, pdf_sim, yerr=errors, fmt='o', color=COLORS['simulation'],
+                    markersize=6, capsize=3, label='Simulation (Geant4)')
+    ax.set_xlabel('Reflection Angle (Degrees)', fontsize=14)
+    ax.set_ylabel('Probability Density', fontsize=14)
+    ax.set_title(f'Direct Comparison at {angle}° Incidence', fontweight='bold')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.set_xlim(-90,90)
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / f'new_chavarria_vs_simulation_{angle}deg.png', dpi=150)
+    plt.close()
+    print(f"New plot (specific angle {angle}) saved: {OUTPUT_DIR / f'new_chavarria_vs_simulation_{angle}deg.png'}")
+
+def plot_underprediction_summary(results):
+    """
+    Bar chart showing systematic under-prediction of S/L ratio (simulation -
+    Chavarria). This is a DERIVED quantity (a difference), so it uses the
+    'interpolated' color (the "derived/computed curve" meaning), not the raw
+    simulation or Chavarria colors, since it is neither of those directly.
+    """
+    if not results:
+        print("Skipping underprediction summary: no results")
+        return
+    phi_vals = [r['phi'] for r in results]
+    sim_ratios = [r['ratio'] for r in results]
+    chav_ratios = []
+    for phi in phi_vals:
+        idx = np.argmin(np.abs(np.array(CHAVARRIA_WATER_ANGLES) - phi))
+        chav_ratios.append(CHAVARRIA_WATER_RATIO[idx])
+    diff = np.array(sim_ratios) - np.array(chav_ratios)
+    fig, ax = plt.subplots(figsize=(8,5))
+    ax.axhline(0, color=COLORS['reference'], linestyle='--', alpha=0.7)
+    ax.bar(phi_vals, diff, width=5, color=COLORS['interpolated'], alpha=0.85)
+    ax.set_xlabel('Incident Angle (Degrees)', fontsize=14)
+    ax.set_ylabel('Simulation - Chavarria (S/L ratio)', fontsize=14)
+    ax.set_title('Systematic Under‑prediction in Simulation', fontweight='bold')
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / 'new_underprediction_summary.png', dpi=150)
+    plt.close()
+    print(f"New plot (underprediction summary) saved: {OUTPUT_DIR / 'new_underprediction_summary.png'}")
+
+# ============================================================================
+# 15. PRINT SUMMARY TABLES (simple errors only)
 # ============================================================================
 
 def print_summary_tables(results):
@@ -1426,12 +1690,14 @@ def print_summary_tables(results):
         print(f"Range: {np.min(ratios):.2f}x to {np.max(ratios):.2f}x")
 
 # ============================================================================
-# 15. MAIN
+# 16. MAIN
 # ============================================================================
 
 print("\n" + "="*70)
 print("RUNNING ALL PLOTS")
 print("="*70)
+
+plot_color_legend()   # reference key, generated first
 
 plot_function_a()
 plot_function_a_all()
@@ -1446,10 +1712,18 @@ plot_tyvek_sim_vs_chavarria_measurement_no_Nevent()
 plot_tyvek_ratio_comparison(tyvek_results)
 plot_tyvek_overlay_all_angles()
 
-# New diagnostic plots
+# Original diagnostic plots
 plot_0_5_degree_bin_check()
 plot_tail_behavior()
 plot_S_and_L_separate(tyvek_results)
+
+# =====================================================================
+# NEW PLOTS ADDED (these are additional, not modifying existing ones)
+# =====================================================================
+plot_interpolation_only_13deg()
+plot_validation_simulation_vs_interpolation_13deg()
+plot_chavarria_vs_simulation_specific_angle(10)   # can change to 20/30 if desired
+plot_underprediction_summary(tyvek_results)
 
 print_summary_tables(tyvek_results)
 
