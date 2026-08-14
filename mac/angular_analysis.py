@@ -21,11 +21,11 @@ probabilities (counts / n_total), not true densities divided by bin width.
 ================================================================================
 COLOR CONSISTENCY: every plot in this file pulls its colors from the single
 COLORS dict below, using plain/common color names (not hex) so they're easy
-to tell apart. The three most important, used consistently EVERYWHERE:
-    - red   = Chavarria measurement DATA POINTS
-    - blue  = Simulation (Geant4) DATA POINTS
+to tell apart. The three that matter most, used consistently EVERYWHERE:
+    - blue  = Chavarria measurement DATA POINTS
+    - red   = Simulation (Geant4) DATA POINTS
     - black = Fit CURVE (total Gaussian + Lambertian fit)
-No other series is ever drawn in red, blue, or black anywhere in this file.
+No other series is ever drawn in blue, red, or black anywhere in this file.
 A standalone reference plot (plot_color_legend) documents every color and
 its meaning - it's generated first, before any data plots.
 ================================================================================
@@ -92,19 +92,19 @@ plt.rcParams['mathtext.fontset'] = 'cm'
 # ============================================================================
 # Plain/common color names on purpose (not hex) so they're easy to tell apart.
 # The three that matter most and are used identically in every single plot:
-#   chavarria  -> red    (Chavarria measurement DATA POINTS)
-#   simulation -> blue   (Geant4 simulation DATA POINTS)
+#   chavarria  -> blue   (Chavarria measurement DATA POINTS)
+#   simulation -> red    (Geant4 simulation DATA POINTS)
 #   fit_total  -> black  (the TOTAL fit curve)
-# Everything else below is secondary decoration and never reuses red/blue/black.
+# Everything else below is secondary decoration and never reuses blue/red/black.
 # See plot_color_legend() for a generated reference image of all of these.
 
 COLORS = {
-    'chavarria':             'red',     # Chavarria measurement DATA POINTS - always, everywhere
-    'simulation':             'blue',    # Simulation (Geant4) DATA POINTS - always, everywhere
+    'chavarria':             'blue',    # Chavarria measurement DATA POINTS - always, everywhere
+    'simulation':             'red',     # Simulation (Geant4) DATA POINTS - always, everywhere
     'fit_total':               'black',   # Fit CURVE (total Gaussian + Lambertian fit) - always, everywhere
 
     # secondary/supporting colors - never reused for the three above
-    'chavarria_secondary':     'brown',   # a 2nd Chavarria series in the SAME plot (e.g. 20 deg when 10 deg is red)
+    'chavarria_secondary':     'brown',   # a 2nd Chavarria series in the SAME plot (e.g. 20 deg when 10 deg is blue)
     'interpolated':            'orange',  # any INTERPOLATED / derived PDF curve (dashed)
     'lambertian':              'green',   # Lambertian / diffuse component line (part of the fit, not the total)
     'gaussian':                'purple',  # Gaussian / specular component line (part of the fit, not the total)
