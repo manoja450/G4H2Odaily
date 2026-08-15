@@ -278,10 +278,12 @@ def objective(trial):
     chi2 = calculate_chi2(mc_norm, mc_counts_raw, REAL_NORM, REAL_COUNTS_RAW)
     print(f"    chi2 = {chi2:.2f}")
 
+    # Delete the trial output file to save disk space
     try:
         os.remove(sim_output_path)
-    except OSError:
-        pass
+        print(f"    [Deleted trial file: {os.path.basename(sim_output_path)}]")
+    except OSError as e:
+        print(f"    [Could not delete trial file: {e}]")
 
     return chi2
 

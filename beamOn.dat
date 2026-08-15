@@ -1,5 +1,5 @@
-16               //Run-number
-100000           //primaries-to-generate
+900          //Run-number
+20000           //primaries-to-generate
 0               //Visualization:0=no,1=yes
 0               //Debug:0=no-debug,1=debugToScreen,2=DebugToFile
 0               //RandomSeed:0=use-default-seed,1=use-clock
@@ -15,8 +15,8 @@
 -8              //PMTDiameter(inches),negNumUsesEllipsoidalPMT
 10              //TailCatcherThickness(cm)
 2               //ShieldThickness(in
-0.302          //H2oAttenuationLengthCoefficient
-0.93          //ReflectivityOfTyvek
+0.245806          //H2oAttenuationLengthCoefficient
+0.901418          //ReflectivityOfTyvek
 10.0            //SpecialEnergy
 ./data          //outputDir
 

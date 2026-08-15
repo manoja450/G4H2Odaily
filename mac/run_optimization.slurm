@@ -34,16 +34,16 @@ SLURM_DIR="${MAC_DIR}/SLURMOUT"
 mkdir -p "${SLURM_DIR}"
 
 # ============================================================
-# Activate the optical Conda environment
+# Activate the base Conda environment (has all required packages)
 # ============================================================
 
 source /home/manoja450/miniconda3/etc/profile.d/conda.sh
 
-conda activate optical
+conda activate base
 
 # Stop immediately if the environment could not be activated
 if [ $? -ne 0 ]; then
-    echo "ERROR: Could not activate Conda environment 'optical'"
+    echo "ERROR: Could not activate Conda environment 'base'"
     exit 1
 fi
 
@@ -72,12 +72,8 @@ echo "SLURM Job ID: ${SLURM_JOB_ID}"
 echo "Hostname: $(hostname)"
 echo "========================================="
 
-echo "Conda environment:"
-echo "${CONDA_DEFAULT_ENV}"
-
-echo "Python:"
-which python
-
+echo "Conda environment: ${CONDA_DEFAULT_ENV}"
+echo "Python: $(which python)"
 python --version
 
 echo "========================================="
