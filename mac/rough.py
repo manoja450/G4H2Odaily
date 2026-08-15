@@ -1,26 +1,26 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import os
 import uproot
 import numpy as np
 import matplotlib.pyplot as plt
 
 # ============================================================
-# Base project directory and subfolders
+# Base paths (same as your other scripts)
 # ============================================================
 base_dir = "/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN_COPY"
 data_dir = os.path.join(base_dir, "data")
 mac_dir = os.path.join(base_dir, "mac")
 
 michel_path = os.path.join(mac_dir, "all_histograms.root")
-sim_path = os.path.join(data_dir, "Sim_D2ODetector015.root")
+sim_path = os.path.join(data_dir, "Sim_D2ODetector022.root")   # change to your preferred file
 
-# ============================================================
-# Output folder for plots (created in the current working directory)
-# ============================================================
 plots_dir = os.path.join(os.getcwd(), "PLOTS")
 os.makedirs(plots_dir, exist_ok=True)
 
 # ============================================================
-# ROOT-like plotting style
+# Plot style (same as original)
 # ============================================================
 plt.rcParams.update({
     "font.family": "DejaVu Serif",
@@ -53,41 +53,45 @@ michel_counts = counts[first_bin:]
 
 # Normalize
 michel_norm = michel_counts / michel_counts.sum()
+michel_norm_err = np.sqrt(michel_counts) / michel_counts.sum()  # Poisson errors for error bars
 
 # ============================================================
-# Read Geant4 Monte Carlo
+# Read Geant4 Monte Carlo (raw, unsmeared)
 # ============================================================
 sim_file = uproot.open(sim_path)
 tree = sim_file["Sim_Tree"]
 
-num_hits = tree["eventData/numHits"].array().to_numpy()
+# Use the correct branch name (as confirmed in your files)
+num_hits_all = tree["eventData/numHits"].array().to_numpy().astype(float)
 
 # Apply threshold
-num_hits = num_hits[num_hits >= cut_value]
+num_hits = num_hits_all[num_hits_all >= cut_value]
 
 # Histogram using same binning as Michel data
 sim_counts, _ = np.histogram(num_hits, bins=michel_edges)
 
 # Normalize
 sim_norm = sim_counts / sim_counts.sum()
+sim_norm_err = np.sqrt(sim_counts) / sim_counts.sum()
 
 # ============================================================
 # Bin width (for y-axis label)
 # ============================================================
 bin_width = michel_edges[1] - michel_edges[0]
+bin_centers = (michel_edges[:-1] + michel_edges[1:]) / 2
 
 # ============================================================
 # Plot
 # ============================================================
 fig, ax = plt.subplots(figsize=(12, 8))
 
-# Geant4 Monte Carlo
+# Geant4 Monte Carlo (raw)
 ax.stairs(
     sim_norm,
     michel_edges,
     color="red",
     linewidth=1.5,
-    label="G4 Monte Carlo"
+    label="G4 Monte Carlo (raw)"
 )
 
 # Real Data
@@ -99,6 +103,12 @@ ax.stairs(
     label="Real Data"
 )
 
+# Optional error bars (commented out by default in original, but we add them)
+# ax.errorbar(bin_centers, michel_norm, yerr=michel_norm_err, fmt='none',
+#             ecolor='blue', elinewidth=1.0, capsize=0, alpha=0.5)
+# ax.errorbar(bin_centers, sim_norm, yerr=sim_norm_err, fmt='none',
+#             ecolor='red', elinewidth=1.0, capsize=0, alpha=0.5)
+
 # ============================================================
 # Axes
 # ============================================================
@@ -108,7 +118,7 @@ ax.set_ylim(bottom=0)
 ax.set_xlabel("Number of Photoelectrons (PE)", fontsize=22)
 ax.set_ylabel(f"Normalized Counts / {bin_width:g} PE", fontsize=22)
 
-ax.set_title("Michel Electron Spectrum", fontsize=26, pad=15)
+ax.set_title("Michel Electron Spectrum - Raw MC vs Real Data", fontsize=24, pad=15)
 
 # ROOT-like ticks
 ax.minorticks_on()
@@ -140,7 +150,7 @@ ax.grid(False)
 # Legend
 ax.legend(
     loc="upper right",
-    fontsize=18,
+    fontsize=16,
     frameon=True,
     framealpha=1,
     edgecolor="black",
@@ -149,28 +159,37 @@ ax.legend(
 
 plt.tight_layout()
 
-# Save figure into PLOTS/
-pdf_out = os.path.join(plots_dir, "MichelSpectrumComparison.pdf")
-png_out = os.path.join(plots_dir, "MichelSpectrumComparison.png")
-
+# Save figures
+pdf_out = os.path.join(plots_dir, "MichelSpectrumComparison_Raw.pdf")
+png_out = os.path.join(plots_dir, "MichelSpectrumComparison_Raw.png")
 plt.savefig(pdf_out, dpi=300, bbox_inches="tight")
 plt.savefig(png_out, dpi=300, bbox_inches="tight")
 print(f"Saved plot to: {pdf_out}")
 print(f"Saved plot to: {png_out}")
 
-plt.show()
+# Optionally show (if running interactively)
+# plt.show()
+plt.close()
 
 # ============================================================
 # Statistics
 # ============================================================
 michel_centers = (michel_edges[:-1] + michel_edges[1:]) / 2
 michel_mean = np.average(michel_centers, weights=michel_counts)
+michel_std = np.sqrt(np.average((michel_centers - michel_mean)**2, weights=michel_counts))
 
-print("=" * 60)
+sim_mean = num_hits.mean()
+sim_std = num_hits.std()
+
+print("=" * 70)
 print(f"Threshold              : {cut_value:.0f} PE")
-print(f"Real Data Events       : {michel_counts.sum():.0f}")
-print(f"G4 Monte Carlo Events  : {len(num_hits)}")
-print(f"Real Data Mean PE      : {michel_mean:.2f}")
-print(f"G4 Monte Carlo Mean PE : {num_hits.mean():.2f}")
-print(f"G4 Monte Carlo Median  : {np.median(num_hits):.2f}")
-print("=" * 60)
+print("-" * 70)
+print(f"{'Source':<20}{'Entries':>12}{'Mean (PE)':>12}{'StdDev':>12}")
+print("-" * 70)
+print(f"{'Real Data':<20}{michel_counts.sum():>12.0f}{michel_mean:>12.2f}{michel_std:>12.2f}")
+print(f"{'G4 MC (raw)':<20}{len(num_hits):>12.0f}{sim_mean:>12.2f}{sim_std:>12.2f}")
+print("=" * 70)
+print("This plot shows the raw MC (without any PMT-response smearing).")
+print("The MC spectrum is visibly narrower than the real data.")
+print("Run the smearing scan (smeartest.py) to find the optimal sigma.")
+print("=" * 70)

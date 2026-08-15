@@ -117,7 +117,7 @@ std::vector<G4double> G4d2oDataDrivenReflector::CreateContinuousPDF(
 // PDF Loading with Function B (Continuous Interpolation)
 // ============================================================
 
-void G4d2oDataDrivenReflector::NormalizeAndBuildCDF(PDF& pdf) {
+void G4d2oDataDrivenReflector::NormalizeAndBuildCDF(PDF& pdf) const {
     if (pdf.intensity.empty()) return;
 
     // Normalize
@@ -514,4 +514,3 @@ void G4d2oDataDrivenReflector::RecordReflection(G4double incidentAngleDeg, G4dou
 void G4d2oDataDrivenReflector::SetCurrentEventNumber(G4int eventNum) {
     fCurrentEventNumber = eventNum;
 }
-

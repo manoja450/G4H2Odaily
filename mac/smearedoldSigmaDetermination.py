@@ -15,8 +15,6 @@ import matplotlib.pyplot as plt
 # That predicts the MC spectrum should be systematically NARROWER than
 # real data at the same mean - which is exactly what was observed:
 #
-#   Real Data: Mean = 249.86 PE, StdDev = 121.31 PE  (Threshold = 60 PE)
-#   MC (raw) : Mean = 241.01 PE, StdDev = 112.78 PE
 #
 # Assuming the missing smearing is ~independent of the underlying photon
 # count (a first-order approximation), variances add in quadrature:
@@ -47,7 +45,7 @@ data_dir = os.path.join(base_dir, "data")
 mac_dir = os.path.join(base_dir, "mac")
 
 michel_path = os.path.join(mac_dir, "all_histograms.root")
-sim_path = os.path.join(data_dir, "Sim_D2ODetector010.root")
+sim_path = os.path.join(data_dir, "Sim_D2ODetector022.root")
 
 plots_dir = os.path.join(os.getcwd(), "PLOTS")
 os.makedirs(plots_dir, exist_ok=True)

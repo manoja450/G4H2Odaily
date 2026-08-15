@@ -59,7 +59,7 @@ private:
     mutable std::uniform_real_distribution<G4double> fRandDist;
 
     // Helper functions
-    void NormalizeAndBuildCDF(PDF& pdf);
+    void NormalizeAndBuildCDF(PDF& pdf) const;
     G4double SampleFromPDF(const PDF& pdf, G4double rand) const;
     G4double GetThetaOut(G4double incidentAngleDeg) const;
     G4double InterpolateThetaOut(G4double incidentAngleDeg, G4double rand) const;

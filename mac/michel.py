@@ -10,8 +10,8 @@ base_dir = "/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/
 data_dir = os.path.join(base_dir, "data")
 mac_dir = os.path.join(base_dir, "mac")
 
-michel_path = os.path.join(mac_dir, "all_histograms.root")
-sim_path = os.path.join(data_dir, "Sim_D2ODetector022.root")
+michel_path = os.path.join(mac_dir, "all_histogramsnew.root")
+sim_path = os.path.join(data_dir, "Sim_D2ODetector016.root")
 
 # ============================================================
 # Output folder for plots (created in current working directory)

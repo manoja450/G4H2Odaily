@@ -157,7 +157,7 @@ void G4d2oElectronGunvO::GeneratePrimaries(G4Event* anEvent)
 
     // -------- NEW: sample (E, new_cos_theta) from fluxW --------
     if (!fluxW) {
-        G4Exception("G4d2oElectronGunvD::GeneratePrimaries",
+        G4Exception("G4d2oElectronGunvO::GeneratePrimaries",
                     "NoFluxHist", FatalException,
                     "Flux weight histogram not loaded.");
     }
@@ -278,5 +278,3 @@ void G4d2oElectronGunvO::GeneratePrimaries(G4Event* anEvent)
     particleGun->GeneratePrimaryVertex(anEvent);
     
 }// END of GeneratePrimaries()
-
-

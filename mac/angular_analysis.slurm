@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH -J angular_analysis
+#SBATCH -J G4dataAnalysis
 #SBATCH -p shortjobs
-#SBATCH -t 10:00:00
+#SBATCH -t 1:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem=16G
@@ -48,8 +48,8 @@ echo "========================================="
 
 # Run the Python script
 #python3 tighttoleranceAngular.py
-#python3 angular_analysis.py
-python3 angular_analysisV2.py
+python3 angular_analysis.py
+#python3 angular_analysisV2.py
 #python3 two_models_comparison.py
 # Check if the script ran successfully
 if [ $? -eq 0 ]; then

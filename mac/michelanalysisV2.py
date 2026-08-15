@@ -24,7 +24,7 @@ mac_dir = os.path.join(base_dir, "mac")
 
 michel_path = os.path.join(mac_dir, "all_histograms.root")
 
-sim_path = os.path.join(data_dir, "Sim_D2ODetector007.root")
+sim_path = os.path.join(data_dir, "Sim_D2ODetector016.root")
 
 
 
