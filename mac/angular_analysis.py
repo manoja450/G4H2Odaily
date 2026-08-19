@@ -6,12 +6,9 @@ COMPLETE ANALYSIS: FUNCTIONS A, C VALIDATION + TYVEK REFLECTIVITY ANALYSIS
 (REDUCED – removed plots: diagnostic_tail_behavior, complete_workflow_ABC_13deg,
  new_underprediction_summary, function_b_continuous_pdf)
 ================================================================================
-NORMALIZATION FIX APPLIED EVERYWHERE:
-- Every Chavarria curve (single or interpolated) is renormalized over the SAME
-  full angular range as the simulation histogram (default: [-90, 90]).
-- For interpolation plots, the dashed curve is evaluated on a fine grid that
-  spans exactly the measured range (-85° to +85°), matching the endpoints of
-  the raw data lines.
+NORMALIZATION FIX APPLIED INTERNALLY – all Chavarria curves are normalised over
+the same full [-90, 90] range as the simulation, ensuring consistent comparison.
+No mention of this appears in the plots – they are clean for thesis use.
 ================================================================================
 """
 
@@ -505,7 +502,7 @@ def plot_color_legend():
         ('simulation',            'Simulation (Geant4) DATA POINTS'),
         ('fit_total',              'Total FIT CURVE (Gaussian + Lambertian combined)'),
         ('chavarria_secondary',    'A 2nd Chavarria measurement series in the SAME plot'),
-        ('interpolated',           'Interpolated / derived PDF curve (e.g. 13deg = 0.7x10 + 0.3x20)'),
+        ('interpolated',           'Interpolated / derived PDF curve (e.g. 13deg = 0.7×10 + 0.3×20)'),
         ('lambertian',             'Lambertian / diffuse FIT COMPONENT (not the total fit)'),
         ('gaussian',               'Gaussian / specular FIT COMPONENT (not the total fit)'),
         ('cdf_sampled',            'CDF-sampled theoretical draw'),
@@ -547,36 +544,34 @@ def plot_color_legend():
     return str(output_file)
 
 # ============================================================================
-# 7. FUNCTION A (Interpolation) PLOTS – now with grid exactly matching raw data range
+# 7. FUNCTION A (Interpolation) PLOTS – clean, no mention of normalisation
 # ============================================================================
 
 def plot_function_a():
-    theta_10, pdf_10 = load_chavarria_pdf(10)
-    theta_20, pdf_20 = load_chavarria_pdf(20)
-    if theta_10 is None or theta_20 is None:
+    # Get renormalized 10° and 20° PDFs (internally normalised over full range)
+    theta_10_renorm, pdf_10_renorm = get_chavarria_on_full_grid(10, target_theta=HIST_BIN_CENTERS)
+    theta_20_renorm, pdf_20_renorm = get_chavarria_on_full_grid(20, target_theta=HIST_BIN_CENTERS)
+    if theta_10_renorm is None or theta_20_renorm is None:
         print("ERROR: Missing Chavarria measurement data for 10 or 20 deg")
         return None
 
-    # 1. Get the normalized PDF on the simulation bin grid (for correct physics)
-    theta_sim, pdf_sim_norm = get_interpolated_chavarria_pdf(13, target_theta=HIST_BIN_CENTERS)
+    theta_sim, pdf_13_norm = get_interpolated_chavarria_pdf(13, target_theta=HIST_BIN_CENTERS)
     if theta_sim is None:
         return None
 
-    # 2. Create a plotting grid that exactly spans the measured range (-85 to 85)
-    #    with fine spacing to match the endpoints of the raw data lines.
-    theta_plot = np.linspace(-85, 85, 500)  # 500 points from -85 to +85
-    pdf_plot = np.interp(theta_plot, theta_sim, pdf_sim_norm, left=0, right=0)
+    theta_plot = np.linspace(-85, 85, 500)
+    pdf_10_plot = np.interp(theta_plot, theta_10_renorm, pdf_10_renorm, left=0, right=0)
+    pdf_20_plot = np.interp(theta_plot, theta_20_renorm, pdf_20_renorm, left=0, right=0)
+    pdf_13_plot = np.interp(theta_plot, theta_sim, pdf_13_norm, left=0, right=0)
 
     bin_centers, pdf, errors, n_total = get_histogram_for_angle(13)
 
     fig, ax = plt.subplots(figsize=(12, 8))
-    ax.plot(theta_10, pdf_10, '-', color=COLORS['chavarria'], lw=2.5,
+    ax.plot(theta_plot, pdf_10_plot, '-', color=COLORS['chavarria'], lw=2.5,
             label='10° PDF (Chavarria Measurement)')
-    ax.plot(theta_20, pdf_20, '-', color=COLORS['chavarria_secondary'], lw=2.5,
+    ax.plot(theta_plot, pdf_20_plot, '-', color=COLORS['chavarria_secondary'], lw=2.5,
             label='20° PDF (Chavarria Measurement)')
-    
-    # Plot the dashed curve over the same range as the raw data
-    ax.plot(theta_plot, pdf_plot, '--', color=COLORS['interpolated'], lw=3,
+    ax.plot(theta_plot, pdf_13_plot, '--', color=COLORS['interpolated'], lw=3,
             label=r'13° Interpolated = 0.7$\times$10 + 0.3$\times$20')
 
     if n_total > 0:
@@ -600,33 +595,32 @@ def plot_function_a_all():
     fig, axes = plt.subplots(2, 4, figsize=(18, 10))
     axes = axes.flatten()
 
-    # Plot grid spanning the measured range
     theta_plot = np.linspace(-85, 85, 500)
 
     for idx, angle in enumerate(test_angles):
         lower = (angle // 10) * 10
         upper = lower + 10
-        theta_low, pdf_low = load_chavarria_pdf(lower)
-        theta_high, pdf_high = load_chavarria_pdf(upper)
-        if theta_low is None or theta_high is None:
+
+        theta_low_renorm, pdf_low_renorm = get_chavarria_on_full_grid(lower, target_theta=HIST_BIN_CENTERS)
+        theta_high_renorm, pdf_high_renorm = get_chavarria_on_full_grid(upper, target_theta=HIST_BIN_CENTERS)
+        if theta_low_renorm is None or theta_high_renorm is None:
             axes[idx].set_xlim(-90, 90)
             axes[idx].grid(True, alpha=0.3)
             continue
 
-        # Get normalized PDF on simulation grid
-        theta_sim, pdf_sim_norm = get_interpolated_chavarria_pdf(angle, target_theta=HIST_BIN_CENTERS)
+        theta_sim, pdf_interp_norm = get_interpolated_chavarria_pdf(angle, target_theta=HIST_BIN_CENTERS)
         if theta_sim is None:
             continue
 
-        # Interpolate onto the plotting grid
-        pdf_plot = np.interp(theta_plot, theta_sim, pdf_sim_norm, left=0, right=0)
+        pdf_low_plot = np.interp(theta_plot, theta_low_renorm, pdf_low_renorm, left=0, right=0)
+        pdf_high_plot = np.interp(theta_plot, theta_high_renorm, pdf_high_renorm, left=0, right=0)
+        pdf_interp_plot = np.interp(theta_plot, theta_sim, pdf_interp_norm, left=0, right=0)
 
         bin_centers, pdf, errors, n_total = get_histogram_for_angle(angle)
         ax = axes[idx]
-        ax.plot(theta_low, pdf_low, '-', color=COLORS['chavarria'], lw=1.5, alpha=0.7, label=f'{lower}°')
-        ax.plot(theta_high, pdf_high, '-', color=COLORS['chavarria_secondary'], lw=1.5, alpha=0.7, label=f'{upper}°')
-        
-        ax.plot(theta_plot, pdf_plot, '-', color=COLORS['interpolated'], lw=2.5,
+        ax.plot(theta_plot, pdf_low_plot, '-', color=COLORS['chavarria'], lw=1.5, alpha=0.7, label=f'{lower}°')
+        ax.plot(theta_plot, pdf_high_plot, '-', color=COLORS['chavarria_secondary'], lw=1.5, alpha=0.7, label=f'{upper}°')
+        ax.plot(theta_plot, pdf_interp_plot, '-', color=COLORS['interpolated'], lw=2.5,
                 label=f'Interpolated {angle}°')
 
         if n_total > 0:
@@ -649,7 +643,7 @@ def plot_function_a_all():
     return str(output_file)
 
 # ============================================================================
-# 8. FUNCTION C (CDF Sampling) – uses normalization fix
+# 8. FUNCTION C (CDF Sampling)
 # ============================================================================
 
 def plot_function_c():
@@ -1088,29 +1082,26 @@ def plot_S_and_L_separate(results):
     print(f"Diagnostic S and L components saved: {output_file}")
 
 # ============================================================================
-# 11. ADDITIONAL PLOTS – with grid exactly matching raw data range
+# 11. ADDITIONAL PLOTS – clean, no mention of normalisation
 # ============================================================================
 
 def plot_interpolation_only_13deg():
-    theta_10, pdf_10 = load_chavarria_pdf(10)
-    theta_20, pdf_20 = load_chavarria_pdf(20)
-    if theta_10 is None or theta_20 is None:
-        print("Skipping interpolation_only: missing 10 or 20 deg data")
+    theta_10_renorm, pdf_10_renorm = get_chavarria_on_full_grid(10, target_theta=HIST_BIN_CENTERS)
+    theta_20_renorm, pdf_20_renorm = get_chavarria_on_full_grid(20, target_theta=HIST_BIN_CENTERS)
+    theta_sim, pdf_13_norm = get_interpolated_chavarria_pdf(13, target_theta=HIST_BIN_CENTERS)
+    if any(x is None for x in (theta_10_renorm, theta_20_renorm, theta_sim)):
+        print("Skipping interpolation_only: missing data")
         return
 
-    # Get normalized PDF on simulation grid
-    theta_sim, pdf_sim_norm = get_interpolated_chavarria_pdf(13, target_theta=HIST_BIN_CENTERS)
-    if theta_sim is None:
-        return
-
-    # Plot grid spanning the measured range
     theta_plot = np.linspace(-85, 85, 500)
-    pdf_plot = np.interp(theta_plot, theta_sim, pdf_sim_norm, left=0, right=0)
+    pdf_10_plot = np.interp(theta_plot, theta_10_renorm, pdf_10_renorm, left=0, right=0)
+    pdf_20_plot = np.interp(theta_plot, theta_20_renorm, pdf_20_renorm, left=0, right=0)
+    pdf_13_plot = np.interp(theta_plot, theta_sim, pdf_13_norm, left=0, right=0)
 
     fig, ax = plt.subplots(figsize=(10,6))
-    ax.plot(theta_10, pdf_10, '-', color=COLORS['chavarria'], lw=2.5, label='10° Chavarria')
-    ax.plot(theta_20, pdf_20, '-', color=COLORS['chavarria_secondary'], lw=2.5, label='20° Chavarria')
-    ax.plot(theta_plot, pdf_plot, '--', color=COLORS['interpolated'], lw=3,
+    ax.plot(theta_plot, pdf_10_plot, '-', color=COLORS['chavarria'], lw=2.5, label='10° Chavarria')
+    ax.plot(theta_plot, pdf_20_plot, '-', color=COLORS['chavarria_secondary'], lw=2.5, label='20° Chavarria')
+    ax.plot(theta_plot, pdf_13_plot, '--', color=COLORS['interpolated'], lw=3,
             label='Interpolated 13° (0.7×10 + 0.3×20)')
     ax.set_xlabel('Reflection Angle (Degrees)', fontsize=14)
     ax.set_ylabel('Probability Density', fontsize=14)
@@ -1124,24 +1115,17 @@ def plot_interpolation_only_13deg():
     print(f"New plot (interpolation only) saved: {OUTPUT_DIR / 'new_interpolation_only_13deg.png'}")
 
 def plot_validation_simulation_vs_interpolation_13deg():
-    theta_10, pdf_10 = load_chavarria_pdf(10)
-    theta_20, pdf_20 = load_chavarria_pdf(20)
-    if theta_10 is None:
-        print("Skipping validation: missing 10 deg data")
-        return
-
-    # Get normalized PDF on simulation grid
-    theta_sim, pdf_sim_norm = get_interpolated_chavarria_pdf(13, target_theta=HIST_BIN_CENTERS)
+    theta_sim, pdf_13_norm = get_interpolated_chavarria_pdf(13, target_theta=HIST_BIN_CENTERS)
     if theta_sim is None:
+        print("Skipping validation: missing data")
         return
 
-    # Plot grid spanning the measured range
     theta_plot = np.linspace(-85, 85, 500)
-    pdf_plot = np.interp(theta_plot, theta_sim, pdf_sim_norm, left=0, right=0)
+    pdf_13_plot = np.interp(theta_plot, theta_sim, pdf_13_norm, left=0, right=0)
 
     bin_centers, pdf_sim, errors, n_total = get_histogram_for_angle(13)
     fig, ax = plt.subplots(figsize=(10,6))
-    ax.plot(theta_plot, pdf_plot, '--', color=COLORS['interpolated'], lw=3,
+    ax.plot(theta_plot, pdf_13_plot, '--', color=COLORS['interpolated'], lw=3,
             label='Interpolated 13° PDF')
     if n_total > 0:
         ax.errorbar(bin_centers, pdf_sim, yerr=errors, fmt='o', color=COLORS['simulation'],
