@@ -823,6 +823,10 @@ def plot_tyvek_gaussian_lambertian_fit_components(results):
     plt.close()
     print(f"Gaussian + Lambertian fit (with components) plot saved: {output_file}")
 
+# ============================================================================
+# UPDATED: tyvek_2 plots – zero points masked out
+# ============================================================================
+
 def plot_tyvek_sim_vs_chavarria_measurement():
     fig, axes = plt.subplots(3, 3, figsize=(20, 16))
     axes = axes.flatten()
@@ -848,7 +852,12 @@ def plot_tyvek_sim_vs_chavarria_measurement():
 
         ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
                     markersize=6, capsize=3, label='Simulation')
-        ax.plot(bin_centers, pdf_ch, 's', color=COLORS['chavarria'], markersize=6, label='Chavarria Measurement')
+        
+        # Mask out zero or near-zero points (avoid plotting the artificial zeros at edges)
+        mask = pdf_ch > 1e-12
+        if np.any(mask):
+            ax.plot(theta_ch[mask], pdf_ch[mask], 's', color=COLORS['chavarria'],
+                    markersize=6, label='Chavarria Measurement')
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
         ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
@@ -889,7 +898,12 @@ def plot_tyvek_sim_vs_chavarria_measurement_no_Nevent():
 
         ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
                     markersize=6, capsize=3, label='Simulation')
-        ax.plot(bin_centers, pdf_ch, 's', color=COLORS['chavarria'], markersize=6, label='Chavarria Measurement')
+        
+        # Mask out zero or near-zero points
+        mask = pdf_ch > 1e-12
+        if np.any(mask):
+            ax.plot(theta_ch[mask], pdf_ch[mask], 's', color=COLORS['chavarria'],
+                    markersize=6, label='Chavarria Measurement')
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
         ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
@@ -904,6 +918,10 @@ def plot_tyvek_sim_vs_chavarria_measurement_no_Nevent():
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     plt.close()
     print(f"Tyvek Plot 2 (without N=) saved: {output_file}")
+
+# ============================================================================
+# Rest of tyvek plots (ratio, overlay etc.) – unchanged
+# ============================================================================
 
 def plot_tyvek_ratio_comparison(results):
     print("\n" + "="*70)
