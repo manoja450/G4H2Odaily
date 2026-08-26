@@ -32,7 +32,7 @@ echo "Python location: $(which python)"
 # Define file paths
 # ============================================================================
 DATA_DIR="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN_COPY/data"
-SIM_FILE="${DATA_DIR}/Sim_D2ODetector007.root"
+SIM_FILE="${DATA_DIR}/Sim_D2ODetector016.root"
 REAL_FILE="/home/manoja450/G4WithoutLeadSheilding/MODULE2/CUSTOMOPTICALMODULE2/NEXTmodify/G4d2o_DATA_DRIVEN_COPY/mac/all_histograms.root"
 
 # Check if files exist

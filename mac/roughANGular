@@ -7,8 +7,9 @@ COMPLETE ANALYSIS: FUNCTIONS A, C VALIDATION + TYVEK REFLECTIVITY ANALYSIS
  new_underprediction_summary, function_b_continuous_pdf)
 ================================================================================
 NORMALIZATION FIX APPLIED INTERNALLY – all Chavarria curves are normalised over
-the same full [-90, 90] range as the simulation, ensuring consistent comparison.
-No mention of this appears in the plots – they are clean for thesis use.
+the same full [-90, 90] range as the simulation. For overlay plots, Chavarria
+is plotted at its original measured angles (-85 to 85) to avoid artificial
+edge‑zero artifacts.
 ================================================================================
 """
 
@@ -307,7 +308,7 @@ def get_interpolated_chavarria_pdf(incident_angle, target_theta=None):
     return target_theta, pdf_interp
 
 # ============================================================================
-# 3c. SINGLE-ANGLE RENORMALIZATION (for overlay plots)
+# 3c. SINGLE-ANGLE RENORMALIZATION (for overlay plots) – returns on simulation grid
 # ============================================================================
 
 def get_chavarria_on_full_grid(angle, target_theta=None):
@@ -321,7 +322,35 @@ def get_chavarria_on_full_grid(angle, target_theta=None):
     return target_theta, pdf_interp
 
 # ============================================================================
-# 3d. TOLERANCE WINDOW SKEW CHECK
+# 3d. NEW HELPER: renormalize but return at raw positions (fixes 85° bug)
+# ============================================================================
+
+def get_chavarria_renormalized_at_raw_positions(angle):
+    """
+    Loads Chavarria PDF, renormalizes it over the full [-90,90] range,
+    but returns the renormalized values at the ORIGINAL raw measurement angles
+    (e.g., -85, -80, ..., 80, 85). This ensures the blue points are plotted
+    at their true positions and don't get artificially pulled to zero by the
+    simulation bin grid.
+    """
+    theta_raw, pdf_raw = load_chavarria_pdf(angle)
+    if theta_raw is None:
+        return None, None
+
+    # Step 1: Interpolate the raw PDF onto the full simulation grid
+    pdf_on_full_grid = np.interp(HIST_BIN_CENTERS, theta_raw, pdf_raw, left=0, right=0)
+
+    # Step 2: Renormalize over the FULL range (so it sums to 1 over 36 bins)
+    pdf_renorm_full = pdf_on_full_grid / np.sum(pdf_on_full_grid)
+
+    # Step 3: Interpolate BACK to the original raw angles to get the renormalized
+    # values exactly where Chavarria was measured (including at -85 and +85)
+    pdf_renorm_raw = np.interp(theta_raw, HIST_BIN_CENTERS, pdf_renorm_full, left=0, right=0)
+
+    return theta_raw, pdf_renorm_raw
+
+# ============================================================================
+# 3e. TOLERANCE WINDOW SKEW CHECK
 # ============================================================================
 
 def _fit_free_peak_to_curve(theta_grid, pdf_fine):
@@ -696,7 +725,7 @@ def plot_function_c():
     return str(output_file)
 
 # ============================================================================
-# 9. TYVEK PLOTS
+# 9. TYVEK PLOTS (with 85° bin fix)
 # ============================================================================
 
 def plot_tyvek_gaussian_lambertian_fits():
@@ -823,6 +852,10 @@ def plot_tyvek_gaussian_lambertian_fit_components(results):
     plt.close()
     print(f"Gaussian + Lambertian fit (with components) plot saved: {output_file}")
 
+# ============================================================================
+# FIXED: tyvek_2 plots – Chavarria now plotted at raw positions after renormalization
+# ============================================================================
+
 def plot_tyvek_sim_vs_chavarria_measurement():
     fig, axes = plt.subplots(3, 3, figsize=(20, 16))
     axes = axes.flatten()
@@ -839,8 +872,9 @@ def plot_tyvek_sim_vs_chavarria_measurement():
             ax.set_xlim(-90, 90)
             continue
 
-        theta_ch, pdf_ch = get_chavarria_on_full_grid(phi_target, target_theta=bin_centers)
-        if theta_ch is None:
+        # Use the NEW helper: renormalized over full range, plotted at raw positions
+        theta_ch_raw, pdf_ch_renorm = get_chavarria_renormalized_at_raw_positions(phi_target)
+        if theta_ch_raw is None:
             ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
             ax.set_xlim(-90, 90)
             ax.grid(True, alpha=0.3)
@@ -848,7 +882,8 @@ def plot_tyvek_sim_vs_chavarria_measurement():
 
         ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
                     markersize=6, capsize=3, label='Simulation')
-        ax.plot(bin_centers, pdf_ch, 's', color=COLORS['chavarria'], markersize=6, label='Chavarria Measurement')
+        ax.plot(theta_ch_raw, pdf_ch_renorm, 's-', color=COLORS['chavarria'], markersize=6,
+                label='Chavarria Measurement')
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
         ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
@@ -880,8 +915,8 @@ def plot_tyvek_sim_vs_chavarria_measurement_no_Nevent():
             ax.set_xlim(-90, 90)
             continue
 
-        theta_ch, pdf_ch = get_chavarria_on_full_grid(phi_target, target_theta=bin_centers)
-        if theta_ch is None:
+        theta_ch_raw, pdf_ch_renorm = get_chavarria_renormalized_at_raw_positions(phi_target)
+        if theta_ch_raw is None:
             ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
             ax.set_xlim(-90, 90)
             ax.grid(True, alpha=0.3)
@@ -889,7 +924,8 @@ def plot_tyvek_sim_vs_chavarria_measurement_no_Nevent():
 
         ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
                     markersize=6, capsize=3, label='Simulation')
-        ax.plot(bin_centers, pdf_ch, 's', color=COLORS['chavarria'], markersize=6, label='Chavarria Measurement')
+        ax.plot(theta_ch_raw, pdf_ch_renorm, 's-', color=COLORS['chavarria'], markersize=6,
+                label='Chavarria Measurement')
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
         ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
@@ -904,6 +940,11 @@ def plot_tyvek_sim_vs_chavarria_measurement_no_Nevent():
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     plt.close()
     print(f"Tyvek Plot 2 (without N=) saved: {output_file}")
+
+# ============================================================================
+# Rest of tyvek plots (ratio, overlay etc.) – unchanged, they use get_chavarria_on_full_grid
+# which is fine for the purpose of those plots (they show curves, not discrete points)
+# ============================================================================
 
 def plot_tyvek_ratio_comparison(results):
     print("\n" + "="*70)
@@ -988,7 +1029,7 @@ def plot_tyvek_overlay_all_angles():
     print(f"Tyvek Plot 4 (Normalized) saved: {output_file}")
 
 # ============================================================================
-# 10. ADDITIONAL FITS/DIAGNOSTICS
+# 10. ADDITIONAL FITS/DIAGNOSTICS (only diagnostic_0_5_degree_bin_check and S_and_L)
 # ============================================================================
 
 def plot_0_5_degree_bin_check():

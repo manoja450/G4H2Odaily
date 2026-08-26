@@ -14,7 +14,7 @@ data_dir = os.path.join(base_dir, "data")
 mac_dir = os.path.join(base_dir, "mac")
 
 michel_path = os.path.join(mac_dir, "all_histograms.root")
-sim_path = os.path.join(data_dir, "Sim_D2ODetector022.root")   # change to your preferred file
+sim_path = os.path.join(data_dir, "Sim_D2ODetector029.root")   # change to your preferred file
 
 plots_dir = os.path.join(os.getcwd(), "PLOTS")
 os.makedirs(plots_dir, exist_ok=True)
