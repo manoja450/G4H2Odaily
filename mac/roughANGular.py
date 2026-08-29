@@ -3,33 +3,14 @@
 """
 ================================================================================
 COMPLETE ANALYSIS: FUNCTIONS A, C VALIDATION + TYVEK REFLECTIVITY ANALYSIS
-<<<<<<< HEAD:mac/angular_analysisV2.py
-(REDUCED – removed plots: diagnostic_tail_behavior, complete_workflow_ABC_13deg,
- new_underprediction_summary, function_b_continuous_pdf)
-================================================================================
-NORMALIZATION FIX APPLIED INTERNALLY – all Chavarria curves are normalised over
-the same full [-90, 90] range as the simulation, ensuring consistent comparison.
-No mention of this appears in the plots – they are clean for thesis use.
-=======
-(REDUCED - removed plots: diagnostic_tail_behavior, complete_workflow_ABC_13deg,
- new_underprediction_summary, function_b_continuous_pdf)
+(REDUCED - removed: color_legend, diagnostic_0_5, diagnostic_S_and_L)
 ================================================================================
 NORMALIZATION FIX APPLIED INTERNALLY - Chavarria curves are zero-padded outside
 their measured support then renormalized (equivalent to normalizing over just
 their own measured range). The simulation's tyvek_2 comparison plots now use
 a matching RESTRICTED normalization (see get_histogram_for_angle's
 restrict_range parameter and get_chavarria_support_range) so both sides are
-normalized over the SAME window before being compared - this was previously
-NOT true despite the old docstring claiming it was (the simulation side was
-still normalized by its full event count, including reflections beyond
-Chavarria's measured range, which is why sim points sat systematically below
-Chavarria points across the board).
-
-Also includes Slides A/B/C: a single-angle "raw" plot (Slide A), the same
-single angle with the restricted-normalization fix and the missing-data edge
-labeled (Slide B), and the full 9-angle restricted plot (Slide C, reuses
-plot_tyvek_sim_vs_chavarria_measurement).
->>>>>>> 2ec6705 (Update angular analysis and optimization scripts):mac/roughANGular.py
+normalized over the SAME window before being compared.
 ================================================================================
 """
 
@@ -147,16 +128,16 @@ tyvek_angles = [0, 10, 20, 30, 40, 50, 60, 70, 80]
 # TOLERANCE: per-angle
 # ============================================================================
 TOLERANCE_MAP = {
-     0: 0.001,
-    10: 0.001,
-    13: 0.001,
-    20: 0.001,
-    30: 0.001,
-    40: 0.001,
-    50: 0.001,
-    60: 0.001,
-    70: 0.001,
-    80: 0.001,
+     0: 0.01,
+    10: 0.01,
+    13: 0.01,
+    20: 0.01,
+    30: 0.01,
+    40: 0.01,
+    50: 0.01,
+    60: 0.01,
+    70: 0.01,
+    80: 0.01,
 }
 
 missing_tol = [a for a in target_angles if a not in TOLERANCE_MAP]
@@ -211,11 +192,6 @@ def load_chavarria_pdf(incident_deg):
     chavarria_cache[incident_deg] = (theta, pdf)
     return theta, pdf
 
-# NORMALIZATION FIX: the actual measured angular support (min/max theta) of
-# the raw digitized file for this incident angle. This is what
-# get_chavarria_on_full_grid()'s zero-padding effectively normalizes over, and
-# what the simulation side needs to match to make an apples-to-apples
-# comparison instead of comparing two different normalization windows.
 def get_chavarria_support_range(angle):
     theta_raw, pdf_raw = load_chavarria_pdf(angle)
     if theta_raw is None:
@@ -299,28 +275,11 @@ if hist_counts_cache is None:
 # 3. HELPER FUNCTIONS
 # ============================================================================
 
-<<<<<<< HEAD:mac/angular_analysisV2.py
-def get_histogram_for_angle(angle):
-=======
-# NORMALIZATION FIX: added optional restrict_range=(theta_min, theta_max).
-# When given, the PDF is normalized by the sum of counts WITHIN that window
-# only (matching how Chavarria's curve is effectively normalized over its own
-# measured support in get_chavarria_on_full_grid), instead of by the full
-# event count n_total (which includes reflections beyond Chavarria's measured
-# range - the source of the systematic "sim sits below Chavarria" offset).
-# n_total itself (used for legend "N=" labels etc.) is still returned as the
-# TRUE full event count, unaffected - only the pdf/errors normalization
-# denominator changes.
 def get_histogram_for_angle(angle, restrict_range=None):
->>>>>>> 2ec6705 (Update angular analysis and optimization scripts):mac/roughANGular.py
     counts = hist_counts_cache.get(angle)
     n_total = n_events_cache.get(angle, 0)
     if counts is None or n_total == 0:
         return HIST_BIN_CENTERS, np.zeros(HIST_BINS), np.zeros(HIST_BINS), 0
-<<<<<<< HEAD:mac/angular_analysisV2.py
-    pdf = counts / n_total
-    errors = np.sqrt(counts) / n_total
-=======
 
     if restrict_range is not None:
         theta_min, theta_max = restrict_range
@@ -333,7 +292,6 @@ def get_histogram_for_angle(angle, restrict_range=None):
 
     pdf = counts / n_norm
     errors = np.sqrt(counts) / n_norm
->>>>>>> 2ec6705 (Update angular analysis and optimization scripts):mac/roughANGular.py
     return HIST_BIN_CENTERS, pdf, errors, n_total
 
 # ============================================================================
@@ -549,69 +507,10 @@ def perform_constrained_fit(theta, counts, phi, n_total):
         return None
 
 # ============================================================================
-# COLOR LEGEND PLOT
-# ============================================================================
-
-def plot_color_legend():
-    print("\n" + "="*70)
-    print("PLOT: Color Legend (reference key for all plots in this file)")
-    print("="*70)
-
-    legend_entries = [
-        ('chavarria',            'Chavarria measurement DATA POINTS (primary series)'),
-        ('simulation',            'Simulation (Geant4) DATA POINTS'),
-        ('fit_total',              'Total FIT CURVE (Gaussian + Lambertian combined)'),
-        ('chavarria_secondary',    'A 2nd Chavarria measurement series in the SAME plot'),
-        ('interpolated',           'Interpolated / derived PDF curve (e.g. 13deg = 0.7×10 + 0.3×20)'),
-        ('lambertian',             'Lambertian / diffuse FIT COMPONENT (not the total fit)'),
-        ('gaussian',               'Gaussian / specular FIT COMPONENT (not the total fit)'),
-        ('cdf_sampled',            'CDF-sampled theoretical draw'),
-        ('peak_marker',            'Vertical line marking an actual fitted peak location'),
-        ('reference',              'Reference / guide lines (y=1, expected -phi, etc.)'),
-        ('reference_band',         'Shaded reference region (e.g. 0-5deg range)'),
-        ('tolerance_band',         'Shaded tolerance-window region'),
-    ]
-
-    n = len(legend_entries)
-    fig, ax = plt.subplots(figsize=(9, 0.55 * n + 1.5))
-
-    swatch_x0, swatch_x1 = 0.05, 0.20
-    text_x = 0.24
-
-    for i, (key, description) in enumerate(legend_entries):
-        y = n - i
-        color = COLORS[key]
-        ax.add_patch(plt.Rectangle((swatch_x0, y - 0.35), swatch_x1 - swatch_x0, 0.7,
-                                    facecolor=color, edgecolor='black', linewidth=1.2))
-        ax.text(text_x, y, f"{color}  -  {description}",
-                va='center', ha='left', fontsize=11)
-
-    ax.text(swatch_x0, 0, "viridis colormap  -  used ONLY in the angle-overlay plot, "
-                          "to encode incident angle (not data type)",
-            va='center', ha='left', fontsize=10, style='italic', color=COLORS['reference'])
-
-    ax.set_xlim(0, 1)
-    ax.set_ylim(-0.7, n + 0.7)
-    ax.axis('off')
-    ax.set_title('Color Legend — what every color means in this analysis',
-                 fontsize=14, fontweight='bold', pad=15)
-
-    plt.tight_layout()
-    output_file = OUTPUT_DIR / 'color_legend.png'
-    plt.savefig(output_file, dpi=200, bbox_inches='tight')
-    plt.close()
-    print(f"Color legend plot saved: {output_file}")
-    return str(output_file)
-
-# ============================================================================
 # 7. FUNCTION A (Interpolation) PLOTS – clean, no mention of normalisation
 # ============================================================================
 
 def plot_function_a():
-<<<<<<< HEAD:mac/angular_analysisV2.py
-    # Get renormalized 10° and 20° PDFs (internally normalised over full range)
-=======
->>>>>>> 2ec6705 (Update angular analysis and optimization scripts):mac/roughANGular.py
     theta_10_renorm, pdf_10_renorm = get_chavarria_on_full_grid(10, target_theta=HIST_BIN_CENTERS)
     theta_20_renorm, pdf_20_renorm = get_chavarria_on_full_grid(20, target_theta=HIST_BIN_CENTERS)
     if theta_10_renorm is None or theta_20_renorm is None:
@@ -887,69 +786,17 @@ def plot_tyvek_gaussian_lambertian_fit_components(results):
     print(f"Gaussian + Lambertian fit (with components) plot saved: {output_file}")
 
 # ============================================================================
-# UPDATED: tyvek_2 plots - RESTRICTED normalization applied (normalization fix),
-# no shading
+# OVERLAY PLOTS (no N count, descriptive filenames)
 # ============================================================================
 
-def plot_tyvek_sim_vs_chavarria_measurement():
-    fig, axes = plt.subplots(3, 3, figsize=(20, 16))
-    axes = axes.flatten()
-
-    for idx, phi_target in enumerate(tyvek_angles):
-        # NORMALIZATION FIX: restrict the simulation's normalization to
-        # Chavarria's own measured angular support for this angle, so both
-        # curves are normalized over the SAME window before comparison.
-        chav_range = get_chavarria_support_range(phi_target)
-        bin_centers, pdf, errors, n_total = get_histogram_for_angle(phi_target, restrict_range=chav_range)
-        ax = axes[idx]
-
-        if n_total == 0:
-            ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
-            ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-            ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
-            ax.grid(True, alpha=0.3)
-            ax.set_xlim(-90, 90)
-            continue
-
-        theta_ch, pdf_ch = get_chavarria_on_full_grid(phi_target, target_theta=bin_centers)
-        if theta_ch is None:
-            ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
-            ax.set_xlim(-90, 90)
-            ax.grid(True, alpha=0.3)
-            continue
-
-        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
-                    markersize=6, capsize=3, label='Simulation')
-<<<<<<< HEAD:mac/angular_analysisV2.py
-        ax.plot(bin_centers, pdf_ch, 's', color=COLORS['chavarria'], markersize=6, label='Chavarria Measurement')
-=======
-
-        mask = pdf_ch > 1e-12
-        if np.any(mask):
-            ax.plot(theta_ch[mask], pdf_ch[mask], 's', color=COLORS['chavarria'],
-                    markersize=6, label='Chavarria Measurement')
->>>>>>> 2ec6705 (Update angular analysis and optimization scripts):mac/roughANGular.py
-
-        ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
-        ax.set_title(f'Incident Angle = {phi_target}°  (N = {n_total:,})', fontweight='bold')
-        ax.grid(True, alpha=0.3)
-        ax.legend(loc='upper right')
-        ax.set_xlim(-90, 90)
-        ax.set_ylim(bottom=0)
-
-    plt.tight_layout(pad=2.0, h_pad=2.5)
-    output_file = OUTPUT_DIR / 'tyvek_2_simulation_vs_chavarria_measurement_normalized.png'
-    plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    plt.close()
-    print(f"Tyvek Plot 2 (Restricted-normalized) saved: {output_file}")
-
 def plot_tyvek_sim_vs_chavarria_measurement_no_Nevent():
+    """
+    Both simulation and Chavarria normalized over [-85,85], full x-axis, no N count.
+    """
     fig, axes = plt.subplots(3, 3, figsize=(20, 16))
     axes = axes.flatten()
 
     for idx, phi_target in enumerate(tyvek_angles):
-        # NORMALIZATION FIX: same restricted-window normalization as above.
         chav_range = get_chavarria_support_range(phi_target)
         bin_centers, pdf, errors, n_total = get_histogram_for_angle(phi_target, restrict_range=chav_range)
         ax = axes[idx]
@@ -971,15 +818,10 @@ def plot_tyvek_sim_vs_chavarria_measurement_no_Nevent():
 
         ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
                     markersize=6, capsize=3, label='Simulation')
-<<<<<<< HEAD:mac/angular_analysisV2.py
-        ax.plot(bin_centers, pdf_ch, 's', color=COLORS['chavarria'], markersize=6, label='Chavarria Measurement')
-=======
-
         mask = pdf_ch > 1e-12
         if np.any(mask):
             ax.plot(theta_ch[mask], pdf_ch[mask], 's', color=COLORS['chavarria'],
                     markersize=6, label='Chavarria Measurement')
->>>>>>> 2ec6705 (Update angular analysis and optimization scripts):mac/roughANGular.py
 
         ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
         ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
@@ -990,16 +832,109 @@ def plot_tyvek_sim_vs_chavarria_measurement_no_Nevent():
         ax.set_ylim(bottom=0)
 
     plt.tight_layout(pad=2.0, h_pad=2.5)
-    output_file = OUTPUT_DIR / 'tyvek_2_simulation_vs_chavarria_measurement_normalized_no_Nevent.png'
+    output_file = OUTPUT_DIR / 'tyvek_2_simulation_vs_chavarria_both_restricted_to_85deg_no_Nevent.png'
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"Tyvek Plot 2 (Restricted-normalized, without N=) saved: {output_file}")
+    print(f"Tyvek plot (both restricted to 85°, no N) saved: {output_file}")
+
+def plot_tyvek_restricted_range_only():
+    """
+    Both normalized over [-85,85], x-axis clipped to [-85,85], no N count.
+    """
+    fig, axes = plt.subplots(3, 3, figsize=(20, 16))
+    axes = axes.flatten()
+
+    for idx, phi_target in enumerate(tyvek_angles):
+        chav_range = get_chavarria_support_range(phi_target)
+        bin_centers, pdf, errors, n_total = get_histogram_for_angle(phi_target, restrict_range=chav_range)
+        ax = axes[idx]
+
+        if n_total == 0:
+            ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
+            ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
+            ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+            ax.grid(True, alpha=0.3)
+            ax.set_xlim(-85, 85)
+            continue
+
+        theta_ch, pdf_ch = get_chavarria_on_full_grid(phi_target, target_theta=bin_centers)
+        if theta_ch is None:
+            ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
+            ax.set_xlim(-85, 85)
+            ax.grid(True, alpha=0.3)
+            continue
+
+        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
+                    markersize=6, capsize=3, label='Simulation')
+        mask = pdf_ch > 1e-12
+        if np.any(mask):
+            ax.plot(theta_ch[mask], pdf_ch[mask], 's', color=COLORS['chavarria'],
+                    markersize=6, label='Chavarria Measurement')
+
+        ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+        ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
+        ax.grid(True, alpha=0.3)
+        ax.legend(loc='upper right')
+        ax.set_xlim(-85, 85)
+        ax.set_ylim(bottom=0)
+
+    plt.tight_layout(pad=2.0, h_pad=2.5)
+    output_file = OUTPUT_DIR / 'tyvek_2_simulation_vs_chavarria_restricted_xlim_85deg.png'
+    plt.savefig(output_file, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"Tyvek plot (restricted xlim to 85°, no N) saved: {output_file}")
+
+def plot_tyvek_sim_full_norm_chav_restricted():
+    """
+    Simulation normalized over full [-90,90], Chavarria over [-85,85],
+    full x-axis, no N count. Demonstrates the original mismatch.
+    """
+    fig, axes = plt.subplots(3, 3, figsize=(20, 16))
+    axes = axes.flatten()
+
+    for idx, phi_target in enumerate(tyvek_angles):
+        bin_centers, pdf, errors, n_total = get_histogram_for_angle(phi_target, restrict_range=None)
+        ax = axes[idx]
+
+        if n_total == 0:
+            ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
+            ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
+            ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+            ax.grid(True, alpha=0.3)
+            ax.set_xlim(-90, 90)
+            continue
+
+        theta_ch, pdf_ch = get_chavarria_on_full_grid(phi_target, target_theta=bin_centers)
+        if theta_ch is None:
+            ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
+            ax.set_xlim(-90, 90)
+            ax.grid(True, alpha=0.3)
+            continue
+
+        ax.errorbar(bin_centers, pdf, yerr=errors, fmt='o', color=COLORS['simulation'],
+                    markersize=6, capsize=3, label='Simulation')
+        mask = pdf_ch > 1e-12
+        if np.any(mask):
+            ax.plot(theta_ch[mask], pdf_ch[mask], 's', color=COLORS['chavarria'],
+                    markersize=6, label='Chavarria Measurement')
+
+        ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=13, fontweight='bold')
+        ax.set_ylabel('Probability Density', fontsize=13, fontweight='bold')
+        ax.set_title(f'Incident Angle = {phi_target}°', fontweight='bold')
+        ax.grid(True, alpha=0.3)
+        ax.legend(loc='upper right')
+        ax.set_xlim(-90, 90)
+        ax.set_ylim(bottom=0)
+
+    plt.tight_layout(pad=2.0, h_pad=2.5)
+    output_file = OUTPUT_DIR / 'tyvek_2_simulation_full_90deg_norm_chav_restricted_85deg.png'
+    plt.savefig(output_file, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"Tyvek plot (sim full norm, chav restricted, no N) saved: {output_file}")
 
 # ============================================================================
-# Rest of tyvek plots (ratio, overlay etc.) - unchanged, still full-range
-# normalization (these are internal fits/summaries, not direct Chavarria
-# overlays, so left as-is; only the direct sim-vs-Chavarria comparison plots
-# above needed the restricted-window fix)
+# Rest of tyvek plots (ratio, overlay etc.) - unchanged
 # ============================================================================
 
 def plot_tyvek_ratio_comparison(results):
@@ -1085,105 +1020,7 @@ def plot_tyvek_overlay_all_angles():
     print(f"Tyvek Plot 4 (Normalized) saved: {output_file}")
 
 # ============================================================================
-# 10. ADDITIONAL FITS/DIAGNOSTICS
-# ============================================================================
-
-def plot_0_5_degree_bin_check():
-    print("\n" + "="*70)
-    print("DIAGNOSTIC: Check 0-5° Incident Angle Bin")
-    print("="*70)
-
-    bin_centers, pdf, errors, n_total = get_histogram_for_angle(0)
-    if n_total == 0:
-        print("No simulation data for 0°, skipping.")
-        return
-
-    result = perform_fit(bin_centers, pdf * n_total, n_total)
-    if result is None:
-        print("Fit failed for 0°, skipping.")
-        return
-    sim_ratio = result['ratio']
-    sim_err = result['ratio_err']
-
-    angles = [0.0, 2.5, 5.0]
-    theta_grid = np.linspace(INTEGRATION_RANGE[0], INTEGRATION_RANGE[1], INTEGRATION_POINTS)
-    analytical_ratios = []
-
-    for ang in angles:
-        theta_e, pdf_e = get_interpolated_chavarria_pdf(ang, target_theta=theta_grid)
-        if theta_e is None:
-            print(f"No Chavarria data for {ang}°, skipping.")
-            analytical_ratios.append(None)
-            continue
-        r = _fit_free_peak_to_curve(theta_grid, pdf_e)
-        analytical_ratios.append(r)
-
-    fig, ax = plt.subplots(figsize=(8, 6))
-
-    valid_angles = [a for a, r in zip(angles, analytical_ratios) if r is not None]
-    valid_ratios = [r for r in analytical_ratios if r is not None]
-    ax.plot(valid_angles, valid_ratios, 'o-', color=COLORS['chavarria'], markersize=8, label='Analytical (Chavarria)')
-
-    ax.errorbar(0, sim_ratio, yerr=sim_err, fmt='s', color=COLORS['simulation'], markersize=10,
-                capsize=5, label=f'Simulation 0° (tolerance ±0.5°), S/L={sim_ratio:.3f}')
-
-    ax.set_xlabel('Incident Angle (Degrees)', fontsize=13, fontweight='bold')
-    ax.set_ylabel(RATIO_LABEL, fontsize=18, fontweight='bold')
-    ax.set_title('Check 0–5° Incident Angle Bin', fontsize=14, fontweight='bold')
-    ax.grid(True, alpha=0.3)
-    ax.legend(loc='best')
-    ax.set_xlim(-0.5, 6)
-
-    tol = TOLERANCE_MAP[0]
-    ax.axvspan(0, tol, alpha=0.3, color=COLORS['tolerance_band'], label=f'Tolerance window (±{tol}°)')
-    ax.axvspan(0, 5, alpha=0.2, color=COLORS['reference_band'], label='0-5° range (for reference)')
-
-    output_file = OUTPUT_DIR / 'diagnostic_0_5_degree_bin_check.png'
-    plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    plt.close()
-    print(f"Diagnostic 0-5° bin check saved: {output_file}")
-
-def plot_S_and_L_separate(results):
-    print("\n" + "="*70)
-    print("DIAGNOSTIC: S and L Components vs Incident Angle")
-    print("="*70)
-
-    if not results:
-        print("No fit results available, skipping.")
-        return
-
-    phi_vals = [r['phi'] for r in results]
-    S_vals = [r['S'] for r in results]
-    L_vals = [r['L'] for r in results]
-    n_events = [r['n_events'] for r in results]
-
-    S_errs = [S / np.sqrt(N) if N > 0 else 0 for S, N in zip(S_vals, n_events)]
-    L_errs = [L / np.sqrt(N) if N > 0 else 0 for L, N in zip(L_vals, n_events)]
-
-    fig, ax = plt.subplots(figsize=(10, 6))
-
-    ax.errorbar(phi_vals, S_vals, yerr=S_errs, fmt='o-', color=COLORS['gaussian'],
-                capsize=5, markersize=8, label='S (Specular/Gaussian)')
-    ax.errorbar(phi_vals, L_vals, yerr=L_errs, fmt='s-', color=COLORS['lambertian'],
-                capsize=5, markersize=8, label='L (Diffuse/Lambertian)')
-
-    ax.set_xlabel('Incident Angle (Degrees)', fontsize=13, fontweight='bold')
-    ax.set_ylabel('Integrated Area', fontsize=13, fontweight='bold')
-    ax.set_title('Specular vs Diffuse Components (Simulation)', fontsize=14, fontweight='bold')
-    ax.grid(True, alpha=0.3)
-    ax.legend(loc='best')
-
-    output_file = OUTPUT_DIR / 'diagnostic_S_and_L_components_vs_angle.png'
-    plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    plt.close()
-    print(f"Diagnostic S and L components saved: {output_file}")
-
-# ============================================================================
-<<<<<<< HEAD:mac/angular_analysisV2.py
-# 11. ADDITIONAL PLOTS – clean, no mention of normalisation
-=======
 # 11. ADDITIONAL PLOTS - clean, no mention of normalisation
->>>>>>> 2ec6705 (Update angular analysis and optimization scripts):mac/roughANGular.py
 # ============================================================================
 
 def plot_interpolation_only_13deg():
@@ -1215,6 +1052,9 @@ def plot_interpolation_only_13deg():
     plt.close()
     print(f"New plot (interpolation only) saved: {OUTPUT_DIR / 'new_interpolation_only_13deg.png'}")
 
+# -----------------------------------------------------------------------------
+# ORIGINAL validation plot (simulation full-range, interpolation full-range)
+# -----------------------------------------------------------------------------
 def plot_validation_simulation_vs_interpolation_13deg():
     theta_sim, pdf_13_norm = get_interpolated_chavarria_pdf(13, target_theta=HIST_BIN_CENTERS)
     if theta_sim is None:
@@ -1242,15 +1082,59 @@ def plot_validation_simulation_vs_interpolation_13deg():
     plt.close()
     print(f"New plot (validation) saved: {OUTPUT_DIR / 'new_validation_simulation_vs_interpolation_13deg.png'}")
 
+# -----------------------------------------------------------------------------
+# NEW: restricted-range validation plot (both normalized over [-85,85])
+# -----------------------------------------------------------------------------
+def plot_validation_simulation_vs_interpolation_13deg_restricted():
+    """
+    Same as the validation plot, but BOTH the simulation and the interpolated
+    Chavarria PDF are normalized over the exact same measured range [-85,85].
+    This isolates the interpolation from the edge effect.
+    """
+    # --- Interpolated Chavarria (restricted to -85,85) ---
+    # Get the interpolated PDF on the full simulation grid
+    theta_full, pdf_full_norm = get_interpolated_chavarria_pdf(13, target_theta=HIST_BIN_CENTERS)
+    if theta_full is None:
+        return
+
+    # Restrict to the measured range (-85,85) and renormalize
+    mask = (theta_full >= -85) & (theta_full <= 85)
+    theta_restricted = theta_full[mask]
+    pdf_restricted = pdf_full_norm[mask]
+    # Renormalize over the restricted range only
+    if np.sum(pdf_restricted) > 0:
+        pdf_restricted = pdf_restricted / np.sum(pdf_restricted)
+
+    # Plotting grid (fine, within -85 to 85)
+    theta_plot = np.linspace(-85, 85, 500)
+    pdf_13_plot = np.interp(theta_plot, theta_restricted, pdf_restricted, left=0, right=0)
+
+    # --- Simulation (restricted to -85,85) ---
+    # Use restrict_range to normalize over the same measured window
+    bin_centers, pdf_sim, errors, n_total = get_histogram_for_angle(13, restrict_range=(-85, 85))
+
+    fig, ax = plt.subplots(figsize=(10,6))
+    ax.plot(theta_plot, pdf_13_plot, '--', color=COLORS['interpolated'], lw=3,
+            label='Interpolated 13° PDF')
+    if n_total > 0:
+        ax.errorbar(bin_centers, pdf_sim, yerr=errors, fmt='o', color=COLORS['simulation'],
+                    markersize=6, capsize=3, label='Simulation (Geant4)')
+    ax.set_xlabel('Reflection Angle (Degrees)', fontsize=14)
+    ax.set_ylabel('Probability Density', fontsize=14)
+    ax.set_title('Validation: Simulation vs Interpolated PDF for 13° (both normalized over [-85,85])', fontweight='bold')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.set_xlim(-90,90)
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / 'new_validation_simulation_vs_interpolation_13deg_restricted.png', dpi=150)
+    plt.close()
+    print(f"New plot (validation, restricted normalisation) saved: {OUTPUT_DIR / 'new_validation_simulation_vs_interpolation_13deg_restricted.png'}")
+
+# -----------------------------------------------------------------------------
+
 def plot_chavarria_vs_simulation_specific_angle(angle=10):
-<<<<<<< HEAD:mac/angular_analysisV2.py
-    bin_centers, pdf_sim, errors, n_total = get_histogram_for_angle(angle)
-=======
-    # NORMALIZATION FIX: also restrict this one, since it's a direct
-    # single-angle Chavarria-vs-simulation comparison, same category as tyvek_2.
     chav_range = get_chavarria_support_range(angle)
     bin_centers, pdf_sim, errors, n_total = get_histogram_for_angle(angle, restrict_range=chav_range)
->>>>>>> 2ec6705 (Update angular analysis and optimization scripts):mac/roughANGular.py
     theta_ch, pdf_ch = get_chavarria_on_full_grid(angle, target_theta=bin_centers)
     if theta_ch is None:
         print(f"Skipping specific angle {angle}: no Chavarria data")
@@ -1274,82 +1158,6 @@ def plot_chavarria_vs_simulation_specific_angle(angle=10):
     print(f"New plot (specific angle {angle}) saved: {OUTPUT_DIR / f'new_chavarria_vs_simulation_{angle}deg.png'}")
 
 # ============================================================================
-<<<<<<< HEAD:mac/angular_analysisV2.py
-=======
-# 11b. SLIDES A / B / C
-# ============================================================================
-
-def plot_slide_a_single_angle_raw(angle=80):
-    """Slide A: single angle, RAW (unrestricted) normalization on both sides.
-    Just orients the audience to what the figure is - no residual highlighting."""
-    theta_raw, pdf_raw = load_chavarria_pdf(angle)
-    bin_centers, pdf_sim, errors, n_total = get_histogram_for_angle(angle)
-
-    if theta_raw is None or n_total == 0:
-        print(f"Slide A: missing data for {angle}deg, skipping")
-        return
-
-    fig, ax = plt.subplots(figsize=(10, 7))
-    ax.plot(theta_raw, pdf_raw, 's-', color=COLORS['chavarria'], markersize=6, lw=1.5,
-            label='Chavarria Measurement')
-    ax.errorbar(bin_centers, pdf_sim, yerr=errors, fmt='o', color=COLORS['simulation'],
-                markersize=6, capsize=3, label='Simulation (Geant4)')
-    ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=14, fontweight='bold')
-    ax.set_ylabel('Probability Density', fontsize=14, fontweight='bold')
-    ax.set_title(f'Reflection Angle Distribution at {angle}° Incidence', fontsize=16, fontweight='bold')
-    ax.legend(loc='upper right', fontsize=12)
-    ax.grid(True, alpha=0.3)
-    ax.set_xlim(-90, 90)
-    ax.set_ylim(bottom=0)
-    plt.tight_layout()
-    output_file = OUTPUT_DIR / f'slide_a_raw_{angle}deg.png'
-    plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    plt.close()
-    print(f"Slide A ({angle}deg, raw) saved: {output_file}")
-
-def plot_slide_b_single_angle_restricted(angle=80):
-    """Slide B: same angle as Slide A, but with the restricted-normalization
-    fix applied. Shows the match, and explicitly labels the edge where
-    Chavarria has no measurement (rather than shading the whole plot)."""
-    chav_range = get_chavarria_support_range(angle)
-    theta_raw, pdf_raw = load_chavarria_pdf(angle)
-    bin_centers, pdf_sim, errors, n_total = get_histogram_for_angle(angle, restrict_range=chav_range)
-
-    if theta_raw is None or n_total == 0 or chav_range is None:
-        print(f"Slide B: missing data for {angle}deg, skipping")
-        return
-
-    fig, ax = plt.subplots(figsize=(10, 7))
-    ax.plot(theta_raw, pdf_raw, 's-', color=COLORS['chavarria'], markersize=6, lw=1.5,
-            label='Chavarria Measurement')
-    ax.errorbar(bin_centers, pdf_sim, yerr=errors, fmt='o', color=COLORS['simulation'],
-                markersize=6, capsize=3, label='Simulation (restricted normalization)')
-
-    theta_min, theta_max = chav_range
-    for edge, label_x_offset in [(theta_min, -18), (theta_max, 6)]:
-        ax.annotate(f'no Chavarria\ndata past {edge:.0f}°',
-                    xy=(edge, 0.0), xytext=(edge + label_x_offset, ax.get_ylim()[1]*0.15 if ax.get_ylim()[1] else 0.01),
-                    fontsize=9, color=COLORS['reference'],
-                    arrowprops=dict(arrowstyle='->', color=COLORS['reference'], lw=1.2))
-
-    ax.set_xlabel('Angle of Reflection (Degrees)', fontsize=14, fontweight='bold')
-    ax.set_ylabel('Probability Density', fontsize=14, fontweight='bold')
-    ax.set_title(f'Reflection Angle Distribution at {angle}° Incidence — Restricted Normalization', fontsize=15, fontweight='bold')
-    ax.legend(loc='upper right', fontsize=12)
-    ax.grid(True, alpha=0.3)
-    ax.set_xlim(-90, 90)
-    ax.set_ylim(bottom=0)
-    plt.tight_layout()
-    output_file = OUTPUT_DIR / f'slide_b_restricted_{angle}deg.png'
-    plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    plt.close()
-    print(f"Slide B ({angle}deg, restricted) saved: {output_file}")
-
-# Slide C reuses plot_tyvek_sim_vs_chavarria_measurement() (already restricted,
-# already no-shading) - no separate function needed.
-
-# ============================================================================
->>>>>>> 2ec6705 (Update angular analysis and optimization scripts):mac/roughANGular.py
 # 12. MISSING FUNCTIONS
 # ============================================================================
 
@@ -1567,7 +1375,9 @@ print("\n" + "="*70)
 print("RUNNING ALL PLOTS")
 print("="*70)
 
-plot_color_legend()
+# Removed: plot_color_legend()
+# Removed: plot_0_5_degree_bin_check()
+# Removed: plot_S_and_L_separate()
 
 plot_function_a()
 plot_function_a_all()
@@ -1576,20 +1386,21 @@ plot_function_c()
 tyvek_results = plot_tyvek_gaussian_lambertian_fits()
 plot_tyvek_gaussian_lambertian_fit_components(tyvek_results)
 
-# Slides A / B / C - single-angle "setup" and "aha" plots, then the full range
-plot_slide_a_single_angle_raw(80)
-plot_slide_b_single_angle_restricted(80)
-plot_tyvek_sim_vs_chavarria_measurement()   # Slide C: full 9-angle restricted view
-plot_tyvek_sim_vs_chavarria_measurement_no_Nevent()
+# Overlay plots with restricted normalization (no N count)
+plot_tyvek_sim_vs_chavarria_measurement_no_Nevent()       # both restricted, full x
+plot_tyvek_restricted_range_only()                        # both restricted, xlim = -85,85
+plot_tyvek_sim_full_norm_chav_restricted()               # sim full, chav restricted
 
 plot_tyvek_ratio_comparison(tyvek_results)
 plot_tyvek_overlay_all_angles()
 
-plot_0_5_degree_bin_check()
-plot_S_and_L_separate(tyvek_results)
-
+# Additional plots
 plot_interpolation_only_13deg()
-plot_validation_simulation_vs_interpolation_13deg()
+
+# Validation plots (original and new restricted)
+plot_validation_simulation_vs_interpolation_13deg()                     # original
+plot_validation_simulation_vs_interpolation_13deg_restricted()         # NEW: both restricted
+
 plot_chavarria_vs_simulation_specific_angle(10)
 
 print_summary_tables(tyvek_results)
@@ -1612,4 +1423,3 @@ print("="*70)
 
 sys.stdout = sys.__stdout__
 _log_file.close()
-
